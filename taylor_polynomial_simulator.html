@@ -1,0 +1,2533 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Taylor Polynomial Simulator</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Oswald:wght@400;500;600&family=Ubuntu:wght@400;500;700&display=swap">
+<style id="katex-style">.katex{font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;text-indent:0;text-rendering:auto}.katex *{-ms-high-contrast-adjust:none!important;border-color:currentColor}.katex .katex-version:after{content:"0.16.11"}.katex .katex-mathml{clip:rect(1px,1px,1px,1px);border:0;height:1px;overflow:hidden;padding:0;position:absolute;width:1px}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathnormal{font-family:KaTeX_Math;font-style:italic}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-style:italic;font-weight:700}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathboldfrak,.katex .textboldfrak{font-family:KaTeX_Fraktur;font-weight:700}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{border-collapse:collapse;display:inline-table;table-layout:fixed}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;position:relative;vertical-align:bottom}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;font-size:1px;min-width:2px;vertical-align:bottom;width:2px}.katex .vbox{align-items:baseline;display:inline-flex;flex-direction:column}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{max-width:0;width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .clap,.katex .llap,.katex .rlap{position:relative;width:0}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{border:0 solid;display:inline-block;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline{border-bottom-style:dashed;display:inline-block;width:100%}.katex .sqrt>.root{margin-left:.2777777778em;margin-right:-.5555555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.1666666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.3333333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.6666666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.4566666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.1466666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.7142857143em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.8571428571em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.1428571429em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.2857142857em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.4285714286em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.7142857143em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.0571428571em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.4685714286em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.9628571429em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.5542857143em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.5555555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.6666666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.7777777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.8888888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.1111111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.3333333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.3044444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.7644444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.4166666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.5833333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.6666666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.7283333333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.0733333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.3472222222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.4166666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.4861111111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.5555555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.6944444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.4402777778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.7277777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.2893518519em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.3472222222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.4050925926em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.462962963em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.5208333333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.6944444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.2002314815em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.4398148148em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.2410800386em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.2892960463em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.337512054em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.3857280617em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.4339440694em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.4821600771em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.5785920926em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.6943105111em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.8331726133em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.1996142719em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.2009646302em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.2411575563em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.2813504823em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.3215434084em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.3617363344em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.4019292605em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.4823151125em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.578778135em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.6945337621em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.8336012862em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{fill:currentColor;stroke:currentColor;fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:block;height:inherit;position:absolute;width:100%}.katex svg path{stroke:none}.katex img{border-style:none;max-height:none;max-width:none;min-height:0;min-width:0}.katex .stretchy{display:block;overflow:hidden;position:relative;width:100%}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{overflow:hidden;position:relative;width:100%}.katex .halfarrow-left{left:0;overflow:hidden;position:absolute;width:50.2%}.katex .halfarrow-right{overflow:hidden;position:absolute;right:0;width:50.2%}.katex .brace-left{left:0;overflow:hidden;position:absolute;width:25.1%}.katex .brace-center{left:25%;overflow:hidden;position:absolute;width:50%}.katex .brace-right{overflow:hidden;position:absolute;right:0;width:25.1%}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{border:.04em solid;box-sizing:border-box}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{border-right:.049em solid;border-top:.049em solid;box-sizing:border-box;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{content:"(" counter(katexEqnNo) ")";counter-increment:katexEqnNo}.katex .mml-eqn-num:before{content:"(" counter(mmlEqnNo) ")";counter-increment:mmlEqnNo}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;left:calc(50% + .3em);position:absolute;text-align:right}.katex-display{display:block;margin:1em 0;text-align:center}.katex-display>.katex{display:block;text-align:center;white-space:nowrap}.katex-display>.katex>.katex-html{display:block;position:relative}.katex-display>.katex>.katex-html>.tag{position:absolute;right:0}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{padding-left:2em;text-align:left}body{counter-reset:katexEqnNo mmlEqnNo}
+</style>
+<style>
+/* ------------------------------------------------------------------
+   Taylor polynomial workbench.
+   Layout: ink control rail (344px) + cream analysis canvas.
+   Type: Oswald display / Ubuntu body / JetBrains Mono numbers.
+   ------------------------------------------------------------------ */
+:root {
+  --bg: #EDEADE;
+  --surface: #F7F5EC;
+  --surface-2: #FFFDF6;
+  --ink: #0A1F1E;
+  --ink-soft: #3C5350;
+  --muted: #5B6C68;
+  --line: #D6D2C3;
+  --line-strong: #B7B09C;
+  --primary: #072C2C;
+  --accent: #E85400;
+  --accent-soft: #FFE3D2;
+  --rail-bg: #072C2C;
+  --rail-ink: #F1EEE4;
+  --rail-muted: #A9BCB8;
+  --rail-line: #1E4744;
+  --rail-input: #0D3A37;
+  --danger: #B42318;
+  --series-f: #2A78D6;
+  --series-p: #EB6834;
+  --series-r: #6250D6;
+  --grid: #E2DED0;
+  --axis: #8E8977;
+  --shadow: 0 1px 0 rgba(10, 31, 30, .05), 0 18px 44px -30px rgba(10, 31, 30, .5);
+  --radius: 16px;
+  --font-display: "Oswald", "Ubuntu Condensed", "Arial Narrow", sans-serif;
+  --font-body: "Ubuntu", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "Ubuntu Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #061B1A;
+    --surface: #0A2725;
+    --surface-2: #0C302D;
+    --ink: #EFEDE3;
+    --ink-soft: #C3D1CD;
+    --muted: #98ADA9;
+    --line: #1D4642;
+    --line-strong: #30605A;
+    --primary: #EFEDE3;
+    --accent: #FF7A33;
+    --accent-soft: #3A1B0A;
+    --rail-bg: #03110F;
+    --rail-ink: #F1EEE4;
+    --rail-muted: #9DB3AF;
+    --rail-line: #173B37;
+    --rail-input: #0A2A27;
+    --danger: #F97066;
+    --series-f: #3987E5;
+    --series-p: #D95926;
+    --series-r: #9085E9;
+    --grid: #123A36;
+    --axis: #6F8A85;
+    --shadow: 0 1px 0 rgba(0, 0, 0, .35), 0 22px 50px -30px rgba(0, 0, 0, .85);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #061B1A;
+  --surface: #0A2725;
+  --surface-2: #0C302D;
+  --ink: #EFEDE3;
+  --ink-soft: #C3D1CD;
+  --muted: #98ADA9;
+  --line: #1D4642;
+  --line-strong: #30605A;
+  --primary: #EFEDE3;
+  --accent: #FF7A33;
+  --accent-soft: #3A1B0A;
+  --rail-bg: #03110F;
+  --rail-ink: #F1EEE4;
+  --rail-muted: #9DB3AF;
+  --rail-line: #173B37;
+  --rail-input: #0A2A27;
+  --danger: #F97066;
+  --series-f: #3987E5;
+  --series-p: #D95926;
+  --series-r: #9085E9;
+  --grid: #123A36;
+  --axis: #6F8A85;
+  --shadow: 0 1px 0 rgba(0, 0, 0, .35), 0 22px 50px -30px rgba(0, 0, 0, .85);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 26px;
+}
+::selection { background: var(--accent); color: #FFF; }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ---------- Masthead ---------- */
+.masthead {
+  max-width: 1560px;
+  margin: 0 auto;
+  min-height: 66px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+  padding-block: 12px;
+}
+.brand { display: flex; align-items: center; gap: 11px; margin-right: auto; min-width: 0; }
+.brand-mark {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: var(--primary); color: var(--bg);
+  display: grid; place-items: center; flex: none;
+  font-family: var(--font-display); font-size: 19px; font-weight: 500;
+  letter-spacing: .01em;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .brand-mark { background: var(--accent); color: #180700; }
+}
+:root[data-theme="dark"] .brand-mark { background: var(--accent); color: #180700; }
+.brand-copy { display: grid; line-height: 1.15; min-width: 0; }
+.brand-name {
+  font-family: var(--font-display); font-weight: 600; font-size: 17px;
+  letter-spacing: .08em; text-transform: uppercase;
+}
+.brand-sub {
+  font-family: var(--font-mono); font-size: 9.5px;
+  letter-spacing: .11em; text-transform: uppercase; color: var(--muted);
+}
+.masthead-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  min-height: 30px; padding: 4px 10px;
+  border: 1px solid var(--line); border-radius: 999px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--ink-soft);
+  background: var(--surface-2); text-decoration: none; white-space: nowrap;
+}
+.chip .pip { width: 6px; height: 6px; border-radius: 50%; background: var(--series-f); flex: none; }
+a.chip:hover { border-color: var(--accent); color: var(--accent); }
+.icon-btn {
+  appearance: none; display: grid; place-items: center;
+  width: 32px; height: 32px; flex: none;
+  border: 1px solid var(--line); border-radius: 999px;
+  background: var(--surface-2); color: var(--ink-soft); cursor: pointer;
+}
+.icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+.icon-btn:active { transform: translateY(1px); }
+.icon-btn svg { width: 15px; height: 15px; }
+
+/* ---------- Shell ---------- */
+.shell {
+  max-width: 1560px; margin: 0 auto;
+  display: grid; grid-template-columns: 344px minmax(0, 1fr);
+  gap: 26px; align-items: start; padding-top: 24px;
+}
+
+/* ---------- Control rail ---------- */
+.panel {
+  position: sticky; top: 18px;
+  background: var(--rail-bg); color: var(--rail-ink);
+  border-radius: 20px; padding: 20px;
+  box-shadow: var(--shadow);
+  display: grid; gap: 20px;
+}
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--rail-line);
+}
+.panel-title {
+  margin: 0; font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  letter-spacing: .16em; text-transform: uppercase; color: var(--rail-muted);
+}
+.ghost-btn {
+  appearance: none; background: transparent;
+  border: 1px solid var(--rail-line); border-radius: 7px;
+  padding: 4px 9px; min-height: 30px;
+  color: var(--rail-muted); font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: .06em; text-transform: uppercase; cursor: pointer;
+}
+.ghost-btn:hover { color: var(--rail-ink); border-color: var(--accent); }
+.ghost-btn:active { transform: translateY(1px); }
+
+.field { display: grid; gap: 8px; min-width: 0; border: 0; padding: 0; margin: 0; }
+.field-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.field label, .field legend {
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  letter-spacing: .11em; text-transform: uppercase; color: var(--rail-muted); padding: 0;
+}
+.field-hint { margin: 0; font-size: 11.5px; color: var(--rail-muted); line-height: 1.45; }
+.field-hint.error { color: #FFB3A6; }
+.value-pill {
+  font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+  font-size: 11px; color: var(--rail-ink); background: var(--rail-input);
+  border: 1px solid var(--rail-line); border-radius: 6px;
+  padding: 2px 7px; white-space: nowrap;
+}
+.select-wrap { position: relative; }
+.select-wrap::after {
+  content: ""; position: absolute; right: 14px; top: 50%;
+  width: 7px; height: 7px;
+  border-right: 1.5px solid var(--rail-muted); border-bottom: 1.5px solid var(--rail-muted);
+  transform: translateY(-70%) rotate(45deg); pointer-events: none;
+}
+.select-wrap select {
+  appearance: none; -webkit-appearance: none; width: 100%; min-height: 42px;
+  padding: 10px 34px 10px 12px;
+  border: 1px solid var(--rail-line); border-radius: 10px;
+  background: var(--rail-input); color: var(--rail-ink);
+  font-family: var(--font-mono); font-size: 13px; cursor: pointer;
+}
+.select-wrap select:hover { border-color: #3C6B66; }
+
+.input {
+  width: 100%; min-height: 42px; padding: 9px 11px;
+  border: 1px solid var(--rail-line); border-radius: 10px;
+  background: var(--rail-input); color: var(--rail-ink);
+  font-family: var(--font-mono); font-size: 13px; font-variant-numeric: tabular-nums;
+}
+.input::placeholder { color: #7E9995; }
+.input:hover { border-color: #3C6B66; }
+.input.bad { border-color: #FF8A76; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+.interval-row {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  align-items: center; gap: 7px;
+}
+.interval-row .arrow { color: var(--rail-muted); font-family: var(--font-mono); font-size: 12px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip-btn {
+  appearance: none; border: 1px solid var(--rail-line); background: transparent;
+  color: var(--rail-muted); border-radius: 7px; min-height: 30px; padding: 4px 9px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: .02em; cursor: pointer;
+}
+.chip-btn:hover { color: var(--rail-ink); border-color: var(--accent); }
+.chip-btn:active { transform: translateY(1px); }
+
+.range {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 30px; background: transparent; cursor: pointer; margin: 0;
+}
+.range::-webkit-slider-runnable-track {
+  height: 4px; border-radius: 999px;
+  background: linear-gradient(to right, var(--accent) 0%, var(--accent) var(--fill, 0%),
+              var(--rail-line) var(--fill, 0%), var(--rail-line) 100%);
+}
+.range::-moz-range-track { height: 4px; border-radius: 999px; background: var(--rail-line); }
+.range::-moz-range-progress { height: 4px; border-radius: 999px; background: var(--accent); }
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 20px; height: 20px; margin-top: -8px;
+  border-radius: 50%; background: var(--rail-ink);
+  border: 3px solid var(--accent); box-shadow: 0 2px 6px rgba(0,0,0,.35);
+}
+.range::-moz-range-thumb {
+  width: 15px; height: 15px; border-radius: 50%;
+  background: var(--rail-ink); border: 3px solid var(--accent);
+}
+.range:focus-visible { outline: none; }
+.range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(232, 84, 0, .35); }
+.range:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4px rgba(232, 84, 0, .35); }
+.ticks {
+  display: flex; justify-content: space-between;
+  font-family: var(--font-mono); font-size: 9px; color: var(--rail-muted);
+  letter-spacing: .04em; padding-inline: 3px; margin-top: -5px;
+}
+
+.panel-note {
+  border-top: 1px solid var(--rail-line); padding-top: 14px;
+  font-size: 11.5px; line-height: 1.55; color: var(--rail-muted);
+}
+.panel-note b { color: var(--rail-ink); font-weight: 500; font-family: var(--font-mono); font-size: 11px; }
+.panel-note code {
+  font-family: var(--font-mono); font-size: 11px; color: var(--rail-ink);
+  background: var(--rail-input); border-radius: 4px; padding: 1px 5px;
+}
+
+/* ---------- Main ---------- */
+.main { min-width: 0; display: grid; gap: 18px; }
+.hero {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 24px; flex-wrap: wrap; padding-bottom: 2px;
+}
+.eyebrow {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  letter-spacing: .15em; text-transform: uppercase; color: var(--accent);
+  margin-bottom: 8px;
+}
+.eyebrow::before { content: ""; width: 22px; height: 2px; background: var(--accent); flex: none; }
+h1 {
+  margin: 0; font-family: var(--font-display); font-weight: 500;
+  font-size: clamp(30px, 3.4vw, 44px); line-height: 1.02;
+  letter-spacing: .005em; text-transform: uppercase; text-wrap: balance;
+}
+.hero p { margin: 9px 0 0; max-width: 58ch; color: var(--ink-soft); font-size: 14px; }
+/* ---------- Stat strip ---------- */
+.stats {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
+}
+.stat { padding: 13px 16px 12px; min-width: 0; display: grid; gap: 2px; }
+.stat + .stat { border-left: 1px solid var(--line); }
+.stat-label {
+  font-family: var(--font-mono); font-size: 9px; font-weight: 600;
+  letter-spacing: .11em; text-transform: uppercase; color: var(--muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.stat-value {
+  font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+  font-size: clamp(17px, 1.6vw, 21px); font-weight: 500;
+  letter-spacing: -.02em; color: var(--ink); white-space: nowrap;
+}
+.stat-value .unit { font-size: 10.5px; font-weight: 400; color: var(--muted); letter-spacing: 0; }
+.stat-sub {
+  font-family: var(--font-mono); font-size: 9.5px; color: var(--muted);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.stat:first-child { background: var(--primary); }
+.stat:first-child .stat-label { color: rgba(237, 234, 222, .66); }
+.stat:first-child .stat-value { color: var(--bg); }
+.stat:first-child .stat-sub { color: rgba(237, 234, 222, .66); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .stat:first-child { background: var(--accent); }
+  :root:not([data-theme="light"]) .stat:first-child .stat-label,
+  :root:not([data-theme="light"]) .stat:first-child .stat-sub { color: rgba(26, 8, 0, .72); }
+  :root:not([data-theme="light"]) .stat:first-child .stat-value { color: #1A0800; }
+}
+:root[data-theme="dark"] .stat:first-child { background: var(--accent); }
+:root[data-theme="dark"] .stat:first-child .stat-label,
+:root[data-theme="dark"] .stat:first-child .stat-sub { color: rgba(26, 8, 0, .72); }
+:root[data-theme="dark"] .stat:first-child .stat-value { color: #1A0800; }
+
+/* ---------- Chart cards ---------- */
+.charts {
+  display: grid;
+  grid-template-columns: minmax(0, 1.24fr) minmax(0, 1fr);
+  gap: 18px; align-items: stretch;
+}
+.chart-card {
+  background: var(--surface-2);
+  height: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 15px 15px 11px;
+  min-width: 0; box-shadow: var(--shadow);
+  display: flex; flex-direction: column; gap: 8px;
+}
+.chart-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-wrap: wrap; min-width: 0;
+}
+.chart-head .legend { margin-left: auto; }
+.chart-title {
+  margin: 0; font-family: var(--font-display); font-weight: 500;
+  font-size: 15.5px; letter-spacing: .04em; text-transform: uppercase;
+  color: var(--ink); white-space: nowrap;
+}
+.chart-title .idx {
+  font-family: var(--font-mono); font-size: 9.5px; font-weight: 500;
+  letter-spacing: .06em; color: var(--accent); margin-right: 7px;
+  vertical-align: 2px;
+}
+.legend {
+  display: flex; align-items: center; gap: 11px; flex-wrap: wrap;
+  font-family: var(--font-mono); font-size: 9.5px; color: var(--ink-soft);
+}
+.legend span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; color: var(--ink-soft); }
+.swatch { width: 13px; height: 4px; border-radius: 999px; flex: none; background: currentColor; }
+.swatch.dot { width: 8px; height: 8px; border-radius: 50%; background: transparent; border: 2px solid currentColor; }
+.swatch.dashed { height: 0; border-top: 2px dashed currentColor; background: transparent; border-radius: 0; }
+.swatch.band { width: 13px; height: 8px; border-radius: 2px; opacity: .28; }
+.s-f { color: var(--series-f); }
+.s-p { color: var(--series-p); }
+.s-r { color: var(--series-r); }
+.s-muted { color: var(--muted); }
+.legend .swatch { color: inherit; }
+.legend .swatch.s-f { color: var(--series-f); }
+.legend .swatch.s-p { color: var(--series-p); }
+.legend .swatch.s-r { color: var(--series-r); }
+.legend .swatch.s-muted { color: var(--muted); }
+.log-btn { min-height: 26px; padding: 2px 8px; border-color: var(--line-strong); color: var(--ink-soft); background: var(--surface-2); }
+.log-btn:hover { border-color: var(--accent); color: var(--accent); }
+.log-btn[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--surface-2); }
+
+.plot { position: relative; height: 322px; min-width: 0; }
+.plot canvas { display: block; width: 100%; height: 100%; touch-action: pan-y; }
+.plot:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
+
+.chart-tip {
+  position: absolute; z-index: 4; min-width: 158px;
+  padding: 8px 10px; border-radius: 9px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface-2); color: var(--ink);
+  box-shadow: 0 14px 30px -14px rgba(0,0,0,.4);
+  font-family: var(--font-mono); font-size: 10.5px; line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none; opacity: 0; transform: translateY(3px);
+  transition: opacity .1s ease, transform .1s ease;
+}
+.chart-tip.on { opacity: 1; transform: translateY(0); }
+.chart-tip .tip-x {
+  color: var(--muted); letter-spacing: .04em; margin-bottom: 4px;
+  border-bottom: 1px solid var(--line); padding-bottom: 3px;
+}
+.chart-tip .tip-row { display: flex; justify-content: space-between; gap: 16px; }
+.chart-tip .tip-row i { font-style: normal; color: var(--muted); }
+.chart-tip .tip-row b { font-weight: 500; }
+
+.chart-foot {
+  margin-top: auto;
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 14px; flex-wrap: wrap;
+  font-family: var(--font-mono); font-size: 9.5px; color: var(--muted);
+  border-top: 1px solid var(--line); padding-top: 8px; min-height: 26px;
+  font-variant-numeric: tabular-nums;
+}
+.chart-foot b { font-weight: 500; color: var(--ink-soft); }
+.chart-foot .ok { color: var(--ink-soft); }
+
+/* ---------- Expansion card ---------- */
+.expansion {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden; box-shadow: var(--shadow); min-width: 0;
+}
+.expansion-pane { padding: 17px 18px 18px; min-width: 0; }
+.expansion-pane + .expansion-pane { border-left: 1px solid var(--line); background: var(--surface); }
+.pane-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 11px;
+}
+.pane-title {
+  margin: 0; font-family: var(--font-display); font-weight: 500;
+  font-size: 15.5px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink);
+}
+.pane-title .idx {
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .06em;
+  color: var(--accent); margin-right: 7px; vertical-align: 2px;
+}
+.pane-meta { font-family: var(--font-mono); font-size: 9.5px; color: var(--muted); letter-spacing: .03em; }
+.pane-actions { display: flex; gap: 6px; flex: none; }
+.copy-btn {
+  appearance: none; border: 1px solid var(--line); background: transparent;
+  border-radius: 7px; min-height: 30px; padding: 3px 9px;
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--muted); cursor: pointer; white-space: nowrap;
+}
+.copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+.copy-btn:active { transform: translateY(1px); }
+
+.formula {
+  border: 1px solid var(--line); background: var(--bg);
+  border-radius: 10px; padding: 13px 10px;
+  overflow-x: auto; overflow-y: hidden; scrollbar-width: thin;
+}
+.formula .katex-display { margin: .1em 0; }
+.math-mono { color: var(--ink); }
+.math-mono .katex, .math-mono .katex * {
+  font-family: var(--font-mono) !important;
+  letter-spacing: -.02em;
+}
+.math-mono .katex { font-size: clamp(13.5px, 1.05vw, 16.5px); line-height: 1.55; }
+.series-note { margin: 10px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--muted); }
+.series-note b, .series-note code {
+  font-family: var(--font-mono); font-weight: 500; font-size: 11px; color: var(--ink-soft);
+}
+.series-note code { background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
+
+.formula-error { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+.frac {
+  display: inline-flex; flex-direction: column; align-items: center;
+  vertical-align: -0.42em; line-height: 1.05; margin-right: 2px;
+  font-size: 10px;
+}
+.frac .num { border-bottom: 1px solid var(--line-strong); padding: 0 3px 1px; }
+.frac .den { padding: 1px 3px 0; color: var(--muted); }
+.ledger-scroll { overflow-x: auto; scrollbar-width: thin; }
+table.ledger {
+  width: 100%; border-collapse: collapse;
+  font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 11px;
+}
+table.ledger th {
+  text-align: right; font-size: 8.5px; font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--muted);
+  padding: 5px 7px; border-bottom: 1px solid var(--line-strong); white-space: nowrap;
+}
+table.ledger th:first-child, table.ledger td:first-child { text-align: left; }
+table.ledger th.l, table.ledger td.l { text-align: left; }
+table.ledger td {
+  padding: 4.5px 7px; border-bottom: 1px solid var(--line);
+  color: var(--ink-soft); white-space: nowrap;
+}
+table.ledger tr:last-child td { border-bottom: 0; }
+table.ledger td.k { color: var(--ink); font-weight: 500; }
+table.ledger td.zero { color: var(--muted); }
+table.ledger tbody tr:hover td { background: var(--bg); }
+table.ledger .term {
+  font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-soft);
+}
+.ledger-foot {
+  display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  margin-top: 8px; font-family: var(--font-mono); font-size: 9.5px; color: var(--muted);
+}
+.ledger-foot b { color: var(--ink-soft); font-weight: 500; font-variant-numeric: tabular-nums; }
+
+/* ---------- Footer ---------- */
+.foot {
+  max-width: 1560px; margin: 20px auto 0;
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 14px; flex-wrap: wrap;
+  border-top: 1px solid var(--line); padding-top: 12px;
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .05em;
+  text-transform: uppercase; color: var(--muted);
+}
+.foot a { color: var(--ink-soft); text-decoration: none; border-bottom: 1px solid var(--line-strong); }
+.foot a:hover { color: var(--accent); border-color: var(--accent); }
+.foot .formula-ref { text-transform: none; letter-spacing: .01em; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1220px) {
+  .shell { grid-template-columns: 312px minmax(0, 1fr); gap: 20px; }
+  .charts { grid-template-columns: 1fr; }
+  .plot { height: 300px; }
+}
+@media (max-width: 960px) {
+  .shell { grid-template-columns: 1fr; padding-top: 18px; }
+  .panel { position: static; }
+  .expansion { grid-template-columns: 1fr; }
+  .expansion-pane + .expansion-pane { border-left: 0; border-top: 1px solid var(--line); }
+  .hero { align-items: flex-start; }
+}
+@media (max-width: 720px) {
+  body { font-size: 14px; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .stat { padding: 11px 13px 10px; }
+  .stat:nth-child(3) { border-left: 0; }
+  .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .stat-value { font-size: 18px; }
+  .masthead-meta .chip.optional { display: none; }
+  .chart-card { padding: 13px 12px 10px; }
+  .plot { height: 246px; }
+  .chart-title { font-size: 14px; }
+  .expansion-pane { padding: 14px 13px 15px; }
+}
+@media (max-width: 430px) {
+  .brand-sub { display: none; }
+  .brand-name { font-size: 15px; }
+  .masthead { min-height: 58px; }
+  .panel { padding: 16px; border-radius: 16px; }
+  h1 { font-size: 28px; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .legend { gap: 8px; font-size: 9px; }
+  .plot { height: 224px; }
+  .foot { flex-direction: column; gap: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <div class="brand-mark" aria-hidden="true"><span>x<sup>n</sup></span></div>
+    <div class="brand-copy">
+      <span class="brand-name">Taylor Lab</span>
+      <span class="brand-sub">Approximation workbench</span>
+    </div>
+  </div>
+  <div class="masthead-meta">
+    <span class="chip optional"><span class="pip" aria-hidden="true"></span>math.js · KaTeX</span>
+    <a class="chip" id="creditLink" href="https://github.com/alanngh/MATH_lab/tree/main" target="_blank" rel="noopener">Nilton Garcia Hilares</a>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Switch color theme" title="Switch color theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.2"></circle>
+        <path d="M12 2.5v2.2M12 19.3v2.2M4.3 4.3l1.6 1.6M18.1 18.1l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.3 19.7l1.6-1.6M18.1 5.9l1.6-1.6"></path>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="panel" aria-labelledby="panelTitle">
+    <div class="panel-head">
+      <h2 class="panel-title" id="panelTitle">Controls</h2>
+      <button class="ghost-btn" id="resetBtn" type="button">Reset</button>
+    </div>
+
+    <div class="field">
+      <div class="field-row">
+        <label for="fnSelect">Function f(x)</label>
+        <span class="value-pill" id="fnTag">built-in</span>
+      </div>
+      <div class="select-wrap">
+        <select id="fnSelect">
+          <option value="sin">sin(x)</option>
+          <option value="cos">cos(x)</option>
+          <option value="exp">eˣ</option>
+          <option value="log1p">ln(1+x)</option>
+          <option value="geom">1/(1−x)</option>
+          <option value="atan">atan(x)</option>
+          <option value="sqrt1p">√(1+x)</option>
+          <option value="tan">tan(x)</option>
+          <option value="custom">Custom expression…</option>
+        </select>
+      </div>
+      <input class="input" id="exprInput" aria-label="Function expression in math.js syntax" spellcheck="false" autocomplete="off" value="sin(x)">
+      <p class="field-hint" id="fnHint">Sine series: every derivative is bounded, so the remainder shrinks on the whole real line.</p>
+    </div>
+
+    <div class="field">
+      <div class="field-row">
+        <label for="centerInput">Center a</label>
+        <span class="value-pill" id="centerPill">0</span>
+      </div>
+      <input class="input" id="centerInput" type="number" step="0.25" value="0" inputmode="decimal">
+      <div class="chips" id="centerChips" role="group" aria-label="Center presets">
+        <button class="chip-btn" type="button" data-center="-1">−1</button>
+        <button class="chip-btn" type="button" data-center="0">0</button>
+        <button class="chip-btn" type="button" data-center="1">1</button>
+        <button class="chip-btn" type="button" data-center="1.5707963268">π/2</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-row">
+        <label for="degreeRange">Degree n</label>
+        <span class="value-pill" id="degreePill">n = 4</span>
+      </div>
+      <input class="range" id="degreeRange" type="range" min="0" max="12" step="1" value="4">
+      <div class="ticks" aria-hidden="true"><span>0</span><span>3</span><span>6</span><span>9</span><span>12</span></div>
+    </div>
+
+    <div class="field">
+      <div class="field-row">
+        <label for="x0Input">Interval</label>
+        <button class="ghost-btn" id="fitBtn" type="button" title="Center the interval on a">Fit to a</button>
+      </div>
+      <div class="interval-row">
+        <input class="input" id="x0Input" type="number" step="0.5" value="-4" inputmode="decimal" aria-label="Interval start">
+        <span class="arrow" aria-hidden="true">→</span>
+        <input class="input" id="x1Input" type="number" step="0.5" value="4" inputmode="decimal" aria-label="Interval end">
+      </div>
+      <p class="field-hint" id="intervalHint">Both plots and every readout use this window.</p>
+    </div>
+
+    <p class="panel-note">
+      The remainder is <b>Rₙ(x) = f(x) − Pₙ(x)</b>. Its chart plots <code>|Rₙ(x)|</code> on its own axis so small errors stay readable next to the function plot.
+    </p>
+  </aside>
+
+  <main class="main">
+    <div class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">Series expansion · degree 0–12</div>
+        <h1>Taylor polynomial<br>simulator</h1>
+        <p>Move the center and degree to watch a polynomial lock onto a function. The second plot isolates what is left over.</p>
+      </div>
+    </div>
+
+    <section class="stats" aria-label="Series summary">
+      <div class="stat">
+        <span class="stat-label">Expansion center</span>
+        <span class="stat-value" id="statA">a = 0</span>
+        <span class="stat-sub" id="statAFoot">f(a) = 0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Degree</span>
+        <span class="stat-value" id="statN">n = 4</span>
+        <span class="stat-sub" id="statNFoot">13 coefficients shown</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Max remainder</span>
+        <span class="stat-value" id="statErr">—</span>
+        <span class="stat-sub" id="statErrFoot">on the view window</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Radius of convergence</span>
+        <span class="stat-value" id="statR">∞</span>
+        <span class="stat-sub" id="statRFoot">about this center</span>
+      </div>
+    </section>
+
+    <div class="charts">
+      <section class="chart-card" aria-labelledby="chart1Title">
+        <div class="chart-head">
+          <h2 class="chart-title" id="chart1Title"><span class="idx">01</span>Function vs. polynomial</h2>
+          <div class="legend">
+            <span><i class="swatch s-f"></i>f(x)</span>
+            <span><i class="swatch dashed s-p"></i>Pₙ(x)</span>
+            <span><i class="swatch dot s-muted"></i>center</span>
+          </div>
+        </div>
+        <div class="plot" id="plot1Wrap" tabindex="0" role="img" aria-label="Line chart comparing the function and its Taylor polynomial on the chosen interval">
+          <canvas id="plot1"></canvas>
+          <div class="chart-tip" id="tip1" role="status" aria-live="polite" aria-hidden="true"></div>
+        </div>
+        <div class="chart-foot">
+          <span>f at right edge <b id="footF1">—</b></span>
+          <span>Pₙ at right edge <b id="footP1">—</b></span>
+        </div>
+      </section>
+
+      <section class="chart-card" aria-labelledby="chart2Title">
+        <div class="chart-head">
+          <h2 class="chart-title" id="chart2Title"><span class="idx">02</span>Remainder</h2>
+          <div class="legend">
+            <span><i class="swatch s-r"></i>|Rₙ(x)|</span>
+            <button class="ghost-btn log-btn" id="scaleBtn" type="button" aria-pressed="false" title="Toggle logarithmic error scale">log</button>
+          </div>
+        </div>
+        <div class="plot" id="plot2Wrap" tabindex="0" role="img" aria-label="Line chart of the absolute remainder on its own axis">
+          <canvas id="plot2"></canvas>
+          <div class="chart-tip" id="tip2" role="status" aria-live="polite" aria-hidden="true"></div>
+        </div>
+        <div class="chart-foot">
+          <span>peak <b id="footPeak">—</b></span>
+          <span>at x = <b id="footPeakX">—</b></span>
+        </div>
+      </section>
+    </div>
+
+    <section class="expansion" aria-label="Polynomial expansion and coefficients">
+      <div class="expansion-pane">
+        <div class="pane-head">
+          <h2 class="pane-title"><span class="idx">03</span>Expansion</h2>
+          <div class="pane-actions">
+            <button class="copy-btn" id="copyTexBtn" type="button">Copy LaTeX</button>
+          </div>
+        </div>
+        <div class="formula math-mono" id="formula" aria-live="polite"></div>
+        <p class="series-note" id="seriesNote">Loading the expansion…</p>
+      </div>
+      <div class="expansion-pane">
+        <div class="pane-head">
+          <h2 class="pane-title"><span class="idx">04</span>Coefficients</h2>
+          <span class="pane-meta" id="ledgerMeta">k = 0 … 4</span>
+        </div>
+        <div class="ledger-scroll">
+          <table class="ledger">
+            <caption class="sr-only">Taylor coefficients at the expansion center</caption>
+            <thead>
+              <tr>
+                <th scope="col">k</th>
+                <th scope="col">f⁽ᵏ⁾(a)</th>
+                <th scope="col">cₖ</th>
+                <th scope="col" class="l">term</th>
+              </tr>
+            </thead>
+            <tbody id="ledgerBody"></tbody>
+          </table>
+        </div>
+        <div class="ledger-foot">
+          <span>Σ|cₖ| <b id="ledgerSum">—</b></span>
+          <span>nonzero <b id="ledgerNonzero">—</b></span>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer class="foot">
+  <span>Taylor Series Simulator by <a href="https://github.com/alanngh/MATH_lab/tree/main" target="_blank" rel="noopener">Nilton Garcia Hilares</a></span>
+  <span class="formula-ref">Pₙ(x) = Σ<sub>k=0</sub><sup>n</sup> f⁽ᵏ⁾(a)·(x−a)<sup>k</sup> / k!</span>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.2/lib/browser/math.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var $ = function (sel, root) { return (root || document).querySelector(sel); };
+  var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
+
+  /* ---------------- presets & copy ---------------- */
+
+  var PRESETS = {
+    sin: {
+      expr: "sin(x)",
+      label: "sin(x)",
+      hint: "All derivatives of sine stay bounded by 1, so the remainder shrinks across the whole real line.",
+      radius: function () { return Infinity; }
+    },
+    cos: {
+      expr: "cos(x)",
+      label: "cos(x)",
+      hint: "Cosine expands in even powers only; its derivatives never exceed 1 in magnitude.",
+      radius: function () { return Infinity; }
+    },
+    exp: {
+      expr: "exp(x)",
+      label: "eˣ",
+      hint: "Every derivative of eˣ equals eˣ, so the coefficients are 1/k! and the radius is infinite.",
+      radius: function () { return Infinity; }
+    },
+    log1p: {
+      expr: "log(1+x)",
+      label: "ln(1+x)",
+      hint: "The logarithm has a branch point at x = −1, so the series stops converging there.",
+      radius: function (a) { return Math.abs(1 + a); }
+    },
+    geom: {
+      expr: "1/(1-x)",
+      label: "1/(1−x)",
+      hint: "The geometric series sums xᵏ and converges only inside |x − a| < |1 − a|.",
+      radius: function (a) { return Math.abs(1 - a); }
+    },
+    atan: {
+      expr: "atan(x)",
+      label: "atan(x)",
+      hint: "Arctangent's coefficients decay like 1/k; the series converges inside the unit circle about every center.",
+      radius: function (a) { return Math.sqrt(1 + a * a); }
+    },
+    sqrt1p: {
+      expr: "sqrt(1+x)",
+      label: "√(1+x)",
+      hint: "The square root has a branch point at x = −1, so the radius is the distance from a to −1.",
+      radius: function (a) { return Math.abs(1 + a); }
+    },
+    tan: {
+      expr: "tan(x)",
+      label: "tan(x)",
+      hint: "Tangent blows up at ±π/2, ±3π/2, …; the nearest pole sets the radius.",
+      radius: function (a) { return nearestPole(a); }
+    },
+    custom: {
+      expr: "",
+      label: "Custom expression",
+      hint: "Any math.js expression in x. Derivatives are taken symbolically up to the chosen degree.",
+      radius: null
+    }
+  };
+
+  var KNOWN_EXPR = {
+    "sin(x)": "sin",
+    "cos(x)": "cos",
+    "exp(x)": "exp",
+    "e^x": "exp",
+    "log(1+x)": "log1p",
+    "ln(1+x)": "log1p",
+    "1/(1-x)": "geom",
+    "1/(1\u2212x)": "geom",
+    "atan(x)": "atan",
+    "arctan(x)": "atan",
+    "sqrt(1+x)": "sqrt1p",
+    "tan(x)": "tan"
+  };
+
+  function knownPreset(expr) {
+    var key = expr.replace(/\s+/g, "").replace(/\u2212/g, "-").toLowerCase();
+    return KNOWN_EXPR[key] || null;
+  }
+
+  function nearestPole(a) {
+    var k = Math.round(a / Math.PI - 0.5);
+    var best = Infinity;
+    for (var j = k - 2; j <= k + 2; j++) {
+      var p = Math.PI / 2 + j * Math.PI;
+      best = Math.min(best, Math.abs(a - p));
+    }
+    return best;
+  }
+
+  var DEFAULTS = {
+    preset: "sin",
+    expr: "sin(x)",
+    a: 0,
+    n: 4,
+    x0: -4,
+    x1: 4,
+    log: false
+  };
+
+  var state = {
+    preset: DEFAULTS.preset,
+    expr: DEFAULTS.expr,
+    a: DEFAULTS.a,
+    n: DEFAULTS.n,
+    x0: DEFAULTS.x0,
+    x1: DEFAULTS.x1,
+    logScale: DEFAULTS.log,
+    formulaTex: "",
+    samples: [],
+    derived: null,
+    error: null,
+    hover1: null,
+    hover2: null
+  };
+
+  /* ---------------- storage (optional) ---------------- */
+
+  var store = {
+    get: function (key) {
+      try { return window.localStorage.getItem(key); } catch (e) { return null; }
+    },
+    set: function (key, value) {
+      try { window.localStorage.setItem(key, value); } catch (e) { /* private mode */ }
+    }
+  };
+
+  /* ---------------- number formatting ---------------- */
+
+  var MINUS = "−";
+
+  function tidy(v, sig) {
+    sig = sig || 4;
+    if (!Number.isFinite(v)) return "—";
+    if (v === 0) return "0";
+    var abs = Math.abs(v);
+    if (abs >= 1e5 || abs < 1e-3) return v.toExponential(Math.max(1, sig - 1)).replace("e+", "e").replace("e-", "e" + MINUS);
+    var s = String(Number(v.toPrecision(sig)));
+    return s.replace("-", MINUS);
+  }
+
+  function tidyAscii(v, sig) {
+    return tidy(v, sig).replace(new RegExp(MINUS, "g"), "-");
+  }
+
+  function texNum(v, sig) {
+    sig = sig || 4;
+    if (!Number.isFinite(v)) return "\\text{—}";
+    if (v === 0) return "0";
+    var abs = Math.abs(v);
+    var s;
+    if (abs >= 1e5 || abs < 1e-3) {
+      var parts = v.toExponential(Math.max(1, sig - 1)).split("e");
+      var exp = Number(parts[1]);
+      s = parts[0] + " \\times 10^{" + exp + "}";
+    } else {
+      s = String(Number(v.toPrecision(sig)));
+      s = s.replace("-", "-");
+    }
+    return s.replace(/-/g, "-");
+  }
+
+  function compactTick(v) {
+    if (!Number.isFinite(v)) return "";
+    if (v === 0) return "0";
+    var abs = Math.abs(v);
+    var s;
+    if (abs >= 1e4 || abs < 1e-3) {
+      s = v.toExponential(1);
+      var p = s.split("e");
+      s = p[0] + "e" + Number(p[1]);
+    } else if (abs >= 100) {
+      s = String(Math.round(v));
+    } else {
+      s = String(Number(v.toPrecision(3)));
+    }
+    return s.replace("-", MINUS);
+  }
+
+  function superscript(k) {
+    var map = { "0": "⁰", "1": "¹", "2": "²", "3": "³", "4": "⁴", "5": "⁵", "6": "⁶", "7": "⁷", "8": "⁸", "9": "⁹" };
+    return String(k).split("").map(function (d) { return map[d] || d; }).join("");
+  }
+
+  /* The ledger prints c_k as f^(k)(a) over k!, so this returns only the
+     (x - a)^k factor and its sign. */
+  function termText(c, k, a) {
+    if (k === 0) return c < 0 ? MINUS : "";
+    var body = a === 0
+      ? "x" + (k > 1 ? superscript(k) : "")
+      : "(x " + (a > 0 ? MINUS : "+") + " " + tidy(Math.abs(a), 4) + ")" + (k > 1 ? superscript(k) : "");
+    return (c < 0 ? MINUS : "") + body;
+  }
+
+  /* ---------------- math engine ---------------- */
+
+  var derivCache = new Map();
+
+  /* Derivatives come from complex-step differentiation, not symbolic
+     differentiation. It evaluates the expression at a + ih and reads
+     Im(f)/h: exact to machine precision and as cheap on the 12th derivative
+     as on the first. A fallback to math.js symbols covers expressions that
+     only accept real arguments. */
+  /* Derivatives come from the Cauchy integral formula, evaluated by a small
+     Fourier sum: sample the expression on a circle of radius r around a, and
+     the k-th Fourier coefficient is f^(k)(a)/k!. It is exact for analytic
+     functions and costs the same for n = 12 as for n = 1, unlike twelve rounds
+     of symbolic differentiation. If the circle crosses a singularity the
+     reconstruction check fails, and a smaller radius is tried. */
+
+  function evaluateComplex(node, x) {
+    var out = { re: NaN, im: NaN, ok: false };
+    try {
+      var v = node.evaluate({ x: x });
+      if (v && typeof v === "object" && "re" in v) {
+        out.re = Number(v.re);
+        out.im = Number(v.im || 0);
+        out.ok = Number.isFinite(out.re) && Number.isFinite(out.im);
+      } else if (typeof v === "number") {
+        out.re = v;
+        out.im = 0;
+        out.ok = Number.isFinite(v);
+      }
+    } catch (e) { out.ok = false; }
+    return out;
+  }
+
+  function cauchyCoefficients(node, a, n, r) {
+    var N = 32;
+    var re = new Array(N);
+    var im = new Array(N);
+    for (var j = 0; j < N; j++) {
+      var theta = 2 * Math.PI * j / N;
+      var sample = evaluateComplex(node, math.complex(a + r * Math.cos(theta), r * Math.sin(theta)));
+      if (!sample.ok) return null;
+      re[j] = sample.re;
+      im[j] = sample.im;
+    }
+    var parts = [];
+    var scale = 1;
+    for (var k = 0; k <= n && k < N / 2; k++) {
+      var sr = 0, si = 0;
+      for (var m = 0; m < N; m++) {
+        var ang = 2 * Math.PI * k * m / N;
+        var ca = Math.cos(ang), sa = Math.sin(ang);
+        sr += re[m] * ca + im[m] * sa;
+        si += im[m] * ca - re[m] * sa;
+      }
+      sr /= N * Math.pow(r, k);
+      si /= N * Math.pow(r, k);
+      if (!Number.isFinite(sr) || !Number.isFinite(si)) return null;
+      parts.push({ re: sr, im: si });
+      scale = Math.max(scale, Math.abs(sr));
+    }
+    // Real-analytic functions have real coefficients; imaginary residue beyond
+    // the sampling noise means the circle crossed a pole or branch cut.
+    var noise = scale * 2e-6 + 1e-10;
+    var coeffs = [];
+    for (var j = 0; j < parts.length; j++) {
+      if (Math.abs(parts[j].im) > noise * Math.pow(r, -j)) return null;
+      coeffs.push(parts[j].re);
+    }
+    return coeffs;
+  }
+
+  function reconstructError(node, a, coeffs, r) {
+    var worst = 0;
+    var probes = [-0.5, -0.2, 0.25, 0.6];
+    for (var i = 0; i < probes.length; i++) {
+      var s = probes[i] * r;
+      var actual = evaluateComplex(node, math.complex(a + s, 0));
+      if (!actual.ok) return Infinity;
+      var approx = 0;
+      for (var k = coeffs.length - 1; k >= 0; k--) approx = approx * s + coeffs[k];
+      worst = Math.max(worst, Math.abs(approx - actual.re) / Math.max(1, Math.abs(actual.re)));
+    }
+    return worst;
+  }
+
+  function fallbackDerivatives(expr, maxN, a, f) {
+    var values = [f(a)];
+    var node;
+    try { node = math.parse(expr); } catch (e) { node = null; }
+    for (var k = 1; k <= maxN; k++) {
+      if (!node) { values.push(NaN); continue; }
+      var started = (window.performance && performance.now) ? performance.now() : Date.now();
+      try {
+        node = math.derivative(node, "x");
+      } catch (e) {
+        node = null;
+        values.push(NaN);
+        continue;
+      }
+      var spent = ((window.performance && performance.now) ? performance.now() : Date.now()) - started;
+      if (node.toString().length > 900 || spent > 120) {
+        for (var rest = k; rest <= maxN; rest++) values.push(NaN);
+        break;
+      }
+      values.push(numAt(node, a));
+    }
+    while (values.length <= maxN) values.push(NaN);
+    return values;
+  }
+
+  function derivativesAt(expr, a, n) {
+    var node;
+    try { node = math.parse(expr); } catch (e) { throw new Error("parse"); }
+
+    var scale = Math.max(1, Math.abs(a), Math.abs(n) * 0.05);
+    var radii = [0.5, 0.28, 0.14, 0.06, 0.03];
+    var best = null;
+    var bestError = Infinity;
+    for (var t = 0; t < radii.length; t++) {
+      var r = radii[t] * scale;
+      var coeffs = cauchyCoefficients(node, a, n, r);
+      if (!coeffs || coeffs.length <= n) continue;
+      var err = reconstructError(node, a, coeffs, r);
+      if (err < bestError) { bestError = err; best = coeffs; }
+      if (err < 1e-5) { best = coeffs; bestError = err; break; }
+    }
+
+    if (best) {
+      var values = [];
+      var fact = 1;
+      for (var k = 0; k <= n; k++) {
+        if (k > 0) fact *= k;
+        values.push(best[k] * fact);
+        if (!Number.isFinite(best[k])) values[k] = NaN;
+      }
+      return values;
+    }
+
+    return fallbackDerivatives(expr, n, a, function (x) {
+      var s = evaluateComplex(node, math.complex(x, 0));
+      return s.ok ? s.re : NaN;
+    });
+  }
+
+  function numAt(node, a) {
+    if (!node) return NaN;
+    var v;
+    try { v = node.evaluate({ x: a }); } catch (e) { return NaN; }
+    if (v && typeof v === "object" && "re" in v) {
+      if (Math.abs(v.im || 0) > 1e-10) return NaN;
+      v = v.re;
+    }
+    return typeof v === "number" && Number.isFinite(v) ? v : NaN;
+  }
+
+  function compileFn(expr) {
+    var node = math.parse(expr);
+    return function (x) {
+      var v;
+      try { v = node.evaluate({ x: x }); } catch (e) { return NaN; }
+      if (v && typeof v === "object" && "re" in v) {
+        if (Math.abs(v.im || 0) > 1e-9) return NaN;
+        v = v.re;
+      }
+      return typeof v === "number" && Number.isFinite(v) ? v : NaN;
+    };
+  }
+
+  function horner(cs, a, x) {
+    var acc = 0;
+    for (var k = cs.length - 1; k >= 0; k--) acc = acc * (x - a) + cs[k];
+    return acc;
+  }
+
+  function scanRadius(f, a) {
+    var steps = 320, reach = 48;
+    for (var i = 1; i <= steps; i++) {
+      var d = reach * i / steps;
+      var left = f(a - d), right = f(a + d);
+      var badL = !Number.isFinite(left) || Math.abs(left) > 1e7;
+      var badR = !Number.isFinite(right) || Math.abs(right) > 1e7;
+      if (badL && badR) {
+        // refine inward with a short bisection for a cleaner number
+        var lo = d * (i - 1) / i, hi = d;
+        for (var j = 0; j < 18; j++) {
+          var mid = (lo + hi) / 2;
+          var vL = f(a - mid), vR = f(a + mid);
+          if (!Number.isFinite(vL) || !Number.isFinite(vR) || Math.abs(vL) > 1e7 || Math.abs(vR) > 1e7) hi = mid;
+          else lo = mid;
+        }
+        return (lo + hi) / 2;
+      }
+    }
+    return Infinity;
+  }
+
+  function build() {
+    state.error = null;
+    state.derived = null;
+    var expr = state.expr.trim();
+    var a = state.a;
+    var n = state.n;
+
+    if (!expr) { state.error = "Enter a function of x."; return; }
+    if (!Number.isFinite(a)) { state.error = "Center a must be a number."; return; }
+
+    var f;
+    try { f = compileFn(expr); } catch (e) {
+      state.error = "That expression does not parse. Try sin(x) or exp(x).";
+      return;
+    }
+
+    var orderValues;
+    try { orderValues = derivativesAt(expr, a, n); } catch (e) {
+      state.error = "That expression does not parse. Try sin(x) or exp(x).";
+      return;
+    }
+
+    var fa = f(a);
+    var limitUsed = false;
+    if (!Number.isFinite(fa)) {
+      // A removable singularity (sin(x)/x at 0) still has a limit, and the
+      // Cauchy coefficients already carry it as c0.
+      if (Number.isFinite(orderValues[0])) {
+        fa = orderValues[0];
+        limitUsed = true;
+      } else {
+        state.error = "f is not defined at a = " + tidy(a) + ". Move the center.";
+        return;
+      }
+    }
+
+    var largest = 0;
+    for (var q = 0; q < orderValues.length; q++) {
+      if (Number.isFinite(orderValues[q])) largest = Math.max(largest, Math.abs(orderValues[q]));
+    }
+    var dust = Math.max(1e-11, largest * 1e-9);
+    for (var q2 = 0; q2 < orderValues.length; q2++) {
+      if (Number.isFinite(orderValues[q2]) && Math.abs(orderValues[q2]) < dust) orderValues[q2] = 0;
+    }
+
+    var cs = [];
+    var coeffsKnown = true;
+    var fact = 1;
+    for (var k = 0; k <= n; k++) {
+      if (k > 0) fact *= k;
+      var dk = orderValues[k];
+      if (!Number.isFinite(dk)) {
+        coeffsKnown = false;
+        dk = 0;
+      }
+      orderValues[k] = dk;
+      cs.push(dk / fact);
+    }
+
+    var presetKey = state.preset;
+    var preset = PRESETS[presetKey] || PRESETS.custom;
+    if (presetKey === "custom") {
+      var knownKey = knownPreset(expr);
+      if (knownKey) { preset = PRESETS[knownKey]; presetKey = knownKey; }
+    }
+    var radius, radiusExact, radiusMethod;
+    if (preset && preset.radius) {
+      radius = preset.radius(a);
+      radiusExact = true;
+      radiusMethod = "distance to nearest singularity";
+    } else {
+      var estimate = estimateRadius(expr, cs, a, f);
+      radius = estimate.radius;
+      radiusExact = false;
+      radiusMethod = estimate.method;
+    }
+
+    var x0 = Math.min(state.x0, state.x1);
+    var x1 = Math.max(state.x0, state.x1);
+    if (!(x1 > x0)) { x0 -= 1; x1 += 1; }
+
+    var count = 720;
+    var samples = [];
+    for (var i = 0; i <= count; i++) {
+      var x = x0 + (x1 - x0) * i / count;
+      var fx = f(x);
+      var px = Number.isFinite(fx) ? horner(cs, a, x) : NaN;
+      var rx = (Number.isFinite(fx) && Number.isFinite(px)) ? Math.abs(fx - px) : NaN;
+      samples.push({ x: x, f: fx, p: px, r: rx });
+    }
+    // guarantee the expansion point itself is sampled
+    samples.push({ x: a, f: fa, p: horner(cs, a, a), r: 0 });
+    samples.sort(function (u, v) { return u.x - v.x; });
+
+    // The polynomial only approximates f inside the convergence interval, so
+    // the headline remainder is measured there. The chart still shows the full
+    // window, where the tail can be enormous.
+    var peak = null;
+    for (var s = 0; s < samples.length; s++) {
+      var q = samples[s];
+      if (!Number.isFinite(q.r)) continue;
+      if (Number.isFinite(radius) && Math.abs(q.x - a) > radius) continue;
+      if (!peak || q.r > peak.r) peak = q;
+    }
+    var peakScope = Number.isFinite(radius) ? "inside |x − a| < R" : "on the view window";
+
+    state.derived = {
+      expr: expr,
+      f: f,
+      fa: fa,
+      limitUsed: limitUsed,
+      a: a,
+      n: n,
+      cs: cs,
+      orderValues: orderValues,
+      coeffsKnown: coeffsKnown,
+      radius: radius,
+      radiusExact: radiusExact,
+      radiusMethod: radiusMethod,
+      x0: x0,
+      x1: x1,
+      peak: peak,
+      peakScope: peakScope,
+      samples: samples,
+      preset: preset,
+      presetKey: presetKey
+    };
+    state.samples = samples;
+    state.formulaTex = formulaTex(cs, a, n);
+  }
+
+  /* Radius estimate when no closed form is known. Taylor coefficients near a
+     singularity shrink like R^-k, so |c_k|^(-1/k) settles at the distance to
+     the nearest singularity. Coefficients that keep climbing belong to an
+     entire function, which has no radius. A larger sampling circle keeps the
+     Fourier coefficients clear of round-off. */
+  function estimateRadius(expr, cs, a, f) {
+    var node;
+    try { node = math.parse(expr); } catch (e) {
+      return { radius: Infinity, method: "no singularity found" };
+    }
+    var scale = Math.max(1, Math.abs(a));
+    var raw = cauchyCoefficients(node, a, 12, 0.6 * scale);
+    if (!raw) raw = cauchyCoefficients(node, a, 12, 0.2 * scale);
+    if (!raw) {
+      var scanned = scanRadius(f, a);
+      return { radius: scanned, method: Number.isFinite(scanned) ? "numerically scanned" : "no singularity found" };
+    }
+
+    var peak = 0;
+    for (var i = 0; i < raw.length; i++) peak = Math.max(peak, Math.abs(raw[i]));
+    var estimates = [];
+    for (var k = 2; k < raw.length; k++) {
+      var mag = Math.abs(raw[k]);
+      if (!(mag > peak * 1e-9)) continue;   // exact zeros (even/odd series) carry no information
+      var r = Math.pow(mag, -1 / k);
+      if (Number.isFinite(r) && r > 0) estimates.push(r);
+    }
+    if (estimates.length < 2) {
+      return { radius: Infinity, method: "no singularity detected" };
+    }
+
+    var first = estimates[0];
+    var last = estimates[estimates.length - 1];
+    if (last > first * 1.45) {
+      return { radius: Infinity, method: "entire function" };
+    }
+    return { radius: last, method: "estimated from coefficient decay" };
+  }
+
+  function formulaTex(cs, a, n) {
+    var max = 0;
+    for (var i = 0; i < cs.length; i++) max = Math.max(max, Math.abs(cs[i]));
+    var pieces = [];
+    for (var k = 0; k <= n; k++) {
+      var c = cs[k];
+      if (max > 0 && Math.abs(c) < max * 1e-11) continue;
+      var coefTex = "";
+      if (k === 0) {
+        coefTex = texNum(c, 5);
+      } else {
+        if (Math.abs(Math.abs(c) - 1) > 1e-12) coefTex = texNum(c, 5);
+        else if (c < 0) coefTex = "-";
+      }
+      var power;
+      if (k === 0) {
+        power = "";
+      } else if (a === 0) {
+        power = "x" + (k > 1 ? "^{" + k + "}" : "");
+      } else {
+        var inner = "x " + (a > 0 ? "- " : "+ ") + texNum(Math.abs(a), 4);
+        power = "\\left(" + inner + "\\right)" + (k > 1 ? "^{" + k + "}" : "");
+      }
+      pieces.push({ c: c, tex: coefTex + power });
+    }
+    if (!pieces.length) return "P_{" + n + "}(x) = 0";
+    var out = "P_{" + n + "}(x) = ";
+    pieces.forEach(function (piece, index) {
+      var body = piece.tex;
+      if (index === 0) {
+        out += body;
+      } else {
+        var negative = body.charAt(0) === "-";
+        out += negative ? " - " + body.slice(1) : " + " + body;
+      }
+    });
+    return out;
+  }
+
+  /* ---------------- canvas chart engine ---------------- */
+
+  var FONT_MONO = '"JetBrains Mono", "Ubuntu Mono", ui-monospace, monospace';
+
+  function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  function palette() {
+    return {
+      grid: cssVar("--grid"),
+      axis: cssVar("--axis"),
+      muted: cssVar("--muted"),
+      ink: cssVar("--ink"),
+      inkSoft: cssVar("--ink-soft"),
+      surface: cssVar("--surface-2"),
+      bg: cssVar("--bg"),
+      accent: cssVar("--accent"),
+      f: cssVar("--series-f"),
+      p: cssVar("--series-p"),
+      r: cssVar("--series-r"),
+      line: cssVar("--line")
+    };
+  }
+
+  function niceNum(raw) {
+    if (!(raw > 0) || !Number.isFinite(raw)) return 1;
+    var exp = Math.floor(Math.log10(raw));
+    var f = raw / Math.pow(10, exp);
+    var nf;
+    if (f <= 1) nf = 1;
+    else if (f <= 2) nf = 2;
+    else if (f <= 2.5) nf = 2.5;
+    else if (f <= 5) nf = 5;
+    else nf = 10;
+    return nf * Math.pow(10, exp);
+  }
+
+  function niceTicks(min, max, count) {
+    if (!(max > min)) { max = min + 1; }
+    var step = niceNum((max - min) / Math.max(1, count));
+    var start = Math.ceil(min / step) * step;
+    var ticks = [];
+    for (var v = start, guard = 0; v <= max + step * 1e-6 && guard < 40; v += step, guard++) {
+      ticks.push(Math.abs(v) < step * 1e-9 ? 0 : v);
+    }
+    return { ticks: ticks, step: step };
+  }
+
+  function formatTick(v, step) {
+    if (v === 0) return "0";
+    var abs = Math.abs(v);
+    if (abs >= 1e4 || (abs < 1e-3 && abs > 0)) {
+      var s = v.toExponential(1).split("e");
+      return s[0] + "e" + Number(s[1]);
+    }
+    var decimals = Math.max(0, Math.min(6, -Math.floor(Math.log10(step || 1)) + (step < 1 ? 0 : 0)));
+    if (abs >= 100) decimals = 0;
+    else if (step < 0.01) decimals = Math.min(6, Math.ceil(-Math.log10(step)) + 1);
+    else if (step < 0.1) decimals = 2;
+    else if (step < 1) decimals = 1;
+    var out = v.toFixed(decimals);
+    if (out.indexOf(".") >= 0) out = out.replace(/0+$/, "").replace(/\.$/, "");
+    return out.replace("-", MINUS);
+  }
+
+  function makeChart(canvas, options) {
+    var ctx = canvas.getContext("2d");
+    var chart = {
+      canvas: canvas,
+      ctx: ctx,
+      w: 0, h: 0, dpr: 1,
+      data: null,
+      colors: palette(),
+      options: options,
+      geom: null,
+      resize: function () {
+        var box = canvas.parentElement.getBoundingClientRect();
+        var dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+        var w = Math.max(120, Math.round(box.width));
+        var h = Math.max(120, Math.round(box.height));
+        if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
+          canvas.width = Math.round(w * dpr);
+          canvas.height = Math.round(h * dpr);
+        }
+        chart.w = w; chart.h = h; chart.dpr = dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      },
+      draw: function () {
+        ctx.setTransform(chart.dpr, 0, 0, chart.dpr, 0, 0);
+        ctx.clearRect(0, 0, chart.w, chart.h);
+      }
+    };
+    return chart;
+  }
+
+  /* ---- plot 1: f vs P ---- */
+  function drawCompare(chart, data, hoverX) {
+    var ctx = chart.ctx;
+    chart.resize();
+    var c = palette();
+    var W = chart.w, H = chart.h;
+    ctx.clearRect(0, 0, W, H);
+    if (!W || !H) return;
+
+    var pad = { top: 14, right: 16, bottom: 26, left: 46 };
+    if (W < 420) { pad.left = 38; pad.right = 10; pad.bottom = 22; pad.top = 12; }
+    var iw = W - pad.left - pad.right;
+    var ih = H - pad.top - pad.bottom;
+    if (iw < 20 || ih < 20) return;
+
+    if (!data) {
+      drawEmpty(ctx, W, H, c, "Enter a function to plot");
+      chart.geom = null;
+      return;
+    }
+
+    var xs = data.samples;
+    var xmin = data.x0, xmax = data.x1;
+    var ys = [];
+    for (var i = 0; i < xs.length; i++) {
+      if (Number.isFinite(xs[i].f)) ys.push(xs[i].f);
+    }
+    var ymin, ymax;
+    if (!ys.length) {
+      drawEmpty(ctx, W, H, c, "f is undefined on this interval");
+      chart.geom = null;
+      return;
+    }
+    ys.sort(function (a, b) { return a - b; });
+    var lo = ys[Math.floor(ys.length * 0.05)];
+    var hi = ys[Math.min(ys.length - 1, Math.ceil(ys.length * 0.95))];
+    if (!Number.isFinite(lo) || !Number.isFinite(hi)) { lo = ys[0]; hi = ys[ys.length - 1]; }
+    if (!(hi > lo)) { lo -= 1; hi += 1; }
+    var span = hi - lo;
+    ymin = lo - span * 0.12;
+    ymax = hi + span * 0.12;
+
+    // keep the center point visible when it is inside the window
+    if (data.a >= xmin && data.a <= xmax && Number.isFinite(data.fa)) {
+      var fa = data.fa;
+      if (fa > ymax) { ymax = fa + (fa - ymin) * 0.06; }
+      if (fa < ymin) { ymin = fa - (ymax - fa) * 0.06; }
+    }
+
+    var X = function (x) { return pad.left + (x - xmin) / (xmax - xmin) * iw; };
+    var Y = function (y) { return pad.top + (ymax - y) / (ymax - ymin) * ih; };
+    chart.geom = { pad: pad, X: X, Y: Y, xmin: xmin, xmax: xmax, ymin: ymin, ymax: ymax, iw: iw, ih: ih };
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(pad.left, pad.top, iw, ih);
+    ctx.clip();
+
+    // horizontal grid + labels come after clip release
+    var yt = niceTicks(ymin, ymax, ih > 200 ? 5 : 4);
+    ctx.strokeStyle = c.grid;
+    ctx.lineWidth = 1;
+    for (var t = 0; t < yt.ticks.length; t++) {
+      var yy = Math.round(Y(yt.ticks[t])) + 0.5;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, yy);
+      ctx.lineTo(pad.left + iw, yy);
+      ctx.stroke();
+    }
+    var xt = niceTicks(xmin, xmax, iw > 380 ? 6 : 4);
+    for (var s = 0; s < xt.ticks.length; s++) {
+      var xx = Math.round(X(xt.ticks[s])) + 0.5;
+      ctx.beginPath();
+      ctx.moveTo(xx, pad.top);
+      ctx.lineTo(xx, pad.top + ih);
+      ctx.stroke();
+    }
+
+    // zero axes
+    ctx.strokeStyle = c.axis;
+    ctx.globalAlpha = 0.7;
+    if (0 >= ymin && 0 <= ymax) {
+      var zeroY = Math.round(Y(0)) + 0.5;
+      ctx.beginPath(); ctx.moveTo(pad.left, zeroY); ctx.lineTo(pad.left + iw, zeroY); ctx.stroke();
+    }
+    if (0 >= xmin && 0 <= xmax) {
+      var zeroX = Math.round(X(0)) + 0.5;
+      ctx.beginPath(); ctx.moveTo(zeroX, pad.top); ctx.lineTo(zeroX, pad.top + ih); ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    // f curve
+    strokeSeries(ctx, xs, X, Y, "f", c.f, 2, false);
+    // P curve
+    strokeSeries(ctx, xs, X, Y, "p", c.p, 2.1, true);
+
+    // center marker
+    if (data.a >= xmin && data.a <= xmax && Number.isFinite(data.fa)) {
+      var cxp = X(data.a), cyp = Y(data.fa);
+      if (cxp >= pad.left && cxp <= pad.left + iw && cyp >= pad.top && cyp <= pad.top + ih) {
+        ctx.beginPath();
+        ctx.arc(cxp, cyp, 4.5, 0, Math.PI * 2);
+        ctx.fillStyle = c.surface;
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = c.f;
+        ctx.stroke();
+      }
+    }
+
+    // hover crosshair
+    if (Number.isFinite(hoverX) && hoverX >= xmin && hoverX <= xmax) {
+      var hx = Math.round(X(hoverX)) + 0.5;
+      ctx.strokeStyle = c.axis;
+      ctx.globalAlpha = 0.9;
+      ctx.setLineDash([3, 3]);
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(hx, pad.top); ctx.lineTo(hx, pad.top + ih); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
+      var hSample = nearestSample(xs, hoverX);
+      if (hSample) {
+        if (Number.isFinite(hSample.f)) dot(ctx, X(hSample.x), Y(hSample.f), c.f, c.surface);
+        if (Number.isFinite(hSample.p)) dot(ctx, X(hSample.x), Y(hSample.p), c.p, c.surface);
+      }
+    }
+
+    ctx.restore();
+
+    // frame
+    ctx.strokeStyle = c.line;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(pad.left + 0.5, pad.top + 0.5, iw - 1, ih - 1);
+
+    // tick labels
+    ctx.fillStyle = c.muted;
+    ctx.font = '10px ' + FONT_MONO;
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    for (var tl = 0; tl < yt.ticks.length; tl++) {
+      var lab = formatTick(yt.ticks[tl], yt.step);
+      if (lab === "0") continue;
+      ctx.fillText(lab, pad.left - 7, Y(yt.ticks[tl]));
+    }
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    var xStep = xt.step, xDecimals = xStep >= 1 ? 0 : Math.min(4, Math.ceil(-Math.log10(xStep)));
+    for (var tx = 0; tx < xt.ticks.length; tx++) {
+      var vx = xt.ticks[tx];
+      if (vx === 0 && ymin <= 0 && ymax >= 0) {
+        ctx.fillStyle = c.inkSoft;
+        ctx.fillText("0", X(0), pad.top + ih + 7);
+        ctx.fillStyle = c.muted;
+        continue;
+      }
+      if (Math.abs(vx - data.a) < (xmax - xmin) * 1e-9) continue;
+      var label = Number(vx.toFixed(xDecimals)).toString();
+      ctx.fillText(label, X(vx), pad.top + ih + 7);
+    }
+
+    // center label on x axis
+    if (data.a >= xmin && data.a <= xmax) {
+      var ax = X(data.a);
+      var ay = pad.top + ih;
+      ctx.fillStyle = c.f;
+      ctx.beginPath();
+      ctx.moveTo(ax, ay + 1);
+      ctx.lineTo(ax - 4, ay + 6);
+      ctx.lineTo(ax + 4, ay + 6);
+      ctx.closePath();
+      ctx.fill();
+      ctx.font = '500 9.5px ' + FONT_MONO;
+      ctx.textAlign = ax > pad.left + iw - 16 ? "right" : "center";
+      ctx.fillStyle = c.f;
+      ctx.fillText("a", ax + (ax > pad.left + iw - 16 ? 2 : 0), ay + 8);
+    }
+
+    // endpoint labels
+    directLabel(ctx, xs, X, Y, "f", c.f, pad, iw, ih, "f(x)");
+    directLabel(ctx, xs, X, Y, "p", c.p, pad, iw, ih, "P" + subscriptGlyph(data.n) + "(x)");
+  }
+
+  function subscriptGlyph(n) {
+    var map = { "0": "₀", "1": "₁", "2": "₂", "3": "₃", "4": "₄", "5": "₅", "6": "₆", "7": "₇", "8": "₈", "9": "₉" };
+    return String(n).split("").map(function (d) { return map[d] || d; }).join("");
+  }
+
+  function directLabel(ctx, xs, X, Y, key, color, pad, iw, ih, text) {
+    var last = null;
+    for (var i = xs.length - 1; i >= 0; i--) {
+      if (Number.isFinite(xs[i][key])) { last = xs[i]; break; }
+    }
+    if (!last) return;
+    var px = X(last.x), py = Y(last[key]);
+    if (px < pad.left + 6 || px > pad.left + iw - 4) return;
+    if (py < pad.top + 9 || py > pad.top + ih - 9) return;
+    ctx.font = '500 9.5px ' + FONT_MONO;
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    var w = ctx.measureText(text).width;
+    var lx = Math.min(px + iw * 0.0, pad.left + iw - 4);
+    ctx.fillStyle = color;
+    ctx.globalAlpha = 0.95;
+    ctx.fillText(text, lx, py - 9 < pad.top + 6 ? py + 10 : py - 9);
+    ctx.globalAlpha = 1;
+  }
+
+  function strokeSeries(ctx, xs, X, Y, key, color, width, dashed) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    if (dashed) ctx.setLineDash([7, 4.5]);
+    var pen = false;
+    var px = 0, py = 0;
+    for (var i = 0; i < xs.length; i++) {
+      var v = xs[i][key];
+      if (!Number.isFinite(v)) { pen = false; continue; }
+      var x = X(xs[i].x), y = Y(v);
+      if (y < -1e5 || y > 1e5) { pen = false; continue; }
+      if (!pen) { ctx.moveTo(x, y); pen = true; }
+      else {
+        // break the line across huge jumps (poles) instead of drawing vertical walls
+        if (Math.abs(y - py) > 6e3 && Math.abs(y - py) > 3 * Math.abs(x - px) * 60) { ctx.moveTo(x, y); }
+        else ctx.lineTo(x, y);
+      }
+      px = x; py = y;
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function dot(ctx, x, y, fill, ring) {
+    ctx.beginPath();
+    ctx.arc(x, y, 3.4, 0, Math.PI * 2);
+    ctx.fillStyle = fill;
+    ctx.fill();
+    if (ring) {
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = ring;
+      ctx.stroke();
+    }
+  }
+
+  function drawEmpty(ctx, W, H, c, message) {
+    ctx.fillStyle = c.muted;
+    ctx.font = '11px ' + FONT_MONO;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(message, W / 2, H / 2);
+  }
+
+  function nearestSample(xs, x) {
+    if (!xs || !xs.length) return null;
+    var lo = 0, hi = xs.length - 1;
+    while (lo < hi) {
+      var mid = (lo + hi) >> 1;
+      if (xs[mid].x < x) lo = mid + 1; else hi = mid;
+    }
+    var cand = [xs[lo], xs[Math.max(0, lo - 1)], xs[Math.min(xs.length - 1, lo + 1)]];
+    var best = cand[0];
+    for (var i = 1; i < cand.length; i++) {
+      if (Math.abs(cand[i].x - x) < Math.abs(best.x - x)) best = cand[i];
+    }
+    return best;
+  }
+
+  /* ---- plot 2: remainder ---- */
+  function drawRemainder(chart, data, hoverX, logScale) {
+    var ctx = chart.ctx;
+    chart.resize();
+    var c = palette();
+    var W = chart.w, H = chart.h;
+    ctx.clearRect(0, 0, W, H);
+    if (!W || !H) return;
+
+    var pad = { top: 14, right: 16, bottom: 26, left: 52 };
+    if (W < 420) { pad.left = 46; pad.right = 10; pad.bottom = 22; pad.top = 12; }
+    var iw = W - pad.left - pad.right;
+    var ih = H - pad.top - pad.bottom;
+    if (iw < 20 || ih < 20) return;
+
+    if (!data) {
+      drawEmpty(ctx, W, H, c, "No remainder to show");
+      chart.geom = null;
+      return;
+    }
+
+    var xs = data.samples;
+    var xmin = data.x0, xmax = data.x1;
+    var vals = [];
+    var maxR = 0;
+    for (var i = 0; i < xs.length; i++) {
+      var r = xs[i].r;
+      if (Number.isFinite(r)) { vals.push(r); if (r > maxR) maxR = r; }
+    }
+    if (!vals.length) {
+      drawEmpty(ctx, W, H, c, "Remainder is undefined here");
+      chart.geom = null;
+      return;
+    }
+
+    var floorExp = -16, topExp = 0;
+    var ymin, ymax;
+    if (logScale) {
+      var smallest = Infinity;
+      for (var j = 0; j < vals.length; j++) {
+        if (vals[j] > 0 && vals[j] < smallest) smallest = vals[j];
+      }
+      if (!Number.isFinite(smallest)) { smallest = 1e-16; maxR = Math.max(maxR, 1e-16); }
+      floorExp = Math.floor(Math.log10(smallest)) - 1;
+      topExp = Math.ceil(Math.log10(Math.max(maxR, smallest * 10)));
+      if (topExp - floorExp < 3) floorExp = topExp - 3;
+      ymin = floorExp; ymax = topExp;
+    } else {
+      ymin = 0;
+      ymax = maxR > 0 ? maxR * 1.16 : 1e-9;
+      if (!(ymax > ymin)) ymax = ymin + 1;
+    }
+
+    var X = function (x) { return pad.left + (x - xmin) / (xmax - xmin) * iw; };
+    var Y = logScale
+      ? function (v) { return pad.top + (ymax - Math.log10(Math.max(v, Math.pow(10, floorExp)))) / (ymax - ymin) * ih; }
+      : function (v) { return pad.top + (ymax - v) / (ymax - ymin) * ih; };
+    chart.geom = { pad: pad, X: X, Y: Y, xmin: xmin, xmax: xmax, log: logScale };
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(pad.left, pad.top, iw, ih);
+    ctx.clip();
+
+    // grid
+    ctx.strokeStyle = c.grid;
+    ctx.lineWidth = 1;
+    var tickVals = [];
+    if (logScale) {
+      for (var e = floorExp; e <= topExp; e++) tickVals.push({ v: Math.pow(10, e), label: "1e" + e });
+      if (tickVals.length > 8) {
+        var keepEvery = Math.ceil(tickVals.length / 7);
+        tickVals = tickVals.filter(function (_, idx) { return idx % keepEvery === 0 || idx === tickVals.length - 1; });
+      }
+    } else {
+      var nt = niceTicks(ymin, ymax, ih > 200 ? 5 : 4);
+      tickVals = nt.ticks.map(function (v) { return { v: v, label: formatTick(v, nt.step) }; });
+    }
+    for (var g = 0; g < tickVals.length; g++) {
+      var gy = Math.round(Y(tickVals[g].v)) + 0.5;
+      ctx.beginPath(); ctx.moveTo(pad.left, gy); ctx.lineTo(pad.left + iw, gy); ctx.stroke();
+    }
+    var xt = niceTicks(xmin, xmax, iw > 380 ? 6 : 4);
+    for (var xg = 0; xg < xt.ticks.length; xg++) {
+      var gx = Math.round(X(xt.ticks[xg])) + 0.5;
+      ctx.beginPath(); ctx.moveTo(gx, pad.top); ctx.lineTo(gx, pad.top + ih); ctx.stroke();
+    }
+
+    // remainder line (stepped near zero for log clarity)
+    ctx.beginPath();
+    ctx.strokeStyle = c.r;
+    ctx.lineWidth = 2;
+    ctx.lineJoin = "round";
+    var pen = false, prevY = 0;
+    for (var q = 0; q < xs.length; q++) {
+      var rv = xs[q].r;
+      if (!Number.isFinite(rv)) { pen = false; continue; }
+      var xx = X(xs[q].x), yy = Y(rv);
+      if (!pen) { ctx.moveTo(xx, yy); pen = true; }
+      else if (Math.abs(yy - prevY) > 6000) ctx.moveTo(xx, yy);
+      else ctx.lineTo(xx, yy);
+      prevY = yy;
+    }
+    ctx.stroke();
+
+    // peak marker
+    if (data.peak && Number.isFinite(data.peak.r)) {
+      var pkx = X(data.peak.x), pky = Y(data.peak.r);
+      if (pkx >= pad.left && pkx <= pad.left + iw && pky >= pad.top && pky <= pad.top + ih) {
+        dot(ctx, pkx, pky, c.r, c.surface);
+      }
+    }
+
+    // hover crosshair
+    if (Number.isFinite(hoverX) && hoverX >= xmin && hoverX <= xmax) {
+      var hx = Math.round(X(hoverX)) + 0.5;
+      ctx.strokeStyle = c.axis;
+      ctx.setLineDash([3, 3]);
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(hx, pad.top); ctx.lineTo(hx, pad.top + ih); ctx.stroke();
+      ctx.setLineDash([]);
+      var hs = nearestSample(xs, hoverX);
+      if (hs && Number.isFinite(hs.r)) dot(ctx, X(hs.x), Y(hs.r), c.r, c.surface);
+    }
+
+    ctx.restore();
+
+    ctx.strokeStyle = c.line;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(pad.left + 0.5, pad.top + 0.5, iw - 1, ih - 1);
+
+    // labels
+    ctx.font = '10px ' + FONT_MONO;
+    ctx.fillStyle = c.muted;
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    for (var l = 0; l < tickVals.length; l++) {
+      ctx.fillText(tickVals[l].label, pad.left - 7, Y(tickVals[l].v));
+    }
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    var xStep = xt.step, xDecimals = xStep >= 1 ? 0 : Math.min(4, Math.ceil(-Math.log10(xStep)));
+    for (var tx = 0; tx < xt.ticks.length; tx++) {
+      var vx = xt.ticks[tx];
+      if (Math.abs(vx - data.a) < (xmax - xmin) * 1e-9) continue;
+      ctx.fillText(Number(vx.toFixed(xDecimals)).toString().replace("-", MINUS), X(vx), pad.top + ih + 7);
+    }
+
+    if (data.a >= xmin && data.a <= xmax) {
+      var ax = X(data.a);
+      ctx.fillStyle = c.f;
+      ctx.beginPath();
+      ctx.moveTo(ax, pad.top + ih + 1);
+      ctx.lineTo(ax - 4, pad.top + ih + 6);
+      ctx.lineTo(ax + 4, pad.top + ih + 6);
+      ctx.closePath();
+      ctx.fill();
+      ctx.font = '500 9.5px ' + FONT_MONO;
+      ctx.fillText("a", ax, pad.top + ih + 8);
+    }
+
+    // direct label at peak
+    if (data.peak && Number.isFinite(data.peak.r)) {
+      var px2 = X(data.peak.x), py2 = Y(data.peak.r);
+      if (px2 >= pad.left + 6 && px2 <= pad.left + iw - 6 && py2 >= pad.top + 12) {
+        ctx.font = '500 9.5px ' + FONT_MONO;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "bottom";
+        ctx.fillStyle = c.r;
+        ctx.fillText(tidyAscii(data.peak.r, 3), px2, py2 - 8);
+      }
+    }
+  }
+
+  /* ---------------- DOM wiring ---------------- */
+
+  var els = {
+    fnSelect: $("#fnSelect"),
+    exprInput: $("#exprInput"),
+    fnTag: $("#fnTag"),
+    fnHint: $("#fnHint"),
+    centerInput: $("#centerInput"),
+    centerPill: $("#centerPill"),
+    centerChips: $("#centerChips"),
+    degreeRange: $("#degreeRange"),
+    degreePill: $("#degreePill"),
+    x0Input: $("#x0Input"),
+    x1Input: $("#x1Input"),
+    intervalHint: $("#intervalHint"),
+    fitBtn: $("#fitBtn"),
+    resetBtn: $("#resetBtn"),
+    statA: $("#statA"),
+    statAFoot: $("#statAFoot"),
+    statN: $("#statN"),
+    statNFoot: $("#statNFoot"),
+    statErr: $("#statErr"),
+    statErrFoot: $("#statErrFoot"),
+    statR: $("#statR"),
+    statRFoot: $("#statRFoot"),
+    formula: $("#formula"),
+    seriesNote: $("#seriesNote"),
+    ledgerBody: $("#ledgerBody"),
+    ledgerMeta: $("#ledgerMeta"),
+    ledgerSum: $("#ledgerSum"),
+    ledgerNonzero: $("#ledgerNonzero"),
+    copyTexBtn: $("#copyTexBtn"),
+    scaleBtn: $("#scaleBtn"),
+    footF1: $("#footF1"),
+    footP1: $("#footP1"),
+    footPeak: $("#footPeak"),
+    footPeakX: $("#footPeakX"),
+    tip1: $("#tip1"),
+    tip2: $("#tip2"),
+    plot1Wrap: $("#plot1Wrap"),
+    plot2Wrap: $("#plot2Wrap"),
+    themeBtn: $("#themeBtn"),
+    creditLink: $("#creditLink")
+  };
+
+  var chart1 = makeChart($("#plot1"), {});
+  var chart2 = makeChart($("#plot2"), {});
+
+  /* ---- formula + ledger ---- */
+
+  var katexReady = typeof window.katex !== "undefined";
+
+  function renderFormula(tex) {
+    var host = els.formula;
+    if (katexReady) {
+      try {
+        window.katex.render(tex, host, {
+          displayMode: true,
+          throwOnError: false,
+          strict: false,
+          trust: false
+        });
+        return;
+      } catch (e) { /* fall through to plain text */ }
+    }
+    host.textContent = tex
+      .replace(/\\left\(/g, "(").replace(/\\right\)/g, ")")
+      .replace(/\\times/g, "×").replace(/\^\{?(\d+)\}?/g, function (_, d) { return superscript(Number(d)); })
+      .replace(/_\{?(\d+)\}?/g, function (_, d) { return subscriptGlyph(Number(d)); })
+      .replace(/\\,/g, " ");
+  }
+
+  function factorialText(k) {
+    if (k === 0) return "0!";
+    if (k <= 6) {
+      var f = 1;
+      for (var j = 2; j <= k; j++) f *= j;
+      return k + "! = " + f;
+    }
+    return k + "!";
+  }
+
+  function renderLedger(data) {
+    var rows = [];
+    var sum = 0;
+    var nonzero = 0;
+    for (var k = 0; k <= data.n; k++) {
+      sum += Math.abs(data.cs[k]);
+      if (Math.abs(data.cs[k]) > 1e-12) nonzero++;
+    }
+    for (var i = 0; i <= data.n; i++) {
+      var c = data.cs[i];
+      var zero = Math.abs(c) < 1e-12;
+      var tr = document.createElement("tr");
+
+      var kCell = document.createElement("td");
+      kCell.className = "k";
+      kCell.textContent = String(i);
+      tr.appendChild(kCell);
+
+      var dCell = document.createElement("td");
+      if (zero) dCell.className = "zero";
+      dCell.textContent = tidy(data.orderValues[i], 5);
+      tr.appendChild(dCell);
+
+      var cCell = document.createElement("td");
+      if (zero) cCell.className = "zero";
+      cCell.textContent = tidy(c, 5);
+      tr.appendChild(cCell);
+
+      var tCell = document.createElement("td");
+      tCell.className = "l term";
+      var frac = document.createElement("span");
+      frac.className = "frac";
+      var num = document.createElement("span");
+      num.className = "num";
+      num.textContent = tidy(data.orderValues[i], 5);
+      var den = document.createElement("span");
+      den.className = "den";
+      den.textContent = factorialText(i);
+      frac.appendChild(num);
+      frac.appendChild(den);
+      tCell.appendChild(frac);
+      tCell.appendChild(document.createTextNode(termText(c, i, data.a)));
+      tr.appendChild(tCell);
+
+      rows.push(tr);
+    }
+    els.ledgerBody.replaceChildren.apply(els.ledgerBody, rows);
+    els.ledgerMeta.textContent = "k = 0 \u2026 " + data.n;
+    els.ledgerSum.textContent = tidy(sum, 5);
+    els.ledgerNonzero.textContent = nonzero + " / " + (data.n + 1);
+  }
+
+  function updateStats(data) {
+    els.statA.textContent = "a = " + tidy(data.a, 5);
+    els.statAFoot.textContent = (data.limitUsed ? "f(a) = " : "f(a) = ") + tidy(data.fa, 5) + (data.limitUsed ? " (limit)" : "");
+    els.statN.textContent = "n = " + data.n;
+    els.statNFoot.textContent = (data.n + 1) + " coefficient" + (data.n === 1 ? "" : "s") + " · " + data.n + " derivative" + (data.n === 1 ? "" : "s");
+
+    var peak = data.peak;
+    els.statErr.textContent = peak && Number.isFinite(peak.r) ? tidy(peak.r, 4) : "—";
+    els.statErrFoot.textContent = peak && Number.isFinite(peak.x)
+      ? "peak at x = " + tidy(peak.x, 4) + (Number.isFinite(data.radius) ? " · inside R" : "")
+      : (data.peakScope || "on the view window");
+
+    var radius = data.radius;
+    if (Number.isFinite(radius)) {
+      els.statR.textContent = "R = " + tidy(radius, 4);
+      els.statRFoot.textContent = data.radiusMethod || "estimated";
+    } else {
+      els.statR.textContent = "R = ∞";
+      els.statRFoot.textContent = "entire function";
+    }
+  }
+
+  function updateFooters(data) {
+    var last = null;
+    for (var i = data.samples.length - 1; i >= 0; i--) {
+      if (Number.isFinite(data.samples[i].f)) { last = data.samples[i]; break; }
+    }
+    els.footF1.textContent = last ? tidy(last.f, 4) : "—";
+    els.footP1.textContent = last ? tidy(last.p, 4) : "—";
+    els.footPeak.textContent = data.peak && Number.isFinite(data.peak.r) ? tidy(data.peak.r, 4) : "—";
+    els.footPeakX.textContent = data.peak && Number.isFinite(data.peak.x) ? tidy(data.peak.x, 4) : "—";
+  }
+
+  /* ---- hints ---- */
+
+  function updateHint() {
+    var preset = PRESETS[state.preset];
+    if (state.preset === "custom") {
+      els.fnTag.textContent = "custom";
+      els.fnHint.textContent = PRESETS.custom.hint;
+      els.fnHint.classList.remove("error");
+      return;
+    }
+    els.fnTag.textContent = "built-in";
+    els.fnHint.textContent = preset ? preset.hint : "";
+  }
+
+  /* ---- tooltip ---- */
+
+  function showTip(tipEl, wrapEl, geom, sample, kind) {
+    if (!geom || !sample) { hideTip(tipEl); return; }
+    var d = state.derived;
+    var rows = [];
+    if (kind === "compare") {
+      rows.push(rowHTML("f(x)", tidy(sample.f, 5), "f"));
+      rows.push(rowHTML("P" + subscriptGlyph(d.n) + "(x)", tidy(sample.p, 5), "p"));
+      if (Number.isFinite(sample.f) && Number.isFinite(sample.p)) {
+        rows.push(rowHTML("|Rₙ|", tidy(Math.abs(sample.f - sample.p), 3), "r"));
+      }
+    } else {
+      rows.push(rowHTML("|Rₙ(x)|", tidy(sample.r, 5), "r"));
+      if (Number.isFinite(sample.f) && Number.isFinite(sample.p)) {
+        rows.push(rowHTML("f(x)", tidy(sample.f, 5), "f"));
+        rows.push(rowHTML("P" + subscriptGlyph(d.n) + "(x)", tidy(sample.p, 5), "p"));
+      }
+    }
+    tipEl.innerHTML = '<div class="tip-x">x = ' + tidy(sample.x, 6) + "</div>" + rows.join("");
+    tipEl.classList.add("on");
+    tipEl.setAttribute("aria-hidden", "false");
+
+    var px = geom.X(sample.x);
+    var maxX = wrapEl.clientWidth - tipEl.offsetWidth - 8;
+    var left = Math.max(8, Math.min(px + 14, maxX));
+    var py = wrapEl.clientHeight / 2 - tipEl.offsetHeight / 2;
+    if (kind === "compare") {
+      var top = Math.max(8, Math.min(geom.Y(sample.f) - 40, wrapEl.clientHeight - tipEl.offsetHeight - 8));
+      if (Number.isFinite(top)) py = top;
+    }
+    tipEl.style.left = left + "px";
+    tipEl.style.top = Math.max(8, py) + "px";
+  }
+
+  function rowHTML(label, value, cls) {
+    return '<div class="tip-row"><i>' + label + "</i><b style=\"color:var(--series-" + cls + ")\">" + value + "</b></div>";
+  }
+
+  function hideTip(tipEl) {
+    tipEl.classList.remove("on");
+    tipEl.setAttribute("aria-hidden", "true");
+  }
+
+  /* ---- pointer interaction ---- */
+
+  function attachHover(wrapEl, canvasEl, tipEl, kind) {
+    function handle(evt) {
+      var rect = canvasEl.getBoundingClientRect();
+      var geom = kind === "compare" ? chart1.geom : chart2.geom;
+      if (!geom) return;
+      var xPix = evt.clientX - rect.left;
+      var pad = geom.pad;
+      if (xPix < pad.left || xPix > pad.left + geom.iw) {
+        state[kind === "compare" ? "hover1" : "hover2"] = null;
+        hideTip(tipEl);
+        redraw();
+        return;
+      }
+      var xVal = geom.xmin + (xPix - pad.left) / geom.iw * (geom.xmax - geom.xmin);
+      state[kind === "compare" ? "hover1" : "hover2"] = xVal;
+      var sample = nearestSample(state.samples, xVal);
+      redraw();
+      showTip(tipEl, wrapEl, geom, sample, kind);
+    }
+    canvasEl.addEventListener("pointermove", handle);
+    canvasEl.addEventListener("pointerdown", handle);
+    canvasEl.addEventListener("pointerleave", function () {
+      state[kind === "compare" ? "hover1" : "hover2"] = null;
+      hideTip(tipEl);
+      redraw();
+    });
+    wrapEl.addEventListener("blur", function () {
+      state[kind === "compare" ? "hover1" : "hover2"] = null;
+      hideTip(tipEl);
+      redraw();
+    });
+
+    // Keyboard users move the same crosshair the pointer drives.
+    wrapEl.addEventListener("keydown", function (evt) {
+      var g = kind === "compare" ? chart1.geom : chart2.geom;
+      if (!g) return;
+      var key = evt.key;
+      if (key !== "ArrowLeft" && key !== "ArrowRight" && key !== "Home" && key !== "End" && key !== "Escape") return;
+      evt.preventDefault();
+      var slot = kind === "compare" ? "hover1" : "hover2";
+      if (key === "Escape") {
+        state[slot] = null;
+        hideTip(tipEl);
+        redraw();
+        return;
+      }
+      var span = g.xmax - g.xmin;
+      var current = state[slot] == null ? state.a : state[slot];
+      var next;
+      if (key === "Home") next = g.xmin;
+      else if (key === "End") next = g.xmax;
+      else next = current + (key === "ArrowRight" ? 1 : -1) * span / 60;
+      next = Math.max(g.xmin, Math.min(g.xmax, next));
+      state[slot] = next;
+      var sample = nearestSample(state.samples, next);
+      redraw();
+      showTip(tipEl, wrapEl, g, sample, kind);
+    });
+  }
+
+  /* ---- redraw ---- */
+
+  var framePending = false;
+
+  function redraw() {
+    if (framePending) return;
+    framePending = true;
+    window.requestAnimationFrame(function () {
+      framePending = false;
+      var data = state.derived;
+      if (!data) {
+        drawCompare(chart1, null, NaN);
+        drawRemainder(chart2, null, NaN, state.logScale);
+        return;
+      }
+      drawCompare(chart1, data, state.hover1 == null ? NaN : state.hover1);
+      drawRemainder(chart2, data, state.hover2 == null ? NaN : state.hover2, state.logScale);
+    });
+  }
+
+  /* ---- sync controls from state ---- */
+
+  function syncUI() {
+    els.fnSelect.value = state.preset;
+    if (document.activeElement !== els.exprInput) els.exprInput.value = state.expr;
+    els.exprInput.classList.toggle("bad", Boolean(state.error));
+    els.centerInput.value = Number.isFinite(state.a) ? String(Number(state.a.toFixed(6))) : "";
+    els.centerPill.textContent = Number.isFinite(state.a) ? tidy(state.a, 5) : "—";
+    els.degreeRange.value = String(state.n);
+    els.degreeRange.style.setProperty("--fill", (state.n / 12 * 100) + "%");
+    els.degreePill.textContent = "n = " + state.n;
+    if (document.activeElement !== els.x0Input) els.x0Input.value = String(Number(state.x0.toFixed(6)));
+    if (document.activeElement !== els.x1Input) els.x1Input.value = String(Number(state.x1.toFixed(6)));
+    els.scaleBtn.setAttribute("aria-pressed", state.logScale ? "true" : "false");
+    els.scaleBtn.textContent = state.logScale ? "linear" : "log";
+    els.scaleBtn.style.borderColor = state.logScale ? "var(--accent)" : "";
+    els.scaleBtn.style.color = state.logScale ? "var(--accent)" : "";
+    updateHint();
+  }
+
+  function commit(persist) {
+    build();
+    syncUI();
+    applyResults(persist);
+  }
+
+  function applyResults(persist) {
+    var data = state.derived;
+    if (state.error) {
+      els.fnHint.textContent = state.error;
+      els.fnHint.classList.add("error");
+      els.intervalHint.textContent = "Both plots and every readout use this window.";
+      els.statErr.textContent = "—";
+      els.statErrFoot.textContent = "fix the input to resume";
+      els.formula.replaceChildren();
+      var errLine = document.createElement("span");
+      errLine.className = "formula-error";
+      errLine.textContent = "P" + subscriptGlyph(state.n) + "(x) = —";
+      els.formula.appendChild(errLine);
+      els.seriesNote.textContent = state.error;
+      els.ledgerBody.innerHTML = '<tr><td colspan="4" style="color:var(--muted)">Waiting for a valid function.</td></tr>';
+      state.samples = [];
+      redraw();
+      if (persist) saveState();
+      return;
+    }
+
+    updateHint();
+    els.intervalHint.textContent = "Window [" + tidy(data.x0, 4) + ", " + tidy(data.x1, 4) + "] · " + state.samples.length + " samples.";
+    renderFormula(state.formulaTex);
+    renderLedger(data);
+    updateStats(data);
+    updateFooters(data);
+
+    if (data.limitUsed) {
+      els.seriesNote.innerHTML = "f has a removable singularity at a. The polynomial uses the limit <b>f(a) = " + tidy(data.fa, 5) + "</b>, taken from the Taylor coefficients.";
+    } else if (!data.coeffsKnown) {
+      els.seriesNote.textContent = "Some derivatives are undefined at the center; missing coefficients are shown as 0.";
+    } else if (data.presetKey === "geom") {
+      els.seriesNote.innerHTML = "Geometric tail: the remainder is <b>x<sup>n+1</sup> / (1 − x)</b>, which diverges at x = 1.";
+    } else if (data.presetKey === "sin" || data.presetKey === "cos") {
+      els.seriesNote.innerHTML = "Lagrange remainder is bounded by <b>|f<sup>(n+1)</sup>(ξ)| · |x−a|<sup>n+1</sup> / (n+1)!</b>, and the derivative never exceeds 1.";
+    } else if (Number.isFinite(data.radius)) {
+      els.seriesNote.innerHTML = "Trustworthy inside <b>|x − a| &lt; " + tidy(data.radius, 4) + "</b>. Outside that radius the polynomial separates from f.";
+    } else {
+      els.seriesNote.innerHTML = "Every derivative is defined at the center, so the series converges across the whole real line.";
+    }
+
+    redraw();
+    if (persist) saveState();
+  }
+
+  function saveState() {
+    store.set("taylor-lab-state", JSON.stringify({
+      preset: state.preset,
+      expr: state.expr,
+      a: state.a,
+      n: state.n,
+      x0: state.x0,
+      x1: state.x1,
+      log: state.logScale
+    }));
+  }
+
+  function restoreState() {
+    var raw = store.get("taylor-lab-state");
+    if (!raw) return;
+    try {
+      var parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed !== "object") return;
+      if (typeof parsed.preset === "string" && PRESETS[parsed.preset]) state.preset = parsed.preset;
+      if (typeof parsed.expr === "string" && parsed.expr.trim()) state.expr = parsed.expr;
+      if (Number.isFinite(parsed.a)) state.a = parsed.a;
+      if (Number.isFinite(parsed.n)) state.n = Math.max(0, Math.min(12, Math.round(parsed.n)));
+      if (Number.isFinite(parsed.x0)) state.x0 = parsed.x0;
+      if (Number.isFinite(parsed.x1)) state.x1 = parsed.x1;
+      if (typeof parsed.log === "boolean") state.logScale = parsed.log;
+    } catch (e) { /* ignore malformed state */ }
+  }
+
+  /* ---- events ---- */
+
+  els.fnSelect.addEventListener("change", function () {
+    state.preset = els.fnSelect.value;
+    var preset = PRESETS[state.preset];
+    if (state.preset !== "custom") {
+      state.expr = preset.expr;
+    } else if (!state.expr || PRESETS[state.expr]) {
+      state.expr = "sin(x)";
+    }
+    commit(true);
+  });
+
+  els.exprInput.addEventListener("input", function () {
+    state.expr = els.exprInput.value;
+    state.preset = "custom";
+    if (els.fnSelect.value !== "custom") els.fnSelect.value = "custom";
+    commit(true);
+  });
+
+  els.centerInput.addEventListener("input", function () {
+    var v = parseFloat(els.centerInput.value);
+    if (Number.isFinite(v)) {
+      state.a = v;
+      commit(true);
+    }
+  });
+
+  els.centerInput.addEventListener("change", function () {
+    var v = parseFloat(els.centerInput.value);
+    if (!Number.isFinite(v)) {
+      els.centerInput.value = String(state.a);
+      return;
+    }
+    state.a = v;
+    commit(true);
+  });
+
+  els.centerChips.addEventListener("click", function (evt) {
+    var btn = evt.target.closest("button[data-center]");
+    if (!btn) return;
+    state.a = parseFloat(btn.dataset.center);
+    commit(true);
+  });
+
+  els.degreeRange.addEventListener("input", function () {
+    state.n = Math.max(0, Math.min(12, Math.round(Number(els.degreeRange.value))));
+    commit(true);
+  });
+
+  function applyInterval() {
+    var raw0 = parseFloat(els.x0Input.value);
+    var raw1 = parseFloat(els.x1Input.value);
+    if (Number.isFinite(raw0)) state.x0 = raw0;
+    if (Number.isFinite(raw1)) state.x1 = raw1;
+    if (state.x1 === state.x0) state.x1 = state.x0 + 1;
+    commit(true);
+  }
+
+  els.x0Input.addEventListener("change", applyInterval);
+  els.x1Input.addEventListener("change", applyInterval);
+  els.x0Input.addEventListener("keydown", function (e) { if (e.key === "Enter") applyInterval(); });
+  els.x1Input.addEventListener("keydown", function (e) { if (e.key === "Enter") applyInterval(); });
+
+  els.fitBtn.addEventListener("click", function () {
+    var half = Math.max(1, Math.abs(state.x1 - state.x0) / 2);
+    state.x0 = state.a - half;
+    state.x1 = state.a + half;
+    commit(true);
+  });
+
+  els.scaleBtn.addEventListener("click", function () {
+    state.logScale = !state.logScale;
+    syncUI();
+    redraw();
+    saveState();
+  });
+
+  els.resetBtn.addEventListener("click", function () {
+    state.preset = DEFAULTS.preset;
+    state.expr = DEFAULTS.expr;
+    state.a = DEFAULTS.a;
+    state.n = DEFAULTS.n;
+    state.x0 = DEFAULTS.x0;
+    state.x1 = DEFAULTS.x1;
+    state.logScale = DEFAULTS.log;
+    commit(true);
+  });
+
+  els.copyTexBtn.addEventListener("click", function () {
+    var text = state.formulaTex;
+    var done = function () {
+      var label = els.copyTexBtn.textContent;
+      els.copyTexBtn.textContent = "Copied";
+      setTimeout(function () { els.copyTexBtn.textContent = label; }, 1400);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text); done(); });
+    } else {
+      fallbackCopy(text);
+      done();
+    }
+  });
+
+  function fallbackCopy(text) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "absolute";
+    ta.style.left = "-9999px";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch (e) { /* no clipboard */ }
+    document.body.removeChild(ta);
+  }
+
+  /* ---- theme ---- */
+
+  function currentTheme() {
+    var attr = document.documentElement.getAttribute("data-theme");
+    if (attr === "dark" || attr === "light") return attr;
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+
+  els.themeBtn.addEventListener("click", function () {
+    var next = currentTheme() === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", next);
+    store.set("taylor-lab-theme", next);
+    redraw();
+  });
+
+  (function bootTheme() {
+    var saved = store.get("taylor-lab-theme");
+    if (saved === "dark" || saved === "light") document.documentElement.setAttribute("data-theme", saved);
+  })();
+
+  if (window.matchMedia) {
+    var mq = window.matchMedia("(prefers-color-scheme: dark)");
+    var onScheme = function () { redraw(); };
+    if (mq.addEventListener) mq.addEventListener("change", onScheme);
+    else if (mq.addListener) mq.addListener(onScheme);
+  }
+
+  /* ---- hover + resize ---- */
+
+  attachHover(els.plot1Wrap, chart1.canvas, els.tip1, "compare");
+  attachHover(els.plot2Wrap, chart2.canvas, els.tip2, "remainder");
+
+  var resizeTimer = null;
+  function onResize() {
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () { redraw(); }, 90);
+  }
+  if (window.ResizeObserver) {
+    var ro = new ResizeObserver(onResize);
+    ro.observe(els.plot1Wrap);
+    ro.observe(els.plot2Wrap);
+  } else {
+    window.addEventListener("resize", onResize);
+  }
+
+  /* ---- boot ---- */
+
+  if (!katexReady && window.katexFallbackAttempt !== true) {
+    els.formula.textContent = "Loading typesetting…";
+  }
+
+  restoreState();
+  commit(false);
+
+  // Re-render once KaTeX finishes loading if it arrived after our inline script.
+  window.addEventListener("load", function () {
+    katexReady = typeof window.katex !== "undefined";
+    if (state.derived && state.formulaTex) renderFormula(state.formulaTex);
+    redraw();
+  });
+})();
+</script>
+</body>
+</html>
