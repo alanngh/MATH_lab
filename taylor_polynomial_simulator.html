@@ -239,6 +239,17 @@ a.chip:hover { border-color: var(--accent); color: var(--accent); }
 }
 .select-wrap select:hover { border-color: #3C6B66; }
 
+.center-control {
+  display: grid; grid-template-columns: 36px minmax(0, 1fr) 36px;
+  gap: 6px; align-items: center;
+}
+.center-step-btn {
+  min-height: 42px; border: 1px solid var(--rail-line); border-radius: 10px;
+  background: var(--rail-input); color: var(--rail-ink);
+  font: 600 12px var(--font-mono); cursor: pointer;
+}
+.center-step-btn:hover { border-color: #3C6B66; color: #3C6B66; }
+
 .input {
   width: 100%; min-height: 42px; padding: 9px 11px;
   border: 1px solid var(--rail-line); border-radius: 10px;
@@ -648,12 +659,18 @@ table.ledger .term {
         <label for="centerInput">Center a</label>
         <span class="value-pill" id="centerPill">0</span>
       </div>
-      <input class="input" id="centerInput" type="number" step="0.25" value="0" inputmode="decimal">
+      <div class="center-control">
+        <button class="center-step-btn" id="centerDownBtn" type="button" aria-label="Decrease center" title="Decrease center">▼</button>
+        <input class="input" id="centerInput" type="number" step="0.25" value="0" inputmode="decimal">
+        <button class="center-step-btn" id="centerUpBtn" type="button" aria-label="Increase center" title="Increase center">▲</button>
+      </div>
       <div class="chips" id="centerChips" role="group" aria-label="Center presets">
         <button class="chip-btn" type="button" data-center="-1">−1</button>
         <button class="chip-btn" type="button" data-center="0">0</button>
         <button class="chip-btn" type="button" data-center="1">1</button>
         <button class="chip-btn" type="button" data-center="1.5707963268">π/2</button>
+        <button class="chip-btn" type="button" data-center="3.141592653589793">π</button>
+        <button class="chip-btn" type="button" data-center="2.718281828459045">e</button>
       </div>
     </div>
 
@@ -1952,6 +1969,8 @@ table.ledger .term {
     fnTag: $("#fnTag"),
     fnHint: $("#fnHint"),
     centerInput: $("#centerInput"),
+    centerDownBtn: $("#centerDownBtn"),
+    centerUpBtn: $("#centerUpBtn"),
     centerPill: $("#centerPill"),
     centerChips: $("#centerChips"),
     degreeRange: $("#degreeRange"),
@@ -2371,23 +2390,45 @@ table.ledger .term {
     commit(true);
   });
 
+  function centerIsCompleteNumber(raw) {
+    return /^[+-]?(?:\\d+(?:\\.\\d*)?|\\.\\d+)$/.test(raw.trim());
+  }
+
+  function updateCenterWithoutRewritingInput() {
+    build();
+    els.centerPill.textContent = Number.isFinite(state.a) ? tidy(state.a, 5) : "—";
+    applyResults(true);
+  }
+
   els.centerInput.addEventListener("input", function () {
-    var v = parseFloat(els.centerInput.value);
+    var raw = els.centerInput.value;
+    if (!centerIsCompleteNumber(raw)) return;
+    var v = Number(raw);
     if (Number.isFinite(v)) {
       state.a = v;
-      commit(true);
+      updateCenterWithoutRewritingInput();
     }
   });
 
   els.centerInput.addEventListener("change", function () {
-    var v = parseFloat(els.centerInput.value);
-    if (!Number.isFinite(v)) {
+    var raw = els.centerInput.value.trim();
+    var v = Number(raw);
+    if (!raw || !Number.isFinite(v)) {
       els.centerInput.value = String(state.a);
       return;
     }
     state.a = v;
     commit(true);
   });
+
+  function stepCenter(direction) {
+    var step = Number(els.centerInput.step) || 0.25;
+    state.a = Number((state.a + direction * step).toFixed(12));
+    commit(true);
+  }
+
+  els.centerDownBtn.addEventListener("click", function () { stepCenter(-1); });
+  els.centerUpBtn.addEventListener("click", function () { stepCenter(1); });
 
   els.centerChips.addEventListener("click", function (evt) {
     var btn = evt.target.closest("button[data-center]");
