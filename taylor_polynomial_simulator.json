@@ -1,0 +1,5 @@
+{
+  "title": "Taylor Polynomial Simulator",
+  "description": "Move the center and degree to watch a Taylor polynomial lock onto a function, with the remainder isolated on its own axis.",
+  "tags": ["Calculus", "Series", "Approximation"]
+}
