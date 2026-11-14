@@ -198,16 +198,21 @@ def card_html(html_file: Path, number: int) -> str:
         f'<span class="tag">{escape(tag)}</span>' for tag in tags
     )
     tag_row = (
-        "\n  " + f'<span class="sim-tags">{tag_markup}</span>' if tag_markup else ""
+        f'\n    <span class="sim-tags">{tag_markup}</span>' if tag_markup else ""
+    )
+    tag_data = escape("|".join(tags), quote=True)
+    search_data = escape(
+        clean_text(" ".join([title, description, *tags])).lower(), quote=True
     )
     return (
-        f'<a class="sim-card" href="{escape(relative_url, quote=True)}">\n'
-        '  <span class="sim-top">\n'
-        f'    <span class="sim-num">{number:02d}</span>\n'
-        '    <span class="sim-open">Open <span aria-hidden="true">↗</span></span>\n'
-        '  </span>\n'
-        f'  <h4 class="sim-name">{escape(title)}</h4>\n'
-        f'  <p class="sim-desc">{escape(description)}</p>{tag_row}\n'
+        f'<a class="sim-card" href="{escape(relative_url, quote=True)}"'
+        f' data-tags="{tag_data}" data-search="{search_data}">\n'
+        f'  <span class="sim-num">{number:02d}</span>\n'
+        '  <div class="sim-body">\n'
+        f'    <h4 class="sim-name">{escape(title)}</h4>\n'
+        f'    <p class="sim-desc">{escape(description)}</p>{tag_row}\n'
+        '  </div>\n'
+        '  <span class="sim-open" aria-hidden="true">Open</span>\n'
         '</a>'
     )
 

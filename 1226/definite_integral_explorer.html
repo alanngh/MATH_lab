@@ -1,0 +1,624 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Definite Integral Explorer</title>
+<meta name="description" content="Shade signed area under a curve, compare it with left, right and midpoint Riemann sums, and watch the integral accumulate from a to an adjustable endpoint.">
+<meta name="keywords" content="Calculus, Integration, Riemann sums">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Oswald:wght@400;500;600&family=Ubuntu:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/lab.css">
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem("mathlab-theme");
+      if (saved === "dark" || saved === "light") {
+        document.documentElement.setAttribute("data-theme", saved);
+      }
+    } catch (error) { /* private mode */ }
+  })();
+</script>
+<style>
+/* Page-specific additions to assets/lab.css */
+
+/* f(x) is the primary curve, so it gets its own ink swatch */
+.swatch.s-ink { color: var(--ink); }
+.legend .swatch.s-ink { color: var(--ink); }
+
+/* the alert line only takes up space when it has something to say */
+#error:empty { display: none; }
+
+.explore-card {
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 15px 17px 16px; box-shadow: var(--shadow);
+}
+.explore-card h2 {
+  margin: 0 0 7px; font-family: var(--font-display); font-weight: 500;
+  font-size: 15.5px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink);
+}
+.explore-card h2 .idx {
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .06em;
+  color: var(--accent); margin-right: 7px; vertical-align: 2px;
+}
+.explore-card p { margin: 0; font-size: 12px; line-height: 1.6; color: var(--ink-soft); max-width: 92ch; }
+.explore-card p + p { margin-top: 7px; }
+.explore-card b { color: var(--ink); font-weight: 700; }
+.explore-card em { font-style: italic; }
+
+.preset-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <a class="brand-mark" href="../index.html" aria-label="Back to the Math Lab index" title="Back to the index">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3.5 20.5V4.5M3.5 20.5h17"></path>
+        <path d="M6.5 16.2c2.6-1.2 4.1-6.4 6.6-7.2 2-.6 3.1 1.7 5 1.2"></path>
+        <circle cx="6.5" cy="16.2" r="1.15" fill="currentColor" stroke="none"></circle>
+      </svg>
+    </a>
+    <div class="brand-copy">
+      <span class="brand-name" id="collectionName">Math Lab</span>
+      <span class="brand-sub" id="collectionSub">Collection</span>
+    </div>
+  </div>
+  <div class="masthead-meta">
+    <span class="chip optional" title="Rendering stack"><span class="pip" aria-hidden="true"></span>Canvas 2D</span>
+    <a class="chip" href="https://github.com/alanngh/MATH_lab/tree/main" target="_blank" rel="noopener">Nilton Garcia Hilares</a>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Switch color theme" title="Switch color theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.2"></circle>
+        <path d="M12 2.5v2.2M12 19.3v2.2M4.3 4.3l1.6 1.6M18.1 18.1l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.3 19.7l1.6-1.6M18.1 5.9l1.6-1.6"></path>
+      </svg>
+    </button>
+    <a class="icon-btn" href="../index.html" aria-label="Back to the Math Lab index" title="Back to the index">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3.6 10.6 12 3.8l8.4 6.8"></path>
+        <path d="M5.8 9.4V20h12.4V9.4"></path>
+        <path d="M10.2 20v-5.4h3.6V20"></path>
+      </svg>
+    </a>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="panel" aria-labelledby="panelTitle">
+    <div class="panel-head">
+      <h2 class="panel-title" id="panelTitle">Controls</h2>
+      <button class="ghost-btn" id="reset" type="button">Reset</button>
+    </div>
+
+    <div class="field">
+      <div class="field-row">
+        <label for="preset">Example function</label>
+      </div>
+      <div class="select-wrap">
+        <select id="preset">
+          <option value="quadratic">Crosses the axis: x² − 2</option>
+          <option value="sine">Sine wave: sin x</option>
+          <option value="linear">Decreasing line: 2 − x</option>
+          <option value="cubic">Cubic: x³ − 3x</option>
+          <option value="gaussian">Bell curve: e^(−x²)</option>
+          <option value="rational">Rational: 1/(1+x²)</option>
+          <option value="custom">Custom function</option>
+        </select>
+      </div>
+      <input class="input" id="fx" value="x^2 - 2" spellcheck="false" autocomplete="off" aria-label="Function f of x">
+      <p class="field-hint">Use <code>x</code>, <code>^</code> for powers, explicit multiplication (<code>2*x</code>), and sin, cos, tan, sqrt, abs, exp, log, pi.</p>
+    </div>
+
+    <div class="field">
+      <div class="field-row">
+        <label for="a">Interval [a, b]</label>
+        <span class="value-pill" id="intervalPill">[−2, 2]</span>
+      </div>
+      <div class="interval-row">
+        <input class="input" id="a" type="number" step="any" value="-2" inputmode="decimal" aria-label="Interval start a">
+        <span class="arrow" aria-hidden="true">→</span>
+        <input class="input" id="b" type="number" step="any" value="2" inputmode="decimal" aria-label="Interval end b">
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-row">
+        <label for="method">Approximation</label>
+      </div>
+      <div class="select-wrap">
+        <select id="method">
+          <option value="left">Left endpoints</option>
+          <option value="right">Right endpoints</option>
+          <option value="midpoint" selected>Midpoints</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-row">
+        <label for="n">Subintervals n</label>
+        <span class="value-pill" id="nVal">8</span>
+      </div>
+      <input class="range" id="n" type="range" min="1" max="120" step="1" value="8">
+      <div class="ticks" aria-hidden="true"><span>1</span><span>30</span><span>60</span><span>90</span><span>120</span></div>
+    </div>
+
+    <div class="field">
+      <div class="field-row">
+        <label for="progress">Accumulation endpoint c</label>
+        <span class="value-pill" id="cVal">2.00</span>
+      </div>
+      <input class="range" id="progress" type="range" min="0" max="1000" step="1" value="1000" aria-label="Accumulation endpoint from a to b">
+      <p class="field-hint">Move <b>c</b> from a to b to watch the signed integral grow or shrink.</p>
+    </div>
+
+    <button class="run-btn" id="animate" type="button">Animate accumulation</button>
+
+    <p class="field-hint error" id="error" role="alert" aria-live="polite"></p>
+
+    <p class="panel-note">
+      The integral is <b>signed</b>: area below the axis subtracts. The reference value is a high-resolution numerical approximation, not a symbolic antiderivative.
+    </p>
+  </aside>
+
+  <main class="main">
+    <div class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">Riemann sums · signed area · accumulation</div>
+        <h1>Definite integral explorer</h1>
+        <p>Compare a Riemann sum with the integral, then drag the endpoint to watch the accumulated area build up.</p>
+      </div>
+    </div>
+
+    <section class="stats" aria-label="Integral summary">
+      <div class="stat">
+        <span class="stat-label">Integral ∫ₐᵇ</span>
+        <span class="stat-value" id="integral">—</span>
+        <span class="stat-sub">numerical reference</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Riemann estimate</span>
+        <span class="stat-value" id="estimate">—</span>
+        <span class="stat-sub" id="methodFoot">midpoints</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Error</span>
+        <span class="stat-value" id="errVal">—</span>
+        <span class="stat-sub">|estimate − integral|</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Accumulated ∫ₐᶜ</span>
+        <span class="stat-value" id="accumulated">—</span>
+        <span class="stat-sub" id="accumulatedFoot">to c = 2</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Geometric area</span>
+        <span class="stat-value" id="totalArea">—</span>
+        <span class="stat-sub">above + below, unsigned</span>
+      </div>
+    </section>
+
+    <section class="chart-card" aria-labelledby="chartTitle">
+      <div class="chart-head">
+        <h2 class="chart-title" id="chartTitle"><span class="idx">01</span>Signed area and approximation</h2>
+        <div class="legend" aria-hidden="true">
+          <span><i class="swatch s-ink"></i>f(x)</span>
+          <span><i class="swatch band s-f"></i>above axis</span>
+          <span><i class="swatch band s-d"></i>below axis</span>
+          <span><i class="swatch s-p"></i>approximation</span>
+        </div>
+      </div>
+      <div class="plot" id="plotWrap" style="height:392px">
+        <canvas id="plot" role="img" aria-label="Function graph with signed-area shading, Riemann rectangles and the accumulation endpoint c"></canvas>
+      </div>
+      <div class="chart-foot">
+        <span>above axis <b id="positive">—</b></span>
+        <span>below axis <b id="negative">—</b></span>
+        <span>subintervals <b id="footN">8</b></span>
+      </div>
+    </section>
+
+    <section class="explore-card" aria-labelledby="exploreTitle">
+      <h2 id="exploreTitle"><span class="idx">02</span>Try this</h2>
+      <p id="insight">Predict whether positive and negative contributions will cancel. Then move c and increase n.</p>
+      <p>Shading follows <b>c</b>; the orange rectangles approximate the whole interval [a, b]. Watch the error shrink as <b>n</b> grows, and compare how left, right and midpoint rules approach the reference from different sides.</p>
+    </section>
+  </main>
+</div>
+
+<footer class="foot">
+  <span>Definite Integral Explorer by <a href="https://github.com/alanngh/MATH_lab/tree/main" target="_blank" rel="noopener">Nilton Garcia Hilares</a></span>
+  <span class="formula-ref">∫ₐᵇ f(x) dx = lim Σ f(xᵢ*) Δx</span>
+</footer>
+
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var $ = function (id) { return document.getElementById(id); };
+  var canvas = $("plot");
+  var chart = MathLab.canvas.lab(canvas);
+  var plotWrap = $("plotWrap");
+  var animation = null;
+
+  var EXAMPLES = {
+    quadratic: ["x^2 - 2", -2, 2],
+    sine: ["sin(x)", 0, 2 * Math.PI],
+    linear: ["2 - x", 0, 4],
+    cubic: ["x^3 - 3*x", -2, 2],
+    gaussian: ["exp(-(x^2))", -2, 2],
+    rational: ["1/(1+x^2)", -3, 3]
+  };
+
+  var METHOD_LABEL = { left: "left endpoints", right: "right endpoints", midpoint: "midpoints" };
+
+  /* ---------------- expression compiler ----------------
+     Whitelisted names only: no arbitrary identifiers can reach eval. */
+  function compile(source) {
+    var s = String(source).trim();
+    if (!s) throw new Error("Enter a function f(x).");
+    if (!/^[0-9a-zA-Z+\-*/^().,\s]+$/.test(s)) {
+      throw new Error("Use numbers, x, supported functions, and arithmetic operators only.");
+    }
+    var allowed = {
+      x: 1, sin: 1, cos: 1, tan: 1, asin: 1, acos: 1, atan: 1, sqrt: 1,
+      abs: 1, exp: 1, log: 1, ln: 1, floor: 1, ceil: 1, pi: 1, e: 1
+    };
+    var words = s.match(/[A-Za-z]+/g) || [];
+    for (var i = 0; i < words.length; i++) {
+      if (!allowed[words[i]]) {
+        throw new Error("Unrecognized name: " + words[i] + ". Use x and supported functions.");
+      }
+    }
+    var expression = s.replace(/\^/g, "**");
+    try {
+      return new Function("x",
+        '"use strict";' +
+        "const {sin,cos,tan,asin,acos,atan,sqrt,abs,exp,log,floor,ceil}=Math;" +
+        "const ln=log,pi=Math.PI,e=Math.E;" +
+        "return (" + expression + ");");
+    } catch (e) {
+      throw new Error("Check the function syntax; use * for multiplication, e.g. 2*x.");
+    }
+  }
+
+  function simpson(f, a, b, steps) {
+    steps = steps || 2400;
+    if (a === b) return 0;
+    var sum = f(a) + f(b);
+    for (var k = 1; k < steps; k++) sum += (k % 2 ? 4 : 2) * f(a + (b - a) * k / steps);
+    return sum * (b - a) / (3 * steps);
+  }
+
+  /* every sample must be finite, or the plot is meaningless */
+  function guard(f) {
+    return function (x) {
+      var y = f(x);
+      if (typeof y !== "number" || !Number.isFinite(y) || Math.abs(y) > 1e9) {
+        throw new Error("f(x) must be finite throughout [a, b]. Check the interval or formula.");
+      }
+      return y;
+    };
+  }
+
+  function palette() {
+    var s = getComputedStyle(document.documentElement);
+    return {
+      grid: s.getPropertyValue("--grid").trim(),
+      axis: s.getPropertyValue("--axis").trim(),
+      muted: s.getPropertyValue("--muted").trim(),
+      ink: s.getPropertyValue("--ink").trim(),
+      surface: s.getPropertyValue("--surface-2").trim(),
+      inkSoft: s.getPropertyValue("--ink-soft").trim(),
+      accent: s.getPropertyValue("--accent").trim(),
+      positive: s.getPropertyValue("--series-f").trim(),
+      negative: s.getPropertyValue("--danger").trim(),
+      f: s.getPropertyValue("--ink").trim()
+    };
+  }
+
+  function clearResults() {
+    var ids = ["integral", "estimate", "errVal", "accumulated", "totalArea", "positive", "negative"];
+    for (var i = 0; i < ids.length; i++) {
+      var el = $(ids[i]);
+      if (el) el.textContent = "—";
+    }
+    chart.clear();
+  }
+
+  function niceStep(range, target) {
+    var raw = range / Math.max(1, target);
+    var exp = Math.floor(Math.log10(raw));
+    var base = Math.pow(10, exp);
+    var f = raw / base;
+    return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * base;
+  }
+
+  function draw() {
+    chart.fit();
+    var W = chart.w, H = chart.h;
+    var ctx = chart.ctx;
+    var c = palette();
+
+    $("nVal").textContent = $("n").value;
+
+    try {
+      var a = Number($("a").value);
+      var b = Number($("b").value);
+      if ($("a").value.trim() === "" || $("b").value.trim() === "" ||
+          !Number.isFinite(a) || !Number.isFinite(b) || b <= a) {
+        throw new Error("Enter finite endpoints with b > a.");
+      }
+
+      var raw = compile($("fx").value);
+      var f = guard(raw);
+      var n = Number($("n").value);
+      var method = $("method").value;
+
+      var SAMPLES = 600;
+      var values = new Array(SAMPLES + 1);
+      for (var i = 0; i <= SAMPLES; i++) values[i] = f(a + (b - a) * i / SAMPLES);
+
+      var cPos = a + (b - a) * (Number($("progress").value) / 1000);
+      $("cVal").textContent = cPos.toFixed(2);
+
+      var dx = (b - a) / n;
+      var estimate = 0;
+      var pieces = [];
+      for (var j = 0; j < n; j++) {
+        var x0 = a + j * dx;
+        var x1 = x0 + dx;
+        var y = method === "left" ? f(x0) : method === "right" ? f(x1) : f((x0 + x1) / 2);
+        estimate += y * dx;
+        pieces.push({ x0: x0, x1: x1, y: y });
+      }
+
+      var integral = simpson(f, a, b);
+      var positive = simpson(function (x) { return Math.max(f(x), 0); }, a, b);
+      var negative = -simpson(function (x) { return Math.min(f(x), 0); }, a, b);
+      var accumulated = simpson(f, a, cPos);
+
+      $("error").textContent = "";
+      $("integral").textContent = MathLab.format(integral, 5);
+      $("estimate").textContent = MathLab.format(estimate, 5);
+      $("errVal").textContent = MathLab.format(Math.abs(estimate - integral), 4);
+      $("accumulated").textContent = MathLab.format(accumulated, 5);
+      $("totalArea").textContent = MathLab.format(positive + negative, 5);
+      $("positive").textContent = MathLab.format(positive, 4);
+      $("negative").textContent = MathLab.format(negative, 4);
+      $("methodFoot").textContent = METHOD_LABEL[method];
+      $("accumulatedFoot").textContent = "to c = " + MathLab.format(cPos, 4);
+      $("intervalPill").textContent = "[" + MathLab.format(a, 4) + ", " + MathLab.format(b, 4) + "]";
+      $("footN").textContent = String(n);
+      $("insight").textContent = positive > 0.0001 && negative > 0.0001
+        ? "This curve crosses the x-axis: positive and negative regions partly cancel. Compare the signed integral with the total geometric area " + MathLab.format(positive + negative) + "."
+        : negative > 0.0001
+          ? "The curve is below the x-axis on this interval, so its integral is negative even though its geometric area is positive."
+          : "This curve is above the x-axis on this interval. Change the interval or function to explore cancellation.";
+
+      /* ---- plot ---- */
+      var pad = { top: 20, right: 26, bottom: 46, left: 62 };
+      if (W < 460) pad = { top: 16, right: 14, bottom: 38, left: 48 };
+      var iw = W - pad.left - pad.right;
+      var ih = H - pad.top - pad.bottom;
+
+      var low = Math.min(0, Math.min.apply(null, values));
+      var high = Math.max(0, Math.max.apply(null, values));
+      for (var p = 0; p < pieces.length; p++) {
+        low = Math.min(low, pieces[p].y);
+        high = Math.max(high, pieces[p].y);
+      }
+      var spread = Math.max(high - low, 0.5);
+      low -= spread * 0.13;
+      high += spread * 0.13;
+
+      var X = function (x) { return pad.left + (x - a) / (b - a) * iw; };
+      var Y = function (y) { return pad.top + (high - y) / (high - low) * ih; };
+      var base = Y(0);
+
+      chart.clear();
+
+      /* grid + axis labels */
+      var yStep = niceStep(high - low, 5);
+      ctx.strokeStyle = c.grid;
+      ctx.lineWidth = 1;
+      ctx.fillStyle = c.muted;
+      ctx.font = '10px "JetBrains Mono", monospace';
+      ctx.textAlign = "right";
+      ctx.textBaseline = "middle";
+      for (var gy = Math.ceil(low / yStep) * yStep; gy <= high; gy += yStep) {
+        var py = Math.round(Y(gy)) + 0.5;
+        ctx.beginPath(); ctx.moveTo(pad.left, py); ctx.lineTo(pad.left + iw, py); ctx.stroke();
+        if (Math.abs(gy) > yStep * 1e-9) ctx.fillText(MathLab.format(gy, 3), pad.left - 8, py);
+      }
+      var xStep = niceStep(b - a, 6);
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      for (var gx = Math.ceil(a / xStep) * xStep; gx <= b; gx += xStep) {
+        var px = Math.round(X(gx)) + 0.5;
+        ctx.beginPath(); ctx.moveTo(px, pad.top); ctx.lineTo(px, pad.top + ih); ctx.stroke();
+        ctx.fillText(MathLab.format(gx, 4), px, pad.top + ih + 8);
+      }
+
+      /* signed shading, clipped at the accumulation endpoint */
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(pad.left, pad.top, iw, ih);
+      ctx.clip();
+
+      var fillSegment = function (u, v, h0, h1) {
+        ctx.fillStyle = (h0 + h1) >= 0 ? c.positive : c.negative;
+        ctx.globalAlpha = 0.24;
+        ctx.beginPath();
+        ctx.moveTo(X(u), base);
+        ctx.lineTo(X(u), Y(h0));
+        ctx.lineTo(X(v), Y(h1));
+        ctx.lineTo(X(v), base);
+        ctx.closePath();
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      };
+
+      for (var s2 = 0; s2 < SAMPLES; s2++) {
+        var u = a + (b - a) * s2 / SAMPLES;
+        var v = a + (b - a) * (s2 + 1) / SAMPLES;
+        if (u >= cPos) break;
+        var right = Math.min(v, cPos);
+        var y0 = values[s2];
+        var y1 = right === v ? values[s2 + 1] : f(right);
+        if (y0 * y1 < 0) {
+          var zero = u + (right - u) * Math.abs(y0) / (Math.abs(y0) + Math.abs(y1));
+          fillSegment(u, zero, y0, 0);
+          fillSegment(zero, right, 0, y1);
+        } else {
+          fillSegment(u, right, y0, y1);
+        }
+      }
+
+      /* Riemann rectangles, outlined only so the shading stays readable */
+      ctx.strokeStyle = c.accent;
+      ctx.lineWidth = n > 75 ? 1 : 1.6;
+      for (var r = 0; r < pieces.length; r++) {
+        var pc = pieces[r];
+        ctx.strokeRect(X(pc.x0), Math.min(base, Y(pc.y)),
+          Math.max(0.5, X(pc.x1) - X(pc.x0)), Math.abs(base - Y(pc.y)));
+      }
+
+      /* the function, on top */
+      ctx.strokeStyle = c.f;
+      ctx.lineWidth = 2.2;
+      ctx.lineJoin = "round";
+      ctx.beginPath();
+      for (var q = 0; q <= SAMPLES; q++) {
+        var qx = X(a + (b - a) * q / SAMPLES);
+        var qy = Y(values[q]);
+        if (q === 0) ctx.moveTo(qx, qy); else ctx.lineTo(qx, qy);
+      }
+      ctx.stroke();
+
+      /* x-axis */
+      ctx.strokeStyle = c.axis;
+      ctx.lineWidth = 1.4;
+      ctx.beginPath(); ctx.moveTo(pad.left, base); ctx.lineTo(pad.left + iw, base); ctx.stroke();
+
+      /* accumulation endpoint c */
+      var cxp = X(cPos);
+      ctx.strokeStyle = c.accent;
+      ctx.lineWidth = 1.4;
+      ctx.setLineDash([5, 4]);
+      ctx.beginPath(); ctx.moveTo(cxp, pad.top); ctx.lineTo(cxp, pad.top + ih); ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.restore();
+
+      ctx.fillStyle = c.accent;
+      ctx.font = '600 11px "JetBrains Mono", monospace';
+      ctx.textAlign = "center";
+      ctx.textBaseline = "bottom";
+      ctx.fillText("c", Math.min(pad.left + iw - 8, Math.max(pad.left + 8, cxp)), pad.top + ih - 5);
+
+      ctx.strokeStyle = c.axis;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(pad.left + 0.5, pad.top + 0.5, iw - 1, ih - 1);
+
+      $("error").textContent = "";
+    } catch (err) {
+      $("error").textContent = err.message;
+      clearResults();
+      $("cVal").textContent = "—";
+      $("footN").textContent = "—";
+      stop();
+    }
+  }
+
+  function stop() {
+    if (animation !== null) {
+      cancelAnimationFrame(animation);
+      animation = null;
+    }
+    $("animate").textContent = "Animate accumulation";
+  }
+
+  /* ---------------- events ---------------- */
+  var REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  $("preset").addEventListener("change", function () {
+    stop();
+    var ex = EXAMPLES[$("preset").value];
+    if (ex) {
+      $("fx").value = ex[0];
+      $("a").value = ex[1];
+      $("b").value = ex[2];
+      $("progress").value = 1000;
+    }
+    draw();
+  });
+
+  $("fx").addEventListener("input", function () {
+    $("preset").value = "custom";
+    stop();
+    draw();
+  });
+
+  ["a", "b", "method", "n"].forEach(function (id) {
+    $(id).addEventListener("input", function () {
+      stop();
+      draw();
+    });
+  });
+
+  $("progress").addEventListener("input", function () { draw(); });
+
+  $("animate").addEventListener("click", function () {
+    if (animation !== null) { stop(); return; }
+    draw();
+    if ($("error").textContent) return;
+
+    var progress = $("progress");
+    if (REDUCED) {
+      progress.value = 1000;
+      draw();
+      return;
+    }
+
+    progress.value = 0;
+    $("animate").textContent = "Pause";
+    var start = performance.now();
+    var duration = 4500;
+    function frame(now) {
+      progress.value = Math.min(1000, Math.round((now - start) / duration * 1000));
+      draw();
+      if (Number(progress.value) < 1000) animation = requestAnimationFrame(frame);
+      else stop();
+    }
+    animation = requestAnimationFrame(frame);
+  });
+
+  $("reset").addEventListener("click", function () {
+    stop();
+    $("preset").value = "quadratic";
+    $("fx").value = "x^2 - 2";
+    $("a").value = "-2";
+    $("b").value = "2";
+    $("method").value = "midpoint";
+    $("n").value = "8";
+    $("progress").value = "1000";
+    draw();
+  });
+
+  MathLab.onTheme(draw);
+
+  var resizeTimer = null;
+  function onResize() {
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(draw, 90);
+  }
+  if (window.ResizeObserver) new ResizeObserver(onResize).observe(plotWrap);
+  else window.addEventListener("resize", onResize);
+
+  draw();
+})();
+</script>
+</body>
+</html>

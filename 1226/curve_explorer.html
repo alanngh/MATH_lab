@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="claude:viewport-fit-sides" content="cover">
+<title>Curve Explorer</title>
+<meta name="description" content="Trace polar and parametric curves, then read their enclosed area, arc length and scale.">
+<meta name="keywords" content="Calculus, Polar, Parametric, Curves">
+<link rel="stylesheet" href="../assets/lab.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Oswald:wght@400;500;600&family=Ubuntu:wght@400;500;700&display=swap">
+<script>
+  /* Apply the saved theme before first paint. */
+  (function () {
+    try {
+      var saved = localStorage.getItem("mathlab-theme");
+      if (saved === "dark" || saved === "light") {
+        document.documentElement.setAttribute("data-theme", saved);
+      }
+    } catch (error) { /* private mode */ }
+  })();
+</script>
+<style>
+/* Page-specific additions to assets/lab.css */
+.note-card {
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 15px 17px 16px; box-shadow: var(--shadow);
+}
+.note-card h2 {
+  margin: 0 0 7px; font-family: var(--font-display); font-weight: 500;
+  font-size: 15.5px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink);
+}
+.note-card h2 .idx {
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .06em;
+  color: var(--accent); margin-right: 7px; vertical-align: 2px;
+}
+.note-card p { margin: 0; font-size: 12px; line-height: 1.6; color: var(--ink-soft); max-width: 90ch; }
+.note-card b { color: var(--ink); font-weight: 700; }
+</style>
+</head>
+<body>
+<header class="masthead">
+  <div class="brand">
+    <a class="brand-mark" href="../index.html" aria-label="Back to the Math Lab index" title="Back to the index">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3.5 20.5V4.5M3.5 20.5h17"></path>
+        <path d="M6.5 16.2c2.6-1.2 4.1-6.4 6.6-7.2 2-.6 3.1 1.7 5 1.2"></path>
+        <circle cx="6.5" cy="16.2" r="1.15" fill="currentColor" stroke="none"></circle>
+      </svg>
+    </a>
+    <div class="brand-copy">
+      <span class="brand-name" id="collectionName">Math Lab</span>
+      <span class="brand-sub" id="collectionSub">Collection</span>
+    </div>
+  </div>
+  <div class="masthead-meta">
+    <span class="chip optional" title="Rendering stack"><span class="pip" aria-hidden="true"></span>Canvas 2D</span>
+    <a class="chip" id="creditLink" href="https://github.com/alanngh/MATH_lab/tree/main" target="_blank" rel="noopener">Nilton Garcia Hilares</a>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Switch color theme" title="Switch color theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.2"></circle>
+        <path d="M12 2.5v2.2M12 19.3v2.2M4.3 4.3l1.6 1.6M18.1 18.1l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.3 19.7l1.6-1.6M18.1 5.9l1.6-1.6"></path>
+      </svg>
+    </button>
+    <a class="icon-btn" id="homeBtn" href="../index.html" aria-label="Back to the Math Lab index" title="Back to the index">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3.6 10.6 12 3.8l8.4 6.8"></path>
+        <path d="M5.8 9.4V20h12.4V9.4"></path>
+        <path d="M10.2 20v-5.4h3.6V20"></path>
+      </svg>
+    </a>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="panel" aria-labelledby="panelTitle">
+    <div class="panel-head">
+      <h2 class="panel-title" id="panelTitle">Controls</h2>
+      <button class="ghost-btn" id="reset" type="button">Reset</button>
+    </div>
+
+    <div class="field">
+      <div class="field-row"><label for="mode">Curve type</label></div>
+      <div class="select-wrap">
+        <select id="mode">
+          <option value="polar">Polar curve</option>
+          <option value="parametric">Parametric curve</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field" id="polarControls">
+      <div class="field-row">
+        <label for="polarPreset">Example</label>
+        <span class="value-pill" id="polarTag">r(θ)</span>
+      </div>
+      <div class="select-wrap">
+        <select id="polarPreset">
+          <option value="cardioid">Cardioid: r = M + N cos θ</option>
+          <option value="circle">Circle: r = N</option>
+          <option value="rose">Four-petal rose: r = N cos 2θ</option>
+          <option value="limacon">Limaçon: r = M + N cos θ</option>
+          <option value="spiral">Spiral: r = Nθ</option>
+          <option value="custom">Custom: enter r(θ)</option>
+        </select>
+      </div>
+      <input class="input" id="polarR" value="1 + 1*cos(t)" aria-label="Polar equation r of theta" spellcheck="false" autocomplete="off">
+      <p class="field-hint">Use <b>t</b> for θ. Examples: <code>2+cos(t)</code>, <code>2*cos(3*t)</code>, <code>t/2</code>.</p>
+    </div>
+
+    <div class="field" id="parametricControls" hidden>
+      <div class="field-row">
+        <label for="paramPreset">Example</label>
+        <span class="value-pill" id="paramTag">x(t), y(t)</span>
+      </div>
+      <div class="select-wrap">
+        <select id="paramPreset">
+          <option value="circle">Circle: x = 2cos t, y = 2sin t</option>
+          <option value="ellipse">Ellipse: x = 3cos t, y = sin t</option>
+          <option value="parabola">Parabola: x = t, y = t²/3</option>
+          <option value="cycloid">Cycloid: x = t − sin t, y = 1 − cos t</option>
+          <option value="custom">Custom equations</option>
+        </select>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="paramX">x(t)</label>
+          <input class="input" id="paramX" value="2*cos(t)" aria-label="x of t" spellcheck="false" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="paramY">y(t)</label>
+          <input class="input" id="paramY" value="2*sin(t)" aria-label="y of t" spellcheck="false" autocomplete="off">
+        </div>
+      </div>
+      <p class="field-hint">Use <b>t</b>, numbers, operators, and sin, cos, tan, exp, sqrt, abs, log.</p>
+    </div>
+
+    <div class="field" id="coefficientFields">
+      <div class="field-row">
+        <label for="m">Coefficient M</label>
+        <span class="value-pill" id="mVal">1.0</span>
+      </div>
+      <input class="range" id="m" type="range" min="-3" max="3" step="0.1" value="1">
+      <div class="field-row">
+        <label for="n">Coefficient N</label>
+        <span class="value-pill" id="nVal">1.0</span>
+      </div>
+      <input class="range" id="n" type="range" min="-3" max="3" step="0.1" value="1">
+      <p class="field-hint"><b>M</b> shifts the baseline, <b>N</b> scales the curve. Both are independent of the interval endpoints.</p>
+    </div>
+
+    <div class="field">
+      <div class="field-row">
+        <label for="intervalA">Interval [a, b]</label>
+        <span class="value-pill" id="intervalPill">[0, 2π]</span>
+      </div>
+      <div class="interval-row">
+        <input class="input" id="intervalA" type="number" step="any" value="0" inputmode="decimal" aria-label="Interval start">
+        <span class="arrow" aria-hidden="true">→</span>
+        <input class="input" id="intervalB" type="number" step="any" value="6.283185307" inputmode="decimal" aria-label="Interval end">
+      </div>
+      <p class="field-hint" id="intervalError" hidden>The interval must satisfy b &gt; a.</p>
+    </div>
+
+    <div class="field">
+      <div class="field-row">
+        <label for="slider">Current parameter</label>
+        <span class="value-pill" id="currentPill">2π</span>
+      </div>
+      <input class="range" id="slider" type="range" min="0" max="6.283185307" step="0.001" value="6.283185307">
+    </div>
+
+    <button class="run-btn" id="animate" type="button">Trace curve</button>
+
+    <p class="panel-note">
+      The solid line is the traced part; the faint line is the full path over <code>[a, b]</code>. Area uses the shoelace sum, arc length sums segment distances.
+    </p>
+  </aside>
+
+  <main class="main">
+    <div class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">Polar and parametric · traced by hand</div>
+        <h1>Curve explorer</h1>
+        <p>Pick a curve, set the interval, then trace it. The readouts follow the traced portion so you can watch area and arc length accumulate.</p>
+      </div>
+    </div>
+
+    <section class="stats" aria-label="Curve summary">
+      <div class="stat">
+        <span class="stat-label">Parameter</span>
+        <span class="stat-value" id="statCurrent">—</span>
+        <span class="stat-sub" id="statCurrentFoot">θ or t</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Interval</span>
+        <span class="stat-value" id="statInterval">[0, 2π]</span>
+        <span class="stat-sub" id="statIntervalFoot">b − a = 6.283</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Approx. area</span>
+        <span class="stat-value" id="statArea">—</span>
+        <span class="stat-sub">shoelace, traced part</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Arc length</span>
+        <span class="stat-value" id="statLength">—</span>
+        <span class="stat-sub">sum of segments</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Scale</span>
+        <span class="stat-value" id="statScale">—</span>
+        <span class="stat-sub">largest |coordinate|</span>
+      </div>
+    </section>
+
+    <section class="chart-card" aria-labelledby="chartTitle">
+      <div class="chart-head">
+        <h2 class="chart-title" id="chartTitle"><span class="idx">01</span>Polar graph</h2>
+        <div class="legend" aria-hidden="true">
+          <span><i class="swatch s-f faint"></i>full path</span>
+          <span><i class="swatch s-p"></i>traced</span>
+          <span><i class="swatch dot s-c"></i>current point</span>
+        </div>
+      </div>
+      <div class="plot" id="plotWrap">
+        <canvas id="graph" role="img" aria-label="Curve plot with axes, full path and traced portion"></canvas>
+      </div>
+      <div class="chart-foot">
+        <span>samples <b id="footSamples">—</b></span>
+        <span>traced <b id="footTraced">100%</b></span>
+      </div>
+    </section>
+
+    <section class="note-card" aria-labelledby="exploreTitle">
+      <h2 id="exploreTitle"><span class="idx">02</span>Try this</h2>
+      <p id="exploreText">Predict the shape before pressing <b>Trace curve</b>. Then change one equation, coefficient, or interval endpoint and explain what changed.</p>
+    </section>
+  </main>
+</div>
+
+<footer class="foot">
+  <span>Curve Explorer by <a href="https://github.com/alanngh/MATH_lab/tree/main" target="_blank" rel="noopener">Nilton Garcia Hilares</a></span>
+  <span class="formula-ref">A = ½∫(x dy − y dx) · L = ∫√(x′² + y′²) dt</span>
+</footer>
+
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var $ = function (sel) { return document.querySelector(sel); };
+  var MINUS = "−";
+  var canvas = $("#graph");
+  var ctx = canvas.getContext("2d");
+  var plotWrap = $("#plotWrap");
+
+  var state = { mode: "polar", trace: 1, points: [], anim: null, error: null };
+
+  /* ---------------- formatting ---------------- */
+  function tidy(v, sig) {
+    sig = sig || 4;
+    if (!Number.isFinite(v)) return "—";
+    if (v === 0) return "0";
+    var abs = Math.abs(v);
+    if (abs >= 1e5 || abs < 1e-3) {
+      return v.toExponential(Math.max(1, sig - 1)).replace("e+", "e").replace("e-", "e" + MINUS);
+    }
+    return String(Number(v.toPrecision(sig))).replace("-", MINUS);
+  }
+  function tickLabel(v, step) {
+    if (!Number.isFinite(v)) return "";
+    if (v === 0) return "0";
+    var abs = Math.abs(v);
+    if (abs >= 1e4 || abs < 1e-3) {
+      var parts = v.toExponential(1).split("e");
+      return parts[0] + "e" + Number(parts[1]);
+    }
+    var decimals = step >= 1 ? 0 : Math.min(4, Math.ceil(-Math.log10(step)));
+    return Number(v.toFixed(decimals)).toString().replace("-", MINUS);
+  }
+  function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+  function palette() {
+    return {
+      grid: cssVar("--grid"), axis: cssVar("--axis"), muted: cssVar("--muted"),
+      ink: cssVar("--ink"), inkSoft: cssVar("--ink-soft"),
+      surface: cssVar("--surface-2"), accent: cssVar("--accent"),
+      f: cssVar("--series-f"), p: cssVar("--series-p"),
+      center: cssVar("--center"), line: cssVar("--line")
+    };
+  }
+
+  /* ---------------- expressions ---------------- */
+  function expression(text) {
+    var s = String(text).trim().replace(/\^/g, "**").replace(/π/g, "PI");
+    if (!s) throw new Error("Enter an equation before graphing.");
+    return new Function("t", "with(Math){return (" + s + ");}");
+  }
+  function polarPoint(t) {
+    var preset = $("#polarPreset").value;
+    var m = Number($("#m").value);
+    var n = Number($("#n").value);
+    if (preset === "custom") {
+      var r = Number(expression($("#polarR").value)(t));
+      if (!Number.isFinite(r)) throw new Error("r(θ) must return a finite number.");
+      return [r * Math.cos(t), r * Math.sin(t)];
+    }
+    var radius;
+    if (preset === "circle") radius = n;
+    else if (preset === "rose") radius = n * Math.cos(2 * t);
+    else if (preset === "spiral") radius = n * t;
+    else radius = m + n * Math.cos(t);
+    return [radius * Math.cos(t), radius * Math.sin(t)];
+  }
+  function paramPoint(t) {
+    var preset = $("#paramPreset").value;
+    if (preset === "custom") {
+      var x = Number(expression($("#paramX").value)(t));
+      var y = Number(expression($("#paramY").value)(t));
+      if (!Number.isFinite(x) || !Number.isFinite(y)) throw new Error("x(t) and y(t) must return finite numbers.");
+      return [x, y];
+    }
+    if (preset === "ellipse") return [3 * Math.cos(t), Math.sin(t)];
+    if (preset === "parabola") return [t - 6.3, t * t / 3 - 4];
+    if (preset === "cycloid") return [t - Math.sin(t), 1 - Math.cos(t)];
+    return [2 * Math.cos(t), 2 * Math.sin(t)];
+  }
+  function curveAt(t) {
+    return state.mode === "polar" ? polarPoint(t) : paramPoint(t);
+  }
+  /* ---------------- interval + controls ---------------- */
+  function interval() {
+    var a = Number($("#intervalA").value);
+    var b = Number($("#intervalB").value);
+    return { a: a, b: b, valid: Number.isFinite(a) && Number.isFinite(b) && b > a };
+  }
+
+  function syncControls() {
+    var q = interval();
+    $("#intervalError").hidden = q.valid;
+    var slider = $("#slider");
+    slider.disabled = !q.valid;
+    if (q.valid) {
+      slider.min = String(q.a);
+      slider.max = String(q.b);
+      slider.step = String(Math.max((q.b - q.a) / 1000, 1e-6));
+      var v = Number(slider.value);
+      if (!Number.isFinite(v) || v < q.a || v > q.b) slider.value = String(q.b);
+    }
+    var fill = function (el) {
+      var min = Number(el.min), max = Number(el.max), val = Number(el.value);
+      var pct = max > min ? (val - min) / (max - min) * 100 : 0;
+      el.style.setProperty("--fill", Math.max(0, Math.min(100, pct)).toFixed(1) + "%");
+    };
+    fill($("#m"));
+    fill($("#n"));
+    fill(slider);
+    $("#mVal").textContent = Number($("#m").value).toFixed(1);
+    $("#nVal").textContent = Number($("#n").value).toFixed(1);
+    $("#polarR").classList.toggle("bad", Boolean(state.error) && state.mode === "polar");
+    $("#paramX").classList.toggle("bad", Boolean(state.error) && state.mode === "parametric");
+    $("#paramY").classList.toggle("bad", Boolean(state.error) && state.mode === "parametric");
+  }
+
+  function polarEquationText() {
+    var preset = $("#polarPreset").value;
+    var m = Math.round(Number($("#m").value) * 10) / 10;
+    var n = Math.round(Number($("#n").value) * 10) / 10;
+    if (preset === "circle") return String(n);
+    if (preset === "rose") return n + "*cos(2*t)";
+    if (preset === "spiral") return n + "*t";
+    if (preset === "cardioid" || preset === "limacon") return m + " + " + n + "*cos(t)";
+    return null;
+  }
+
+  function updatePresetTags() {
+    var text = polarEquationText();
+    if (text !== null) $("#polarR").value = text;
+    $("#polarTag").textContent = $("#polarPreset").value === "custom" ? "custom" : "r(θ)";
+    $("#paramTag").textContent = $("#paramPreset").value === "custom" ? "custom" : "x(t), y(t)";
+  }
+
+  /* ---------------- geometry ---------------- */
+  function buildPoints(q, count) {
+    var pts = [], error = null;
+    for (var i = 0; i <= count; i++) {
+      var t = q.a + (q.b - q.a) * i / count;
+      try {
+        var pair = curveAt(t);
+        if (!Number.isFinite(pair[0]) || !Number.isFinite(pair[1])) throw new Error("The curve is undefined on this interval.");
+        pts.push({ t: t, x: pair[0], y: pair[1] });
+      } catch (e) {
+        error = e.message;
+        break;
+      }
+    }
+    return { points: pts, error: error };
+  }
+
+  function measure(pts, upto) {
+    var area = 0, length = 0, scale = 0;
+    for (var i = 0; i < upto; i++) {
+      var p = pts[i];
+      scale = Math.max(scale, Math.abs(p.x), Math.abs(p.y));
+      if (i > 0) {
+        var prev = pts[i - 1];
+        length += Math.hypot(p.x - prev.x, p.y - prev.y);
+        area += (prev.x * p.y - p.x * prev.y) / 2;
+      }
+    }
+    return { area: area, length: length, scale: scale };
+  }
+
+  /* ---------------- canvas ---------------- */
+  function fitCanvas() {
+    var box = plotWrap.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+    var w = Math.max(160, Math.round(box.width));
+    var h = Math.max(160, Math.round(box.height));
+    if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+    }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    return { w: w, h: h };
+  }
+
+  function niceStep(range, target) {
+    var raw = range / Math.max(1, target);
+    var exp = Math.floor(Math.log10(raw));
+    var base = Math.pow(10, exp);
+    var f = raw / base;
+    var nice = f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10;
+    return nice * base;
+  }
+
+  function strokePath(points, upto, X, Y, color, width, alpha) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = color;
+    ctx.lineWidth = width;
+    ctx.lineJoin = "round";
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    var pen = false;
+    for (var i = 0; i < upto; i++) {
+      var p = points[i];
+      var px = X(p.x), py = Y(p.y);
+      if (!pen) { ctx.moveTo(px, py); pen = true; }
+      else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function emptyMessage(c, W, H, message) {
+    ctx.fillStyle = c.muted;
+    ctx.font = '12px "Ubuntu", sans-serif';
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(message, W / 2, H / 2);
+  }
+  function draw() {
+    var dims = fitCanvas();
+    var W = dims.w, H = dims.h;
+    var c = palette();
+    ctx.clearRect(0, 0, W, H);
+
+    var q = interval();
+    state.error = null;
+
+    if (!q.valid) {
+      syncControls();
+      emptyMessage(c, W, H, "Set an interval with b > a");
+      updateStats(null, q, 0);
+      return;
+    }
+
+    var built = buildPoints(q, 1200);
+    state.points = built.points;
+    state.error = built.error;
+
+    if (built.error || !built.points.length) {
+      syncControls();
+      emptyMessage(c, W, H, built.error || "No points to plot");
+      updateStats(null, q, 0);
+      return;
+    }
+
+    var extent = 1;
+    built.points.forEach(function (p) {
+      extent = Math.max(extent, Math.abs(p.x), Math.abs(p.y));
+    });
+    extent *= 1.12;
+
+    var pad = { top: 16, right: 18, bottom: 30, left: 46 };
+    if (W < 420) pad = { top: 12, right: 12, bottom: 26, left: 38 };
+    var iw = W - pad.left - pad.right;
+    var ih = H - pad.top - pad.bottom;
+
+    var X = function (x) { return pad.left + iw / 2 + (x / extent) * (iw / 2); };
+    var Y = function (y) { return pad.top + ih / 2 - (y / extent) * (ih / 2); };
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(pad.left, pad.top, iw, ih);
+    ctx.clip();
+
+    var step = niceStep(extent * 2, Math.max(4, Math.round(iw / 90)));
+    ctx.strokeStyle = c.grid;
+    ctx.lineWidth = 1;
+    var start = -Math.floor(extent / step) * step;
+    for (var gx = start; gx <= extent; gx += step) {
+      var px = Math.round(X(gx)) + 0.5;
+      ctx.beginPath(); ctx.moveTo(px, pad.top); ctx.lineTo(px, pad.top + ih); ctx.stroke();
+    }
+    for (var gy = start; gy <= extent; gy += step) {
+      var py = Math.round(Y(gy)) + 0.5;
+      ctx.beginPath(); ctx.moveTo(pad.left, py); ctx.lineTo(pad.left + iw, py); ctx.stroke();
+    }
+
+    ctx.strokeStyle = c.axis;
+    ctx.globalAlpha = 0.85;
+    var ox = Math.round(X(0)) + 0.5;
+    var oy = Math.round(Y(0)) + 0.5;
+    ctx.beginPath(); ctx.moveTo(pad.left, oy); ctx.lineTo(pad.left + iw, oy); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(ox, pad.top); ctx.lineTo(ox, pad.top + ih); ctx.stroke();
+    ctx.globalAlpha = 1;
+
+    strokePath(built.points, built.points.length, X, Y, c.f, 1.6, 0.3);
+
+    var upto = Math.max(2, Math.floor(built.points.length * state.trace));
+    strokePath(built.points, upto, X, Y, c.p, 2.4, 1);
+
+    var here = built.points[Math.min(upto - 1, built.points.length - 1)];
+    if (here) {
+      ctx.beginPath();
+      ctx.arc(X(here.x), Y(here.y), 5, 0, Math.PI * 2);
+      ctx.fillStyle = c.center;
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = c.surface;
+      ctx.stroke();
+    }
+
+    ctx.restore();
+
+    ctx.strokeStyle = c.line;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(pad.left + 0.5, pad.top + 0.5, iw - 1, ih - 1);
+
+    ctx.fillStyle = c.muted;
+    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.textAlign = "center";
+    ctx.textBaseline = "top";
+    for (var tx = start; tx <= extent; tx += step) {
+      if (Math.abs(tx) < step * 1e-9) continue;
+      ctx.fillText(tickLabel(tx, step), X(tx), pad.top + ih + 7);
+    }
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    for (var ty = start; ty <= extent; ty += step) {
+      if (Math.abs(ty) < step * 1e-9) continue;
+      ctx.fillText(tickLabel(ty, step), pad.left - 7, Y(ty));
+    }
+
+    updateStats(built.points, q, upto);
+    syncControls();
+
+    $("#footSamples").textContent = String(built.points.length);
+    $("#footTraced").textContent = Math.round(state.trace * 100) + "%";
+    $("#chartTitle").innerHTML = '<span class="idx">01</span>' + (state.mode === "polar" ? "Polar graph" : "Parametric graph");
+    $("#exploreText").innerHTML = state.mode === "polar"
+      ? "Predict the shape before pressing <b>Trace curve</b>. Then change <b>M</b>, <b>N</b>, or the interval and explain what changed — symmetry, size, enclosed area, or the order the curve is traced."
+      : "Predict the path before pressing <b>Trace curve</b>. Change one equation or an interval endpoint, then explain how direction, self-intersections, or arc length changed.";
+  }
+
+  function updateStats(points, q, upto) {
+    var sym = state.mode === "polar" ? "θ" : "t";
+    var current = q.valid ? Number($("#slider").value) : NaN;
+
+    $("#statCurrent").textContent = Number.isFinite(current) ? sym + " = " + tidy(current, 5) : "—";
+    $("#statCurrentFoot").textContent = state.mode === "polar" ? "angle θ, radians" : "parameter t";
+    $("#statInterval").textContent = q.valid ? "[" + tidy(q.a, 4) + ", " + tidy(q.b, 4) + "]" : "invalid";
+    $("#statIntervalFoot").textContent = q.valid ? "b − a = " + tidy(q.b - q.a, 4) : "set b > a";
+    $("#intervalPill").textContent = q.valid ? "[" + tidy(q.a, 3) + ", " + tidy(q.b, 3) + "]" : "invalid";
+    $("#currentPill").textContent = Number.isFinite(current) ? tidy(current, 5) : "—";
+
+    if (!points || !points.length || !upto) {
+      $("#statArea").textContent = "—";
+      $("#statLength").textContent = "—";
+      $("#statScale").textContent = "—";
+      return;
+    }
+    var m = measure(points, Math.min(points.length, Math.max(2, upto)));
+    $("#statArea").textContent = state.mode === "polar" ? tidy(Math.abs(m.area), 4) : "—";
+    $("#statLength").textContent = tidy(m.length, 4);
+    $("#statScale").textContent = tidy(m.scale, 4);
+  }
+
+  /* ---------------- animation ---------------- */
+  function animate() {
+    if (!interval().valid) return;
+    cancelAnimationFrame(state.anim);
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) { state.trace = 1; draw(); return; }
+    state.trace = 0;
+    var q = interval();
+    $("#slider").value = String(q.a);
+    var startTime = performance.now();
+    var duration = 1400;
+    function step(now) {
+      var t = Math.min(1, (now - startTime) / duration);
+      state.trace = t;
+      $("#slider").value = String(q.a + (q.b - q.a) * t);
+      draw();
+      if (t < 1) state.anim = requestAnimationFrame(step);
+    }
+    state.anim = requestAnimationFrame(step);
+  }
+
+  /* ---------------- events ---------------- */
+  $("#mode").addEventListener("change", function () {
+    state.mode = $("#mode").value;
+    $("#polarControls").hidden = state.mode !== "polar";
+    $("#parametricControls").hidden = state.mode !== "parametric";
+    $("#coefficientFields").hidden = state.mode !== "polar";
+    state.trace = 1;
+    $("#slider").value = $("#intervalB").value;
+    draw();
+  });
+
+  $("#polarPreset").addEventListener("change", function () {
+    updatePresetTags();
+    state.trace = 1;
+    draw();
+  });
+
+  $("#paramPreset").addEventListener("change", function () {
+    var preset = $("#paramPreset").value;
+    var defaults = {
+      circle: ["2*cos(t)", "2*sin(t)"],
+      ellipse: ["3*cos(t)", "sin(t)"],
+      parabola: ["t-6.3", "t*t/3-4"],
+      cycloid: ["t-sin(t)", "1-cos(t)"]
+    };
+    if (defaults[preset]) {
+      $("#paramX").value = defaults[preset][0];
+      $("#paramY").value = defaults[preset][1];
+    }
+    updatePresetTags();
+    state.trace = 1;
+    draw();
+  });
+
+  ["m", "n"].forEach(function (id) {
+    $("#" + id).addEventListener("input", function () {
+      updatePresetTags();
+      state.trace = 1;
+      draw();
+    });
+  });
+
+  $("#polarR").addEventListener("input", function () {
+    $("#polarPreset").value = "custom";
+    updatePresetTags();
+    state.trace = 1;
+    draw();
+  });
+  ["#paramX", "#paramY"].forEach(function (sel) {
+    $(sel).addEventListener("input", function () {
+      $("#paramPreset").value = "custom";
+      updatePresetTags();
+      state.trace = 1;
+      draw();
+    });
+  });
+
+  ["#intervalA", "#intervalB"].forEach(function (sel) {
+    $(sel).addEventListener("input", function () {
+      var q = interval();
+      if (q.valid) $("#slider").value = String(q.b);
+      state.trace = 1;
+      draw();
+    });
+  });
+
+  $("#slider").addEventListener("input", function () { draw(); });
+  $("#animate").addEventListener("click", animate);
+
+  $("#reset").addEventListener("click", function () {
+    cancelAnimationFrame(state.anim);
+    state.mode = "polar";
+    state.trace = 1;
+    $("#mode").value = "polar";
+    $("#polarControls").hidden = false;
+    $("#parametricControls").hidden = true;
+    $("#coefficientFields").hidden = false;
+    $("#polarPreset").value = "cardioid";
+    $("#m").value = "1";
+    $("#n").value = "1";
+    $("#intervalA").value = "0";
+    $("#intervalB").value = (2 * Math.PI).toFixed(9);
+    $("#slider").value = (2 * Math.PI).toFixed(9);
+    $("#paramPreset").value = "circle";
+    $("#paramX").value = "2*cos(t)";
+    $("#paramY").value = "2*sin(t)";
+    updatePresetTags();
+    syncControls();
+    draw();
+  });
+
+  /* ---------------- theme ---------------- */
+  MathLab.onTheme(draw);
+
+  /* ---------------- boot ---------------- */
+  var resizeTimer = null;
+  function onResize() {
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(draw, 90);
+  }
+  if (window.ResizeObserver) {
+    new ResizeObserver(onResize).observe(plotWrap);
+  } else {
+    window.addEventListener("resize", onResize);
+  }
+
+  updatePresetTags();
+  syncControls();
+  draw();
+})();
+</script>
+</body>
+</html>

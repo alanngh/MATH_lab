@@ -1,0 +1,5 @@
+{
+  "title": "Curve Explorer",
+  "description": "Trace polar and parametric curves and watch enclosed area and arc length accumulate as the parameter advances.",
+  "tags": ["Calculus", "Polar", "Parametric"]
+}

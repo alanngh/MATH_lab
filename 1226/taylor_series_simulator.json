@@ -1,5 +1,0 @@
-{
-  "title": "Taylor Series Simulator",
-  "description": "A classic Taylor series explorer: pick a function, center and degree to see the approximation, its error and the tolerance interval.",
-  "tags": ["Calculus", "Series"]
-}

@@ -5,461 +5,14 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
 <title>Taylor Polynomial Simulator</title>
+<link rel="stylesheet" href="../assets/lab.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Oswald:wght@400;500;600&family=Ubuntu:wght@400;500;700&display=swap">
 <style id="katex-style">.katex{font:normal 1.21em KaTeX_Main,Times New Roman,serif;line-height:1.2;text-indent:0;text-rendering:auto}.katex *{-ms-high-contrast-adjust:none!important;border-color:currentColor}.katex .katex-version:after{content:"0.16.11"}.katex .katex-mathml{clip:rect(1px,1px,1px,1px);border:0;height:1px;overflow:hidden;padding:0;position:absolute;width:1px}.katex .katex-html>.newline{display:block}.katex .base{position:relative;white-space:nowrap;width:-webkit-min-content;width:-moz-min-content;width:min-content}.katex .base,.katex .strut{display:inline-block}.katex .textbf{font-weight:700}.katex .textit{font-style:italic}.katex .textrm{font-family:KaTeX_Main}.katex .textsf{font-family:KaTeX_SansSerif}.katex .texttt{font-family:KaTeX_Typewriter}.katex .mathnormal{font-family:KaTeX_Math;font-style:italic}.katex .mathit{font-family:KaTeX_Main;font-style:italic}.katex .mathrm{font-style:normal}.katex .mathbf{font-family:KaTeX_Main;font-weight:700}.katex .boldsymbol{font-family:KaTeX_Math;font-style:italic;font-weight:700}.katex .amsrm,.katex .mathbb,.katex .textbb{font-family:KaTeX_AMS}.katex .mathcal{font-family:KaTeX_Caligraphic}.katex .mathfrak,.katex .textfrak{font-family:KaTeX_Fraktur}.katex .mathboldfrak,.katex .textboldfrak{font-family:KaTeX_Fraktur;font-weight:700}.katex .mathtt{font-family:KaTeX_Typewriter}.katex .mathscr,.katex .textscr{font-family:KaTeX_Script}.katex .mathsf,.katex .textsf{font-family:KaTeX_SansSerif}.katex .mathboldsf,.katex .textboldsf{font-family:KaTeX_SansSerif;font-weight:700}.katex .mathitsf,.katex .textitsf{font-family:KaTeX_SansSerif;font-style:italic}.katex .mainrm{font-family:KaTeX_Main;font-style:normal}.katex .vlist-t{border-collapse:collapse;display:inline-table;table-layout:fixed}.katex .vlist-r{display:table-row}.katex .vlist{display:table-cell;position:relative;vertical-align:bottom}.katex .vlist>span{display:block;height:0;position:relative}.katex .vlist>span>span{display:inline-block}.katex .vlist>span>.pstrut{overflow:hidden;width:0}.katex .vlist-t2{margin-right:-2px}.katex .vlist-s{display:table-cell;font-size:1px;min-width:2px;vertical-align:bottom;width:2px}.katex .vbox{align-items:baseline;display:inline-flex;flex-direction:column}.katex .hbox{width:100%}.katex .hbox,.katex .thinbox{display:inline-flex;flex-direction:row}.katex .thinbox{max-width:0;width:0}.katex .msupsub{text-align:left}.katex .mfrac>span>span{text-align:center}.katex .mfrac .frac-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline,.katex .hline,.katex .mfrac .frac-line,.katex .overline .overline-line,.katex .rule,.katex .underline .underline-line{min-height:1px}.katex .mspace{display:inline-block}.katex .clap,.katex .llap,.katex .rlap{position:relative;width:0}.katex .clap>.inner,.katex .llap>.inner,.katex .rlap>.inner{position:absolute}.katex .clap>.fix,.katex .llap>.fix,.katex .rlap>.fix{display:inline-block}.katex .llap>.inner{right:0}.katex .clap>.inner,.katex .rlap>.inner{left:0}.katex .clap>.inner>span{margin-left:-50%;margin-right:50%}.katex .rule{border:0 solid;display:inline-block;position:relative}.katex .hline,.katex .overline .overline-line,.katex .underline .underline-line{border-bottom-style:solid;display:inline-block;width:100%}.katex .hdashline{border-bottom-style:dashed;display:inline-block;width:100%}.katex .sqrt>.root{margin-left:.2777777778em;margin-right:-.5555555556em}.katex .fontsize-ensurer.reset-size1.size1,.katex .sizing.reset-size1.size1{font-size:1em}.katex .fontsize-ensurer.reset-size1.size2,.katex .sizing.reset-size1.size2{font-size:1.2em}.katex .fontsize-ensurer.reset-size1.size3,.katex .sizing.reset-size1.size3{font-size:1.4em}.katex .fontsize-ensurer.reset-size1.size4,.katex .sizing.reset-size1.size4{font-size:1.6em}.katex .fontsize-ensurer.reset-size1.size5,.katex .sizing.reset-size1.size5{font-size:1.8em}.katex .fontsize-ensurer.reset-size1.size6,.katex .sizing.reset-size1.size6{font-size:2em}.katex .fontsize-ensurer.reset-size1.size7,.katex .sizing.reset-size1.size7{font-size:2.4em}.katex .fontsize-ensurer.reset-size1.size8,.katex .sizing.reset-size1.size8{font-size:2.88em}.katex .fontsize-ensurer.reset-size1.size9,.katex .sizing.reset-size1.size9{font-size:3.456em}.katex .fontsize-ensurer.reset-size1.size10,.katex .sizing.reset-size1.size10{font-size:4.148em}.katex .fontsize-ensurer.reset-size1.size11,.katex .sizing.reset-size1.size11{font-size:4.976em}.katex .fontsize-ensurer.reset-size2.size1,.katex .sizing.reset-size2.size1{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size2.size2,.katex .sizing.reset-size2.size2{font-size:1em}.katex .fontsize-ensurer.reset-size2.size3,.katex .sizing.reset-size2.size3{font-size:1.1666666667em}.katex .fontsize-ensurer.reset-size2.size4,.katex .sizing.reset-size2.size4{font-size:1.3333333333em}.katex .fontsize-ensurer.reset-size2.size5,.katex .sizing.reset-size2.size5{font-size:1.5em}.katex .fontsize-ensurer.reset-size2.size6,.katex .sizing.reset-size2.size6{font-size:1.6666666667em}.katex .fontsize-ensurer.reset-size2.size7,.katex .sizing.reset-size2.size7{font-size:2em}.katex .fontsize-ensurer.reset-size2.size8,.katex .sizing.reset-size2.size8{font-size:2.4em}.katex .fontsize-ensurer.reset-size2.size9,.katex .sizing.reset-size2.size9{font-size:2.88em}.katex .fontsize-ensurer.reset-size2.size10,.katex .sizing.reset-size2.size10{font-size:3.4566666667em}.katex .fontsize-ensurer.reset-size2.size11,.katex .sizing.reset-size2.size11{font-size:4.1466666667em}.katex .fontsize-ensurer.reset-size3.size1,.katex .sizing.reset-size3.size1{font-size:.7142857143em}.katex .fontsize-ensurer.reset-size3.size2,.katex .sizing.reset-size3.size2{font-size:.8571428571em}.katex .fontsize-ensurer.reset-size3.size3,.katex .sizing.reset-size3.size3{font-size:1em}.katex .fontsize-ensurer.reset-size3.size4,.katex .sizing.reset-size3.size4{font-size:1.1428571429em}.katex .fontsize-ensurer.reset-size3.size5,.katex .sizing.reset-size3.size5{font-size:1.2857142857em}.katex .fontsize-ensurer.reset-size3.size6,.katex .sizing.reset-size3.size6{font-size:1.4285714286em}.katex .fontsize-ensurer.reset-size3.size7,.katex .sizing.reset-size3.size7{font-size:1.7142857143em}.katex .fontsize-ensurer.reset-size3.size8,.katex .sizing.reset-size3.size8{font-size:2.0571428571em}.katex .fontsize-ensurer.reset-size3.size9,.katex .sizing.reset-size3.size9{font-size:2.4685714286em}.katex .fontsize-ensurer.reset-size3.size10,.katex .sizing.reset-size3.size10{font-size:2.9628571429em}.katex .fontsize-ensurer.reset-size3.size11,.katex .sizing.reset-size3.size11{font-size:3.5542857143em}.katex .fontsize-ensurer.reset-size4.size1,.katex .sizing.reset-size4.size1{font-size:.625em}.katex .fontsize-ensurer.reset-size4.size2,.katex .sizing.reset-size4.size2{font-size:.75em}.katex .fontsize-ensurer.reset-size4.size3,.katex .sizing.reset-size4.size3{font-size:.875em}.katex .fontsize-ensurer.reset-size4.size4,.katex .sizing.reset-size4.size4{font-size:1em}.katex .fontsize-ensurer.reset-size4.size5,.katex .sizing.reset-size4.size5{font-size:1.125em}.katex .fontsize-ensurer.reset-size4.size6,.katex .sizing.reset-size4.size6{font-size:1.25em}.katex .fontsize-ensurer.reset-size4.size7,.katex .sizing.reset-size4.size7{font-size:1.5em}.katex .fontsize-ensurer.reset-size4.size8,.katex .sizing.reset-size4.size8{font-size:1.8em}.katex .fontsize-ensurer.reset-size4.size9,.katex .sizing.reset-size4.size9{font-size:2.16em}.katex .fontsize-ensurer.reset-size4.size10,.katex .sizing.reset-size4.size10{font-size:2.5925em}.katex .fontsize-ensurer.reset-size4.size11,.katex .sizing.reset-size4.size11{font-size:3.11em}.katex .fontsize-ensurer.reset-size5.size1,.katex .sizing.reset-size5.size1{font-size:.5555555556em}.katex .fontsize-ensurer.reset-size5.size2,.katex .sizing.reset-size5.size2{font-size:.6666666667em}.katex .fontsize-ensurer.reset-size5.size3,.katex .sizing.reset-size5.size3{font-size:.7777777778em}.katex .fontsize-ensurer.reset-size5.size4,.katex .sizing.reset-size5.size4{font-size:.8888888889em}.katex .fontsize-ensurer.reset-size5.size5,.katex .sizing.reset-size5.size5{font-size:1em}.katex .fontsize-ensurer.reset-size5.size6,.katex .sizing.reset-size5.size6{font-size:1.1111111111em}.katex .fontsize-ensurer.reset-size5.size7,.katex .sizing.reset-size5.size7{font-size:1.3333333333em}.katex .fontsize-ensurer.reset-size5.size8,.katex .sizing.reset-size5.size8{font-size:1.6em}.katex .fontsize-ensurer.reset-size5.size9,.katex .sizing.reset-size5.size9{font-size:1.92em}.katex .fontsize-ensurer.reset-size5.size10,.katex .sizing.reset-size5.size10{font-size:2.3044444444em}.katex .fontsize-ensurer.reset-size5.size11,.katex .sizing.reset-size5.size11{font-size:2.7644444444em}.katex .fontsize-ensurer.reset-size6.size1,.katex .sizing.reset-size6.size1{font-size:.5em}.katex .fontsize-ensurer.reset-size6.size2,.katex .sizing.reset-size6.size2{font-size:.6em}.katex .fontsize-ensurer.reset-size6.size3,.katex .sizing.reset-size6.size3{font-size:.7em}.katex .fontsize-ensurer.reset-size6.size4,.katex .sizing.reset-size6.size4{font-size:.8em}.katex .fontsize-ensurer.reset-size6.size5,.katex .sizing.reset-size6.size5{font-size:.9em}.katex .fontsize-ensurer.reset-size6.size6,.katex .sizing.reset-size6.size6{font-size:1em}.katex .fontsize-ensurer.reset-size6.size7,.katex .sizing.reset-size6.size7{font-size:1.2em}.katex .fontsize-ensurer.reset-size6.size8,.katex .sizing.reset-size6.size8{font-size:1.44em}.katex .fontsize-ensurer.reset-size6.size9,.katex .sizing.reset-size6.size9{font-size:1.728em}.katex .fontsize-ensurer.reset-size6.size10,.katex .sizing.reset-size6.size10{font-size:2.074em}.katex .fontsize-ensurer.reset-size6.size11,.katex .sizing.reset-size6.size11{font-size:2.488em}.katex .fontsize-ensurer.reset-size7.size1,.katex .sizing.reset-size7.size1{font-size:.4166666667em}.katex .fontsize-ensurer.reset-size7.size2,.katex .sizing.reset-size7.size2{font-size:.5em}.katex .fontsize-ensurer.reset-size7.size3,.katex .sizing.reset-size7.size3{font-size:.5833333333em}.katex .fontsize-ensurer.reset-size7.size4,.katex .sizing.reset-size7.size4{font-size:.6666666667em}.katex .fontsize-ensurer.reset-size7.size5,.katex .sizing.reset-size7.size5{font-size:.75em}.katex .fontsize-ensurer.reset-size7.size6,.katex .sizing.reset-size7.size6{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size7.size7,.katex .sizing.reset-size7.size7{font-size:1em}.katex .fontsize-ensurer.reset-size7.size8,.katex .sizing.reset-size7.size8{font-size:1.2em}.katex .fontsize-ensurer.reset-size7.size9,.katex .sizing.reset-size7.size9{font-size:1.44em}.katex .fontsize-ensurer.reset-size7.size10,.katex .sizing.reset-size7.size10{font-size:1.7283333333em}.katex .fontsize-ensurer.reset-size7.size11,.katex .sizing.reset-size7.size11{font-size:2.0733333333em}.katex .fontsize-ensurer.reset-size8.size1,.katex .sizing.reset-size8.size1{font-size:.3472222222em}.katex .fontsize-ensurer.reset-size8.size2,.katex .sizing.reset-size8.size2{font-size:.4166666667em}.katex .fontsize-ensurer.reset-size8.size3,.katex .sizing.reset-size8.size3{font-size:.4861111111em}.katex .fontsize-ensurer.reset-size8.size4,.katex .sizing.reset-size8.size4{font-size:.5555555556em}.katex .fontsize-ensurer.reset-size8.size5,.katex .sizing.reset-size8.size5{font-size:.625em}.katex .fontsize-ensurer.reset-size8.size6,.katex .sizing.reset-size8.size6{font-size:.6944444444em}.katex .fontsize-ensurer.reset-size8.size7,.katex .sizing.reset-size8.size7{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size8.size8,.katex .sizing.reset-size8.size8{font-size:1em}.katex .fontsize-ensurer.reset-size8.size9,.katex .sizing.reset-size8.size9{font-size:1.2em}.katex .fontsize-ensurer.reset-size8.size10,.katex .sizing.reset-size8.size10{font-size:1.4402777778em}.katex .fontsize-ensurer.reset-size8.size11,.katex .sizing.reset-size8.size11{font-size:1.7277777778em}.katex .fontsize-ensurer.reset-size9.size1,.katex .sizing.reset-size9.size1{font-size:.2893518519em}.katex .fontsize-ensurer.reset-size9.size2,.katex .sizing.reset-size9.size2{font-size:.3472222222em}.katex .fontsize-ensurer.reset-size9.size3,.katex .sizing.reset-size9.size3{font-size:.4050925926em}.katex .fontsize-ensurer.reset-size9.size4,.katex .sizing.reset-size9.size4{font-size:.462962963em}.katex .fontsize-ensurer.reset-size9.size5,.katex .sizing.reset-size9.size5{font-size:.5208333333em}.katex .fontsize-ensurer.reset-size9.size6,.katex .sizing.reset-size9.size6{font-size:.5787037037em}.katex .fontsize-ensurer.reset-size9.size7,.katex .sizing.reset-size9.size7{font-size:.6944444444em}.katex .fontsize-ensurer.reset-size9.size8,.katex .sizing.reset-size9.size8{font-size:.8333333333em}.katex .fontsize-ensurer.reset-size9.size9,.katex .sizing.reset-size9.size9{font-size:1em}.katex .fontsize-ensurer.reset-size9.size10,.katex .sizing.reset-size9.size10{font-size:1.2002314815em}.katex .fontsize-ensurer.reset-size9.size11,.katex .sizing.reset-size9.size11{font-size:1.4398148148em}.katex .fontsize-ensurer.reset-size10.size1,.katex .sizing.reset-size10.size1{font-size:.2410800386em}.katex .fontsize-ensurer.reset-size10.size2,.katex .sizing.reset-size10.size2{font-size:.2892960463em}.katex .fontsize-ensurer.reset-size10.size3,.katex .sizing.reset-size10.size3{font-size:.337512054em}.katex .fontsize-ensurer.reset-size10.size4,.katex .sizing.reset-size10.size4{font-size:.3857280617em}.katex .fontsize-ensurer.reset-size10.size5,.katex .sizing.reset-size10.size5{font-size:.4339440694em}.katex .fontsize-ensurer.reset-size10.size6,.katex .sizing.reset-size10.size6{font-size:.4821600771em}.katex .fontsize-ensurer.reset-size10.size7,.katex .sizing.reset-size10.size7{font-size:.5785920926em}.katex .fontsize-ensurer.reset-size10.size8,.katex .sizing.reset-size10.size8{font-size:.6943105111em}.katex .fontsize-ensurer.reset-size10.size9,.katex .sizing.reset-size10.size9{font-size:.8331726133em}.katex .fontsize-ensurer.reset-size10.size10,.katex .sizing.reset-size10.size10{font-size:1em}.katex .fontsize-ensurer.reset-size10.size11,.katex .sizing.reset-size10.size11{font-size:1.1996142719em}.katex .fontsize-ensurer.reset-size11.size1,.katex .sizing.reset-size11.size1{font-size:.2009646302em}.katex .fontsize-ensurer.reset-size11.size2,.katex .sizing.reset-size11.size2{font-size:.2411575563em}.katex .fontsize-ensurer.reset-size11.size3,.katex .sizing.reset-size11.size3{font-size:.2813504823em}.katex .fontsize-ensurer.reset-size11.size4,.katex .sizing.reset-size11.size4{font-size:.3215434084em}.katex .fontsize-ensurer.reset-size11.size5,.katex .sizing.reset-size11.size5{font-size:.3617363344em}.katex .fontsize-ensurer.reset-size11.size6,.katex .sizing.reset-size11.size6{font-size:.4019292605em}.katex .fontsize-ensurer.reset-size11.size7,.katex .sizing.reset-size11.size7{font-size:.4823151125em}.katex .fontsize-ensurer.reset-size11.size8,.katex .sizing.reset-size11.size8{font-size:.578778135em}.katex .fontsize-ensurer.reset-size11.size9,.katex .sizing.reset-size11.size9{font-size:.6945337621em}.katex .fontsize-ensurer.reset-size11.size10,.katex .sizing.reset-size11.size10{font-size:.8336012862em}.katex .fontsize-ensurer.reset-size11.size11,.katex .sizing.reset-size11.size11{font-size:1em}.katex .delimsizing.size1{font-family:KaTeX_Size1}.katex .delimsizing.size2{font-family:KaTeX_Size2}.katex .delimsizing.size3{font-family:KaTeX_Size3}.katex .delimsizing.size4{font-family:KaTeX_Size4}.katex .delimsizing.mult .delim-size1>span{font-family:KaTeX_Size1}.katex .delimsizing.mult .delim-size4>span{font-family:KaTeX_Size4}.katex .nulldelimiter{display:inline-block;width:.12em}.katex .delimcenter,.katex .op-symbol{position:relative}.katex .op-symbol.small-op{font-family:KaTeX_Size1}.katex .op-symbol.large-op{font-family:KaTeX_Size2}.katex .accent>.vlist-t,.katex .op-limits>.vlist-t{text-align:center}.katex .accent .accent-body{position:relative}.katex .accent .accent-body:not(.accent-full){width:0}.katex .overlay{display:block}.katex .mtable .vertical-separator{display:inline-block;min-width:1px}.katex .mtable .arraycolsep{display:inline-block}.katex .mtable .col-align-c>.vlist-t{text-align:center}.katex .mtable .col-align-l>.vlist-t{text-align:left}.katex .mtable .col-align-r>.vlist-t{text-align:right}.katex .svg-align{text-align:left}.katex svg{fill:currentColor;stroke:currentColor;fill-rule:nonzero;fill-opacity:1;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;display:block;height:inherit;position:absolute;width:100%}.katex svg path{stroke:none}.katex img{border-style:none;max-height:none;max-width:none;min-height:0;min-width:0}.katex .stretchy{display:block;overflow:hidden;position:relative;width:100%}.katex .stretchy:after,.katex .stretchy:before{content:""}.katex .hide-tail{overflow:hidden;position:relative;width:100%}.katex .halfarrow-left{left:0;overflow:hidden;position:absolute;width:50.2%}.katex .halfarrow-right{overflow:hidden;position:absolute;right:0;width:50.2%}.katex .brace-left{left:0;overflow:hidden;position:absolute;width:25.1%}.katex .brace-center{left:25%;overflow:hidden;position:absolute;width:50%}.katex .brace-right{overflow:hidden;position:absolute;right:0;width:25.1%}.katex .x-arrow-pad{padding:0 .5em}.katex .cd-arrow-pad{padding:0 .55556em 0 .27778em}.katex .mover,.katex .munder,.katex .x-arrow{text-align:center}.katex .boxpad{padding:0 .3em}.katex .fbox,.katex .fcolorbox{border:.04em solid;box-sizing:border-box}.katex .cancel-pad{padding:0 .2em}.katex .cancel-lap{margin-left:-.2em;margin-right:-.2em}.katex .sout{border-bottom-style:solid;border-bottom-width:.08em}.katex .angl{border-right:.049em solid;border-top:.049em solid;box-sizing:border-box;margin-right:.03889em}.katex .anglpad{padding:0 .03889em}.katex .eqn-num:before{content:"(" counter(katexEqnNo) ")";counter-increment:katexEqnNo}.katex .mml-eqn-num:before{content:"(" counter(mmlEqnNo) ")";counter-increment:mmlEqnNo}.katex .mtr-glue{width:50%}.katex .cd-vert-arrow{display:inline-block;position:relative}.katex .cd-label-left{display:inline-block;position:absolute;right:calc(50% + .3em);text-align:left}.katex .cd-label-right{display:inline-block;left:calc(50% + .3em);position:absolute;text-align:right}.katex-display{display:block;margin:1em 0;text-align:center}.katex-display>.katex{display:block;text-align:center;white-space:nowrap}.katex-display>.katex>.katex-html{display:block;position:relative}.katex-display>.katex>.katex-html>.tag{position:absolute;right:0}.katex-display.leqno>.katex>.katex-html>.tag{left:0;right:auto}.katex-display.fleqn>.katex{padding-left:2em;text-align:left}body{counter-reset:katexEqnNo mmlEqnNo}
 </style>
 <style>
-/* ------------------------------------------------------------------
-   Taylor polynomial workbench.
-   Layout: ink control rail (344px) + cream analysis canvas.
-   Type: Oswald display / Ubuntu body / JetBrains Mono numbers.
-   ------------------------------------------------------------------ */
-:root {
-  --bg: #EDEADE;
-  --surface: #F7F5EC;
-  --surface-2: #FFFDF6;
-  --ink: #0A1F1E;
-  --ink-soft: #3C5350;
-  --muted: #5B6C68;
-  --line: #D6D2C3;
-  --line-strong: #B7B09C;
-  --primary: #072C2C;
-  --accent: #E85400;
-  --accent-soft: #FFE3D2;
-  --rail-bg: #072C2C;
-  --rail-ink: #F1EEE4;
-  --rail-muted: #A9BCB8;
-  --rail-line: #1E4744;
-  --rail-input: #0D3A37;
-  --danger: #B42318;
-  --series-f: #2A78D6;
-  --series-p: #EB6834;
-  --series-r: #6250D6;
-  --grid: #E2DED0;
-  --axis: #8E8977;
-  --shadow: 0 1px 0 rgba(10, 31, 30, .05), 0 18px 44px -30px rgba(10, 31, 30, .5);
-  --radius: 16px;
-  --font-display: "Oswald", "Ubuntu Condensed", "Arial Narrow", sans-serif;
-  --font-body: "Ubuntu", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", "Ubuntu Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-}
+/* Page-specific additions to assets/lab.css */
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --bg: #061B1A;
-    --surface: #0A2725;
-    --surface-2: #0C302D;
-    --ink: #EFEDE3;
-    --ink-soft: #C3D1CD;
-    --muted: #98ADA9;
-    --line: #1D4642;
-    --line-strong: #30605A;
-    --primary: #EFEDE3;
-    --accent: #FF7A33;
-    --accent-soft: #3A1B0A;
-    --rail-bg: #03110F;
-    --rail-ink: #F1EEE4;
-    --rail-muted: #9DB3AF;
-    --rail-line: #173B37;
-    --rail-input: #0A2A27;
-    --danger: #F97066;
-    --series-f: #3987E5;
-    --series-p: #D95926;
-    --series-r: #9085E9;
-    --grid: #123A36;
-    --axis: #6F8A85;
-    --shadow: 0 1px 0 rgba(0, 0, 0, .35), 0 22px 50px -30px rgba(0, 0, 0, .85);
-  }
-}
-
-:root[data-theme="dark"] {
-  color-scheme: dark;
-  --bg: #061B1A;
-  --surface: #0A2725;
-  --surface-2: #0C302D;
-  --ink: #EFEDE3;
-  --ink-soft: #C3D1CD;
-  --muted: #98ADA9;
-  --line: #1D4642;
-  --line-strong: #30605A;
-  --primary: #EFEDE3;
-  --accent: #FF7A33;
-  --accent-soft: #3A1B0A;
-  --rail-bg: #03110F;
-  --rail-ink: #F1EEE4;
-  --rail-muted: #9DB3AF;
-  --rail-line: #173B37;
-  --rail-input: #0A2A27;
-  --danger: #F97066;
-  --series-f: #3987E5;
-  --series-p: #D95926;
-  --series-r: #9085E9;
-  --grid: #123A36;
-  --axis: #6F8A85;
-  --shadow: 0 1px 0 rgba(0, 0, 0, .35), 0 22px 50px -30px rgba(0, 0, 0, .85);
-}
-
-*, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; }
-body {
-  margin: 0;
-  min-height: 100%;
-  background: var(--bg);
-  color: var(--ink);
-  font-family: var(--font-body);
-  font-size: 15px;
-  line-height: 1.5;
-  padding-left: max(16px, env(safe-area-inset-left, 0px));
-  padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 0 26px;
-}
-::selection { background: var(--accent); color: #FFF; }
-button, input, select { font: inherit; color: inherit; }
-:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.sr-only {
-  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
-}
-
-/* ---------- Masthead ---------- */
-.masthead {
-  max-width: 1560px;
-  margin: 0 auto;
-  min-height: 66px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  border-bottom: 1px solid var(--line);
-  flex-wrap: wrap;
-  padding-block: 12px;
-}
-.brand { display: flex; align-items: center; gap: 11px; margin-right: auto; min-width: 0; }
-.brand-mark {
-  width: 38px; height: 38px; border-radius: 10px;
-  background: var(--primary); color: var(--bg);
-  display: grid; place-items: center; flex: none;
-  font-family: var(--font-display); font-size: 19px; font-weight: 500;
-  letter-spacing: .01em;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .brand-mark { background: var(--accent); color: #180700; }
-}
-:root[data-theme="dark"] .brand-mark { background: var(--accent); color: #180700; }
-.brand-copy { display: grid; line-height: 1.15; min-width: 0; }
-.brand-name {
-  font-family: var(--font-display); font-weight: 600; font-size: 17px;
-  letter-spacing: .08em; text-transform: uppercase;
-}
-.brand-sub {
-  font-family: var(--font-mono); font-size: 9.5px;
-  letter-spacing: .11em; text-transform: uppercase; color: var(--muted);
-}
-.masthead-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.chip {
-  display: inline-flex; align-items: center; gap: 7px;
-  min-height: 30px; padding: 4px 10px;
-  border: 1px solid var(--line); border-radius: 999px;
-  font-family: var(--font-mono); font-size: 10px; letter-spacing: .05em;
-  text-transform: uppercase; color: var(--ink-soft);
-  background: var(--surface-2); text-decoration: none; white-space: nowrap;
-}
-.chip .pip { width: 6px; height: 6px; border-radius: 50%; background: var(--series-f); flex: none; }
-a.chip:hover { border-color: var(--accent); color: var(--accent); }
-.icon-btn {
-  appearance: none; display: grid; place-items: center;
-  width: 32px; height: 32px; flex: none;
-  border: 1px solid var(--line); border-radius: 999px;
-  background: var(--surface-2); color: var(--ink-soft); cursor: pointer;
-}
-.icon-btn:hover { border-color: var(--accent); color: var(--accent); }
-.icon-btn:active { transform: translateY(1px); }
-.icon-btn svg { width: 15px; height: 15px; }
-
-/* ---------- Shell ---------- */
-.shell {
-  max-width: 1560px; margin: 0 auto;
-  display: grid; grid-template-columns: 344px minmax(0, 1fr);
-  gap: 26px; align-items: start; padding-top: 24px;
-}
-
-/* ---------- Control rail ---------- */
-.panel {
-  position: sticky; top: 18px;
-  background: var(--rail-bg); color: var(--rail-ink);
-  border-radius: 20px; padding: 20px;
-  box-shadow: var(--shadow);
-  display: grid; gap: 20px;
-}
-.panel-head {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--rail-line);
-}
-.panel-title {
-  margin: 0; font-family: var(--font-mono); font-size: 10px; font-weight: 600;
-  letter-spacing: .16em; text-transform: uppercase; color: var(--rail-muted);
-}
-.ghost-btn {
-  appearance: none; background: transparent;
-  border: 1px solid var(--rail-line); border-radius: 7px;
-  padding: 4px 9px; min-height: 30px;
-  color: var(--rail-muted); font-family: var(--font-mono);
-  font-size: 10px; letter-spacing: .06em; text-transform: uppercase; cursor: pointer;
-}
-.ghost-btn:hover { color: var(--rail-ink); border-color: var(--accent); }
-.ghost-btn:active { transform: translateY(1px); }
-
-.field { display: grid; gap: 8px; min-width: 0; border: 0; padding: 0; margin: 0; }
-.field-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-.field label, .field legend {
-  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
-  letter-spacing: .11em; text-transform: uppercase; color: var(--rail-muted); padding: 0;
-}
-.field-hint { margin: 0; font-size: 11.5px; color: var(--rail-muted); line-height: 1.45; }
-.field-hint.error { color: #FFB3A6; }
-.value-pill {
-  font-family: var(--font-mono); font-variant-numeric: tabular-nums;
-  font-size: 11px; color: var(--rail-ink); background: var(--rail-input);
-  border: 1px solid var(--rail-line); border-radius: 6px;
-  padding: 2px 7px; white-space: nowrap;
-}
-.select-wrap { position: relative; }
-.select-wrap::after {
-  content: ""; position: absolute; right: 14px; top: 50%;
-  width: 7px; height: 7px;
-  border-right: 1.5px solid var(--rail-muted); border-bottom: 1.5px solid var(--rail-muted);
-  transform: translateY(-70%) rotate(45deg); pointer-events: none;
-}
-.select-wrap select {
-  appearance: none; -webkit-appearance: none; width: 100%; min-height: 42px;
-  padding: 10px 34px 10px 12px;
-  border: 1px solid var(--rail-line); border-radius: 10px;
-  background: var(--rail-input); color: var(--rail-ink);
-  font-family: var(--font-mono); font-size: 13px; cursor: pointer;
-}
-.select-wrap select:hover { border-color: #3C6B66; }
-
-.center-control {
-  display: grid; grid-template-columns: 36px minmax(0, 1fr) 36px;
-  gap: 6px; align-items: center;
-}
-.center-step-btn {
-  min-height: 42px; border: 1px solid var(--rail-line); border-radius: 10px;
-  background: var(--rail-input); color: var(--rail-ink);
-  font: 600 12px var(--font-mono); cursor: pointer;
-}
-.center-step-btn:hover { border-color: #3C6B66; color: #3C6B66; }
-
-.input {
-  width: 100%; min-height: 42px; padding: 9px 11px;
-  border: 1px solid var(--rail-line); border-radius: 10px;
-  background: var(--rail-input); color: var(--rail-ink);
-  font-family: var(--font-mono); font-size: 13px; font-variant-numeric: tabular-nums;
-}
-.input::placeholder { color: #7E9995; }
-.input:hover { border-color: #3C6B66; }
-.input.bad { border-color: #FF8A76; }
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-.interval-row {
-  display: grid; grid-template-columns: 1fr auto 1fr;
-  align-items: center; gap: 7px;
-}
-.interval-row .arrow { color: var(--rail-muted); font-family: var(--font-mono); font-size: 12px; }
-
-.chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.chip-btn {
-  appearance: none; border: 1px solid var(--rail-line); background: transparent;
-  color: var(--rail-muted); border-radius: 7px; min-height: 30px; padding: 4px 9px;
-  font-family: var(--font-mono); font-size: 10px; letter-spacing: .02em; cursor: pointer;
-}
-.chip-btn:hover { color: var(--rail-ink); border-color: var(--accent); }
-.chip-btn:active { transform: translateY(1px); }
-
-.range {
-  -webkit-appearance: none; appearance: none;
-  width: 100%; height: 30px; background: transparent; cursor: pointer; margin: 0;
-}
-.range::-webkit-slider-runnable-track {
-  height: 4px; border-radius: 999px;
-  background: linear-gradient(to right, var(--accent) 0%, var(--accent) var(--fill, 0%),
-              var(--rail-line) var(--fill, 0%), var(--rail-line) 100%);
-}
-.range::-moz-range-track { height: 4px; border-radius: 999px; background: var(--rail-line); }
-.range::-moz-range-progress { height: 4px; border-radius: 999px; background: var(--accent); }
-.range::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 20px; height: 20px; margin-top: -8px;
-  border-radius: 50%; background: var(--rail-ink);
-  border: 3px solid var(--accent); box-shadow: 0 2px 6px rgba(0,0,0,.35);
-}
-.range::-moz-range-thumb {
-  width: 15px; height: 15px; border-radius: 50%;
-  background: var(--rail-ink); border: 3px solid var(--accent);
-}
-.range:focus-visible { outline: none; }
-.range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 4px rgba(232, 84, 0, .35); }
-.range:focus-visible::-moz-range-thumb { box-shadow: 0 0 0 4px rgba(232, 84, 0, .35); }
-.ticks {
-  display: flex; justify-content: space-between;
-  font-family: var(--font-mono); font-size: 9px; color: var(--rail-muted);
-  letter-spacing: .04em; padding-inline: 3px; margin-top: -5px;
-}
-
-.panel-note {
-  border-top: 1px solid var(--rail-line); padding-top: 14px;
-  font-size: 11.5px; line-height: 1.55; color: var(--rail-muted);
-}
-.panel-note b { color: var(--rail-ink); font-weight: 500; font-family: var(--font-mono); font-size: 11px; }
-.panel-note code {
-  font-family: var(--font-mono); font-size: 11px; color: var(--rail-ink);
-  background: var(--rail-input); border-radius: 4px; padding: 1px 5px;
-}
-
-/* ---------- Main ---------- */
-.main { min-width: 0; display: grid; gap: 18px; }
-.hero {
-  display: flex; align-items: flex-end; justify-content: space-between;
-  gap: 24px; flex-wrap: wrap; padding-bottom: 2px;
-}
-.eyebrow {
-  display: flex; align-items: center; gap: 8px;
-  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
-  letter-spacing: .15em; text-transform: uppercase; color: var(--accent);
-  margin-bottom: 8px;
-}
-.eyebrow::before { content: ""; width: 22px; height: 2px; background: var(--accent); flex: none; }
-h1 {
-  margin: 0; font-family: var(--font-display); font-weight: 500;
-  font-size: clamp(30px, 3.4vw, 44px); line-height: 1.02;
-  letter-spacing: .005em; text-transform: uppercase; text-wrap: balance;
-}
-.hero p { margin: 9px 0 0; max-width: 58ch; color: var(--ink-soft); font-size: 14px; }
-/* ---------- Stat strip ---------- */
-.stats {
-  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
-  background: var(--surface-2); border: 1px solid var(--line);
-  border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
-}
-.stat { padding: 13px 16px 12px; min-width: 0; display: grid; gap: 2px; }
-.stat + .stat { border-left: 1px solid var(--line); }
-.stat-label {
-  font-family: var(--font-mono); font-size: 9px; font-weight: 600;
-  letter-spacing: .11em; text-transform: uppercase; color: var(--muted);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.stat-value {
-  font-family: var(--font-mono); font-variant-numeric: tabular-nums;
-  font-size: clamp(17px, 1.6vw, 21px); font-weight: 500;
-  letter-spacing: -.02em; color: var(--ink); white-space: nowrap;
-}
-.stat-value .unit { font-size: 10.5px; font-weight: 400; color: var(--muted); letter-spacing: 0; }
-.stat-sub {
-  font-family: var(--font-mono); font-size: 9.5px; color: var(--muted);
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.stat:first-child { background: var(--primary); }
-.stat:first-child .stat-label { color: rgba(237, 234, 222, .66); }
-.stat:first-child .stat-value { color: var(--bg); }
-.stat:first-child .stat-sub { color: rgba(237, 234, 222, .66); }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .stat:first-child { background: var(--accent); }
-  :root:not([data-theme="light"]) .stat:first-child .stat-label,
-  :root:not([data-theme="light"]) .stat:first-child .stat-sub { color: rgba(26, 8, 0, .72); }
-  :root:not([data-theme="light"]) .stat:first-child .stat-value { color: #1A0800; }
-}
-:root[data-theme="dark"] .stat:first-child { background: var(--accent); }
-:root[data-theme="dark"] .stat:first-child .stat-label,
-:root[data-theme="dark"] .stat:first-child .stat-sub { color: rgba(26, 8, 0, .72); }
-:root[data-theme="dark"] .stat:first-child .stat-value { color: #1A0800; }
-
-/* ---------- Chart cards ---------- */
-.charts {
-  display: grid;
-  grid-template-columns: minmax(0, 1.24fr) minmax(0, 1fr);
-  gap: 18px; align-items: stretch;
-}
-.chart-card {
-  background: var(--surface-2);
-  height: 100%;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 15px 15px 11px;
-  min-width: 0; box-shadow: var(--shadow);
-  display: flex; flex-direction: column; gap: 8px;
-}
-.chart-head {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 12px; flex-wrap: wrap; min-width: 0;
-}
-.chart-head .legend { margin-left: auto; }
-.chart-title {
-  margin: 0; font-family: var(--font-display); font-weight: 500;
-  font-size: 15.5px; letter-spacing: .04em; text-transform: uppercase;
-  color: var(--ink); white-space: nowrap;
-}
-.chart-title .idx {
-  font-family: var(--font-mono); font-size: 9.5px; font-weight: 500;
-  letter-spacing: .06em; color: var(--accent); margin-right: 7px;
-  vertical-align: 2px;
-}
-.legend {
-  display: flex; align-items: center; gap: 11px; flex-wrap: wrap;
-  font-family: var(--font-mono); font-size: 9.5px; color: var(--ink-soft);
-}
-.legend span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; color: var(--ink-soft); }
-.swatch { width: 13px; height: 4px; border-radius: 999px; flex: none; background: currentColor; }
-.swatch.dot { width: 8px; height: 8px; border-radius: 50%; background: transparent; border: 2px solid currentColor; }
-.swatch.dashed { height: 0; border-top: 2px dashed currentColor; background: transparent; border-radius: 0; }
-.swatch.band { width: 13px; height: 8px; border-radius: 2px; opacity: .28; }
-.s-f { color: var(--series-f); }
-.s-p { color: var(--series-p); }
-.s-r { color: var(--series-r); }
-.s-muted { color: var(--muted); }
-.legend .swatch { color: inherit; }
-.legend .swatch.s-f { color: var(--series-f); }
-.legend .swatch.s-p { color: var(--series-p); }
-.legend .swatch.s-r { color: var(--series-r); }
-.legend .swatch.s-muted { color: var(--muted); }
-.log-btn { min-height: 26px; padding: 2px 8px; border-color: var(--line-strong); color: var(--ink-soft); background: var(--surface-2); }
-.log-btn:hover { border-color: var(--accent); color: var(--accent); }
-.log-btn[aria-pressed="true"] { border-color: var(--accent); background: var(--accent); color: var(--surface-2); }
-
-.plot { position: relative; height: 322px; min-width: 0; }
-.plot canvas { display: block; width: 100%; height: 100%; touch-action: pan-y; }
-.plot:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 6px; }
-
-.chart-tip {
-  position: absolute; z-index: 4; min-width: 158px;
-  padding: 8px 10px; border-radius: 9px;
-  border: 1px solid var(--line-strong);
-  background: var(--surface-2); color: var(--ink);
-  box-shadow: 0 14px 30px -14px rgba(0,0,0,.4);
-  font-family: var(--font-mono); font-size: 10.5px; line-height: 1.55;
-  font-variant-numeric: tabular-nums;
-  pointer-events: none; opacity: 0; transform: translateY(3px);
-  transition: opacity .1s ease, transform .1s ease;
-}
-.chart-tip.on { opacity: 1; transform: translateY(0); }
-.chart-tip .tip-x {
-  color: var(--muted); letter-spacing: .04em; margin-bottom: 4px;
-  border-bottom: 1px solid var(--line); padding-bottom: 3px;
-}
-.chart-tip .tip-row { display: flex; justify-content: space-between; gap: 16px; }
-.chart-tip .tip-row i { font-style: normal; color: var(--muted); }
-.chart-tip .tip-row b { font-weight: 500; }
-
-.chart-foot {
-  margin-top: auto;
-  display: flex; justify-content: space-between; align-items: baseline;
-  gap: 14px; flex-wrap: wrap;
-  font-family: var(--font-mono); font-size: 9.5px; color: var(--muted);
-  border-top: 1px solid var(--line); padding-top: 8px; min-height: 26px;
-  font-variant-numeric: tabular-nums;
-}
-.chart-foot b { font-weight: 500; color: var(--ink-soft); }
-.chart-foot .ok { color: var(--ink-soft); }
-
-/* ---------- Expansion card ---------- */
+/* expansion card: formula + coefficient ledger */
 .expansion {
   display: grid;
   grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
@@ -510,8 +63,8 @@ h1 {
   font-family: var(--font-mono); font-weight: 500; font-size: 11px; color: var(--ink-soft);
 }
 .series-note code { background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; }
-
 .formula-error { font-family: var(--font-mono); font-size: 12px; color: var(--muted); }
+
 .frac {
   display: inline-flex; flex-direction: column; align-items: center;
   vertical-align: -0.42em; line-height: 1.05; margin-right: 2px;
@@ -539,82 +92,45 @@ table.ledger tr:last-child td { border-bottom: 0; }
 table.ledger td.k { color: var(--ink); font-weight: 500; }
 table.ledger td.zero { color: var(--muted); }
 table.ledger tbody tr:hover td { background: var(--bg); }
-table.ledger .term {
-  font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-soft);
-}
+table.ledger .term { font-family: var(--font-mono); font-size: 10.5px; color: var(--ink-soft); }
 .ledger-foot {
   display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap;
   margin-top: 8px; font-family: var(--font-mono); font-size: 9.5px; color: var(--muted);
 }
 .ledger-foot b { color: var(--ink-soft); font-weight: 500; font-variant-numeric: tabular-nums; }
 
-/* ---------- Footer ---------- */
-.foot {
-  max-width: 1560px; margin: 20px auto 0;
-  display: flex; justify-content: space-between; align-items: baseline;
-  gap: 14px; flex-wrap: wrap;
-  border-top: 1px solid var(--line); padding-top: 12px;
-  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .05em;
-  text-transform: uppercase; color: var(--muted);
+/* two side-by-side chart cards on wide screens */
+.charts {
+  display: grid;
+  grid-template-columns: minmax(0, 1.24fr) minmax(0, 1fr);
+  gap: 18px; align-items: stretch;
 }
-.foot a { color: var(--ink-soft); text-decoration: none; border-bottom: 1px solid var(--line-strong); }
-.foot a:hover { color: var(--accent); border-color: var(--accent); }
-.foot .formula-ref { text-transform: none; letter-spacing: .01em; }
-
-/* ---------- Responsive ---------- */
-@media (max-width: 1220px) {
-  .shell { grid-template-columns: 312px minmax(0, 1fr); gap: 20px; }
-  .charts { grid-template-columns: 1fr; }
-  .plot { height: 300px; }
-}
+@media (max-width: 1220px) { .charts { grid-template-columns: 1fr; } }
 @media (max-width: 960px) {
-  .shell { grid-template-columns: 1fr; padding-top: 18px; }
-  .panel { position: static; }
   .expansion { grid-template-columns: 1fr; }
   .expansion-pane + .expansion-pane { border-left: 0; border-top: 1px solid var(--line); }
-  .hero { align-items: flex-start; }
-}
-@media (max-width: 720px) {
-  body { font-size: 14px; }
-  .stats { grid-template-columns: 1fr 1fr; }
-  .stat { padding: 11px 13px 10px; }
-  .stat:nth-child(3) { border-left: 0; }
-  .stat:nth-child(n+3) { border-top: 1px solid var(--line); }
-  .stat-value { font-size: 18px; }
-  .masthead-meta .chip.optional { display: none; }
-  .chart-card { padding: 13px 12px 10px; }
-  .plot { height: 246px; }
-  .chart-title { font-size: 14px; }
-  .expansion-pane { padding: 14px 13px 15px; }
-}
-@media (max-width: 430px) {
-  .brand-sub { display: none; }
-  .brand-name { font-size: 15px; }
-  .masthead { min-height: 58px; }
-  .panel { padding: 16px; border-radius: 16px; }
-  h1 { font-size: 28px; }
-  .grid-2 { grid-template-columns: 1fr; }
-  .legend { gap: 8px; font-size: 9px; }
-  .plot { height: 224px; }
-  .foot { flex-direction: column; gap: 6px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition: none !important; animation: none !important; }
 }
 </style>
+
 </head>
 <body>
 
 <header class="masthead">
   <div class="brand">
-    <div class="brand-mark" aria-hidden="true"><span>x<sup>n</sup></span></div>
+    <a class="brand-mark" id="homeMark" href="../index.html" aria-label="Back to the Math Lab index" title="Back to the index">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3.5 20.5V4.5M3.5 20.5h17"></path>
+        <path d="M6.5 16.2c2.6-1.2 4.1-6.4 6.6-7.2 2-.6 3.1 1.7 5 1.2"></path>
+        <circle cx="6.5" cy="16.2" r="1.15" fill="currentColor" stroke="none"></circle>
+      </svg>
+    </a>
     <div class="brand-copy">
-      <span class="brand-name">Taylor Lab</span>
-      <span class="brand-sub">Approximation workbench</span>
+      <span class="brand-name" id="collectionName">Math Lab</span>
+      <span class="brand-sub" id="collectionSub">Collection</span>
     </div>
   </div>
   <div class="masthead-meta">
-    <span class="chip optional"><span class="pip" aria-hidden="true"></span>math.js · KaTeX</span>
+    <span class="chip optional" title="Rendering and numerical engine"><span class="pip" aria-hidden="true"></span>math.js · KaTeX</span>
     <a class="chip" id="creditLink" href="https://github.com/alanngh/MATH_lab/tree/main" target="_blank" rel="noopener">Nilton Garcia Hilares</a>
     <button class="icon-btn" id="themeBtn" type="button" aria-label="Switch color theme" title="Switch color theme">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
@@ -622,6 +138,13 @@ table.ledger .term {
         <path d="M12 2.5v2.2M12 19.3v2.2M4.3 4.3l1.6 1.6M18.1 18.1l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.3 19.7l1.6-1.6M18.1 5.9l1.6-1.6"></path>
       </svg>
     </button>
+    <a class="icon-btn" id="homeBtn" href="../index.html" aria-label="Back to the Math Lab index" title="Back to the index">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3.6 10.6 12 3.8l8.4 6.8"></path>
+        <path d="M5.8 9.4V20h12.4V9.4"></path>
+        <path d="M10.2 20v-5.4h3.6V20"></path>
+      </svg>
+    </a>
   </div>
 </header>
 
@@ -696,8 +219,17 @@ table.ledger .term {
       <p class="field-hint" id="intervalHint">Both plots and every readout use this window.</p>
     </div>
 
+    <div class="field">
+      <div class="field-row">
+        <label for="tolInput">Tolerance</label>
+        <button class="ghost-btn tol-toggle" id="tolBtn" type="button" aria-pressed="true" title="Show or hide the tolerance band">on</button>
+      </div>
+      <input class="input" id="tolInput" type="number" min="1e-12" step="0.001" value="0.01" inputmode="decimal" aria-label="Allowed absolute error">
+      <p class="field-hint" id="tolHint">Red band: the largest interval around <b>a</b> where |f(x) − Pₙ(x)| stays within this error.</p>
+    </div>
+
     <p class="panel-note">
-      The remainder is <b>Rₙ(x) = f(x) − Pₙ(x)</b>. Its chart plots <code>|Rₙ(x)|</code> on its own axis so small errors stay readable next to the function plot.
+      The remainder is <b>Rₙ(x) = f(x) − Pₙ(x)</b>. Its chart plots <code>|Rₙ(x)|</code> on its own axis so small errors stay readable next to the function plot. The red band on both charts marks where the error stays under the tolerance.
     </p>
   </aside>
 
@@ -727,6 +259,11 @@ table.ledger .term {
         <span class="stat-sub" id="statErrFoot">on the view window</span>
       </div>
       <div class="stat">
+        <span class="stat-label">Tolerance band</span>
+        <span class="stat-value" id="statTol">—</span>
+        <span class="stat-sub" id="statTolFoot">|f − Pₙ| ≤ tolerance</span>
+      </div>
+      <div class="stat">
         <span class="stat-label">Radius of convergence</span>
         <span class="stat-value" id="statR">∞</span>
         <span class="stat-sub" id="statRFoot">about this center</span>
@@ -740,7 +277,8 @@ table.ledger .term {
           <div class="legend">
             <span><i class="swatch s-f"></i>f(x)</span>
             <span><i class="swatch dashed s-p"></i>Pₙ(x)</span>
-            <span><i class="swatch dot s-muted"></i>center</span>
+            <span><i class="swatch dot s-c"></i>center</span>
+            <span><i class="swatch band s-d"></i>tolerance</span>
           </div>
         </div>
         <div class="plot" id="plot1Wrap" tabindex="0" role="img" aria-label="Line chart comparing the function and its Taylor polynomial on the chosen interval">
@@ -758,6 +296,7 @@ table.ledger .term {
           <h2 class="chart-title" id="chart2Title"><span class="idx">02</span>Remainder</h2>
           <div class="legend">
             <span><i class="swatch s-r"></i>|Rₙ(x)|</span>
+            <span><i class="swatch dashed s-d"></i>tolerance</span>
             <button class="ghost-btn log-btn" id="scaleBtn" type="button" aria-pressed="false" title="Toggle logarithmic error scale">log</button>
           </div>
         </div>
@@ -817,6 +356,7 @@ table.ledger .term {
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/mathjs@12.4.2/lib/browser/math.js"></script>
+<script src="../assets/lab.js"></script>
 <script>
 (function () {
   "use strict";
@@ -913,6 +453,41 @@ table.ledger .term {
     return best;
   }
 
+  /* Largest contiguous interval around a where |f(x) − P(x)| ≤ tol.
+     Walks outward on a dense grid and interpolates the two crossings so the
+     band moves smoothly as the tolerance changes. */
+  function toleranceInterval(f, cs, a, tol, span) {
+    if (!Number.isFinite(tol) || tol <= 0) return null;
+    var half = Math.max(span, Math.abs(span) * 0.5, 1e-9) * 2;
+    var steps = 1600;
+    function err(x) {
+      var fx = f(x);
+      var px = horner(cs, a, x);
+      return Number.isFinite(fx) && Number.isFinite(px) ? Math.abs(fx - px) : NaN;
+    }
+    if (!(err(a) <= tol)) return { lo: a, hi: a, width: 0, empty: true };
+
+    function walk(dir) {
+      var step = half / steps;
+      var prevX = a, prevE = err(a);
+      for (var i = 1; i <= steps; i++) {
+        var x = a + dir * step * i;
+        var e = err(x);
+        if (!Number.isFinite(e)) return x - dir * step;      // left the domain
+        if (e > tol) {
+          // interpolate between the last good and the first bad sample
+          var t = (tol - prevE) / (e - prevE);
+          return prevX + (x - prevX) * t;
+        }
+        prevX = x; prevE = e;
+      }
+      return a + dir * half;                                  // still inside at the edge
+    }
+
+    var lo = walk(-1), hi = walk(1);
+    return { lo: Math.min(lo, a), hi: Math.max(hi, a), width: hi - lo, empty: false };
+  }
+
   var DEFAULTS = {
     preset: "sin",
     expr: "sin(x)",
@@ -920,7 +495,8 @@ table.ledger .term {
     n: 4,
     x0: -4,
     x1: 4,
-    log: false
+    log: false,
+    tol: 0.01
   };
 
   var state = {
@@ -931,6 +507,8 @@ table.ledger .term {
     x0: DEFAULTS.x0,
     x1: DEFAULTS.x1,
     logScale: DEFAULTS.log,
+    tol: DEFAULTS.tol,
+    tolOn: true,
     formulaTex: "",
     samples: [],
     derived: null,
@@ -1319,6 +897,8 @@ table.ledger .term {
     }
     var peakScope = Number.isFinite(radius) ? "inside |x − a| < R" : "on the view window";
 
+    var tolResult = toleranceInterval(f, cs, a, state.tol, Math.max(x1 - x0, 1) / 2);
+
     state.derived = {
       expr: expr,
       f: f,
@@ -1336,6 +916,9 @@ table.ledger .term {
       x1: x1,
       peak: peak,
       peakScope: peakScope,
+      tol: state.tol,
+      tolOn: state.tolOn,
+      tolBand: tolResult,
       samples: samples,
       preset: preset,
       presetKey: presetKey
@@ -1443,6 +1026,8 @@ table.ledger .term {
       f: cssVar("--series-f"),
       p: cssVar("--series-p"),
       r: cssVar("--series-r"),
+      center: cssVar("--center"),
+      danger: cssVar("--danger"),
       line: cssVar("--line")
     };
   }
@@ -1576,6 +1161,18 @@ table.ledger .term {
     ctx.rect(pad.left, pad.top, iw, ih);
     ctx.clip();
 
+    // tolerance band: the interval where |f − P| stays within tolerance
+    if (data.tolOn && data.tolBand && !data.tolBand.empty && data.tolBand.width > 0) {
+      var bandL = X(Math.max(data.tolBand.lo, xmin));
+      var bandR = X(Math.min(data.tolBand.hi, xmax));
+      if (bandR > bandL) {
+        ctx.fillStyle = c.danger;
+        ctx.globalAlpha = 0.14;
+        ctx.fillRect(bandL, pad.top, bandR - bandL, ih);
+        ctx.globalAlpha = 1;
+      }
+    }
+
     // horizontal grid + labels come after clip release
     var yt = niceTicks(ymin, ymax, ih > 200 ? 5 : 4);
     ctx.strokeStyle = c.grid;
@@ -1617,14 +1214,27 @@ table.ledger .term {
     // center marker
     if (data.a >= xmin && data.a <= xmax && Number.isFinite(data.fa)) {
       var cxp = X(data.a), cyp = Y(data.fa);
-      if (cxp >= pad.left && cxp <= pad.left + iw && cyp >= pad.top && cyp <= pad.top + ih) {
+      if (cxp >= pad.left && cxp <= pad.left + iw) {
+        // vertical rule through the expansion center
+        ctx.strokeStyle = c.center;
+        ctx.globalAlpha = 0.55;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([]);
         ctx.beginPath();
-        ctx.arc(cxp, cyp, 4.5, 0, Math.PI * 2);
-        ctx.fillStyle = c.surface;
-        ctx.fill();
-        ctx.lineWidth = 2;
-        ctx.strokeStyle = c.f;
+        ctx.moveTo(Math.round(cxp) + 0.5, pad.top);
+        ctx.lineTo(Math.round(cxp) + 0.5, pad.top + ih);
         ctx.stroke();
+        ctx.globalAlpha = 1;
+
+        if (cyp >= pad.top && cyp <= pad.top + ih) {
+          ctx.beginPath();
+          ctx.arc(cxp, cyp, 5, 0, Math.PI * 2);
+          ctx.fillStyle = c.center;
+          ctx.fill();
+          ctx.lineWidth = 2;
+          ctx.strokeStyle = c.surface;
+          ctx.stroke();
+        }
       }
     }
 
@@ -1844,7 +1454,31 @@ table.ledger .term {
     var Y = logScale
       ? function (v) { return pad.top + (ymax - Math.log10(Math.max(v, Math.pow(10, floorExp)))) / (ymax - ymin) * ih; }
       : function (v) { return pad.top + (ymax - v) / (ymax - ymin) * ih; };
-    chart.geom = { pad: pad, X: X, Y: Y, xmin: xmin, xmax: xmax, log: logScale };
+    chart.geom = { pad: pad, X: X, Y: Y, xmin: xmin, xmax: xmax, log: logScale, tol: data.tol, tolOn: data.tolOn };
+
+    // keep the tolerance line visible on the remainder axis
+    var tol = data.tol;
+    var showTol = data.tolOn && Number.isFinite(tol) && tol > 0;
+    if (showTol) {
+      if (logScale) {
+        var tolExp = Math.log10(tol);
+        if (tolExp > ymax) ymax = tolExp + 0.25;
+        if (tolExp < ymin) {
+          // rescale the log window downward so the line is on canvas
+          var pad2 = (ymax - ymin) * 0.15;
+          ymin = tolExp - pad2;
+          ymax = ymax + pad2;
+        }
+      } else if (tol > ymax) {
+        ymax = tol * 1.08;
+      }
+      Y = logScale
+        ? function (v) { return pad.top + (ymax - Math.log10(Math.max(v, Math.pow(10, ymin)))) / (ymax - ymin) * ih; }
+        : function (v) { return pad.top + (ymax - v) / (ymax - ymin) * ih; };
+      chart.geom.Y = Y;
+      chart.geom.ymin = ymin;
+      chart.geom.ymax = ymax;
+    }
 
     ctx.save();
     ctx.beginPath();
@@ -1856,10 +1490,13 @@ table.ledger .term {
     ctx.lineWidth = 1;
     var tickVals = [];
     if (logScale) {
-      for (var e = floorExp; e <= topExp; e++) tickVals.push({ v: Math.pow(10, e), label: "1e" + e });
-      if (tickVals.length > 8) {
-        var keepEvery = Math.ceil(tickVals.length / 7);
-        tickVals = tickVals.filter(function (_, idx) { return idx % keepEvery === 0 || idx === tickVals.length - 1; });
+      var startExp = Math.ceil(ymin);
+      var endExp = Math.floor(ymax);
+      if (endExp - startExp > 8) {
+        var keep = Math.ceil((endExp - startExp) / 8);
+        for (var e = endExp; e >= startExp; e -= keep) tickVals.push({ v: Math.pow(10, e), label: "1e" + e });
+      } else {
+        for (var e2 = startExp; e2 <= endExp; e2++) tickVals.push({ v: Math.pow(10, e2), label: "1e" + e2 });
       }
     } else {
       var nt = niceTicks(ymin, ymax, ih > 200 ? 5 : 4);
@@ -1873,6 +1510,36 @@ table.ledger .term {
     for (var xg = 0; xg < xt.ticks.length; xg++) {
       var gx = Math.round(X(xt.ticks[xg])) + 0.5;
       ctx.beginPath(); ctx.moveTo(gx, pad.top); ctx.lineTo(gx, pad.top + ih); ctx.stroke();
+    }
+
+    // tolerance band and threshold line
+    if (showTol) {
+      if (data.tolBand && !data.tolBand.empty && data.tolBand.width > 0) {
+        var bandL = X(Math.max(data.tolBand.lo, xmin));
+        var bandR = X(Math.min(data.tolBand.hi, xmax));
+        if (bandR > bandL) {
+          ctx.fillStyle = c.danger;
+          ctx.globalAlpha = 0.16;
+          ctx.fillRect(bandL, pad.top, bandR - bandL, ih);
+          ctx.globalAlpha = 1;
+        }
+      }
+      var tolY = Math.round(Y(tol)) + 0.5;
+      if (tolY >= pad.top && tolY <= pad.top + ih) {
+        ctx.strokeStyle = c.danger;
+        ctx.lineWidth = 1.4;
+        ctx.setLineDash([6, 4]);
+        ctx.beginPath();
+        ctx.moveTo(pad.left, tolY);
+        ctx.lineTo(pad.left + iw, tolY);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = c.danger;
+        ctx.font = '500 9px ' + FONT_MONO;
+        ctx.textAlign = "left";
+        ctx.textBaseline = "bottom";
+        ctx.fillText("tol " + tidyAscii(tol, 3), pad.left + 5, tolY - 3);
+      }
     }
 
     // remainder line (stepped near zero for log clarity)
@@ -1980,12 +1647,17 @@ table.ledger .term {
     intervalHint: $("#intervalHint"),
     fitBtn: $("#fitBtn"),
     resetBtn: $("#resetBtn"),
+    tolInput: $("#tolInput"),
+    tolBtn: $("#tolBtn"),
+    tolHint: $("#tolHint"),
     statA: $("#statA"),
     statAFoot: $("#statAFoot"),
     statN: $("#statN"),
     statNFoot: $("#statNFoot"),
     statErr: $("#statErr"),
     statErrFoot: $("#statErrFoot"),
+    statTol: $("#statTol"),
+    statTolFoot: $("#statTolFoot"),
     statR: $("#statR"),
     statRFoot: $("#statRFoot"),
     formula: $("#formula"),
@@ -2116,6 +1788,21 @@ table.ledger .term {
     } else {
       els.statR.textContent = "R = ∞";
       els.statRFoot.textContent = "entire function";
+    }
+
+    var band = data.tolBand;
+    if (!data.tolOn) {
+      els.statTol.textContent = "off";
+      els.statTolFoot.textContent = "band hidden";
+    } else if (!band) {
+      els.statTol.textContent = "—";
+      els.statTolFoot.textContent = "set a positive tolerance";
+    } else if (band.empty) {
+      els.statTol.textContent = "none";
+      els.statTolFoot.textContent = "f(a) already exceeds tolerance";
+    } else {
+      els.statTol.textContent = "[" + tidy(band.lo, 4) + ", " + tidy(band.hi, 4) + "]";
+      els.statTolFoot.textContent = "width " + tidy(band.width, 3) + " · |f − Pₙ| ≤ " + tidy(data.tol, 3);
     }
   }
 
@@ -2283,6 +1970,13 @@ table.ledger .term {
     els.degreePill.textContent = "n = " + state.n;
     if (document.activeElement !== els.x0Input) els.x0Input.value = String(Number(state.x0.toFixed(6)));
     if (document.activeElement !== els.x1Input) els.x1Input.value = String(Number(state.x1.toFixed(6)));
+    if (els.tolInput && document.activeElement !== els.tolInput) {
+      els.tolInput.value = String(Number(state.tol.toPrecision(6)));
+    }
+    if (els.tolBtn) {
+      els.tolBtn.setAttribute("aria-pressed", state.tolOn ? "true" : "false");
+      els.tolBtn.textContent = state.tolOn ? "on" : "off";
+    }
     els.scaleBtn.setAttribute("aria-pressed", state.logScale ? "true" : "false");
     els.scaleBtn.textContent = state.logScale ? "linear" : "log";
     els.scaleBtn.style.borderColor = state.logScale ? "var(--accent)" : "";
@@ -2343,19 +2037,21 @@ table.ledger .term {
   }
 
   function saveState() {
-    store.set("taylor-lab-state", JSON.stringify({
+    store.set("mathlab-taylor-state", JSON.stringify({
       preset: state.preset,
       expr: state.expr,
       a: state.a,
       n: state.n,
       x0: state.x0,
       x1: state.x1,
-      log: state.logScale
+      log: state.logScale,
+      tol: state.tol,
+      tolOn: state.tolOn
     }));
   }
 
   function restoreState() {
-    var raw = store.get("taylor-lab-state");
+    var raw = store.get("mathlab-taylor-state") || store.get("taylor-lab-state");
     if (!raw) return;
     try {
       var parsed = JSON.parse(raw);
@@ -2367,6 +2063,8 @@ table.ledger .term {
       if (Number.isFinite(parsed.x0)) state.x0 = parsed.x0;
       if (Number.isFinite(parsed.x1)) state.x1 = parsed.x1;
       if (typeof parsed.log === "boolean") state.logScale = parsed.log;
+      if (Number.isFinite(parsed.tol) && parsed.tol > 0) state.tol = parsed.tol;
+      if (typeof parsed.tolOn === "boolean") state.tolOn = parsed.tolOn;
     } catch (e) { /* ignore malformed state */ }
   }
 
@@ -2470,6 +2168,29 @@ table.ledger .term {
     saveState();
   });
 
+  function applyTolerance() {
+    var raw = el_parseTolerance(els.tolInput.value);
+    if (Number.isFinite(raw) && raw > 0) {
+      state.tol = raw;
+      commit(true);
+    } else {
+      els.tolInput.value = String(Number(state.tol.toPrecision(6)));
+    }
+  }
+
+  function el_parseTolerance(text) {
+    var value = Number(String(text).trim());
+    return Number.isFinite(value) ? value : NaN;
+  }
+
+  els.tolInput.addEventListener("change", applyTolerance);
+  els.tolInput.addEventListener("keydown", function (e) { if (e.key === "Enter") applyTolerance(); });
+
+  els.tolBtn.addEventListener("click", function () {
+    state.tolOn = !state.tolOn;
+    commit(true);
+  });
+
   els.resetBtn.addEventListener("click", function () {
     state.preset = DEFAULTS.preset;
     state.expr = DEFAULTS.expr;
@@ -2478,6 +2199,8 @@ table.ledger .term {
     state.x0 = DEFAULTS.x0;
     state.x1 = DEFAULTS.x1;
     state.logScale = DEFAULTS.log;
+    state.tol = DEFAULTS.tol;
+    state.tolOn = true;
     commit(true);
   });
 
@@ -2508,32 +2231,8 @@ table.ledger .term {
     document.body.removeChild(ta);
   }
 
-  /* ---- theme ---- */
-
-  function currentTheme() {
-    var attr = document.documentElement.getAttribute("data-theme");
-    if (attr === "dark" || attr === "light") return attr;
-    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  }
-
-  els.themeBtn.addEventListener("click", function () {
-    var next = currentTheme() === "dark" ? "light" : "dark";
-    document.documentElement.setAttribute("data-theme", next);
-    store.set("taylor-lab-theme", next);
-    redraw();
-  });
-
-  (function bootTheme() {
-    var saved = store.get("taylor-lab-theme");
-    if (saved === "dark" || saved === "light") document.documentElement.setAttribute("data-theme", saved);
-  })();
-
-  if (window.matchMedia) {
-    var mq = window.matchMedia("(prefers-color-scheme: dark)");
-    var onScheme = function () { redraw(); };
-    if (mq.addEventListener) mq.addEventListener("change", onScheme);
-    else if (mq.addListener) mq.addListener(onScheme);
-  }
+  /* ---- theme: toggle and collection label come from assets/lab.js ---- */
+  MathLab.onTheme(redraw);
 
   /* ---- hover + resize ---- */
 

@@ -1,0 +1,5 @@
+{
+  "title": "Definite Integral Explorer",
+  "description": "Shade signed area under a curve, compare it with left, right and midpoint Riemann sums, then drag the endpoint to watch the integral accumulate.",
+  "tags": ["Calculus", "Integration", "Riemann sums"]
+}
