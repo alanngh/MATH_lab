@@ -1,0 +1,234 @@
+/* Hallmark · redesign: full · 1 page (/)
+ * Before: 8 Floor or Reflex tells (eyebrow, two-sentence lede with a dash, mono fact strip, mono labels, overflow-x hidden on body, no stamp, text-beside-a-picture at 6/6, a second hero in the colophon)
+ * Keeps: every link, the filter and tag handlers, the search field, the generated catalog class names, the theme toggle, the year script, the Taylor plot logic
+ * Files: edit index.html · create assets/index.css, assets/index-page.css · delete none */
+/* Hallmark · shape: Index-First · genre: editorial · theme: Formwork (by request, drawing pour) · job: try · draw: manual
+ * hero: Banner · nav: slab (ink bar, wordmark on a red block) · footer: mast · imagery: one live working plot, no photographs · signature: the instrument, sin x and its Taylor polynomial under degree buttons on tracing paper
+ * axes: paper/light · display/Oswald 700 caps · accent/warm 30 red, annotation only · posture: restrained · contrast: pass · fold: pass · v2.0.0 */
+/* Hallmark · pre-emit critique: P5 H4 E5 S5 R5 V4 · weakest: R, the first build carried a three-frame showcase and a grey-on-grey ground; both cut, the catalog is the page */
+/* Hallmark · reworded "Each simulation is one self-contained page. Open it, move a parameter, and the mathematics answers in front of the class, no installs, no accounts, no network after the first load." to "Move a parameter and the mathematics answers in front of the class. No install, no account." · 19 names the dash and the length */
+/* Hallmark · reworded "I teach mathematics and make the tools I want in front of a room: small, fast pages that turn a formula into something a student can grab and move." to "I teach mathematics and build the tools I want in front of a room: small, fast pages that turn a formula into something a student can grab." · 19 names the dash */
+/* Hallmark · dropped "Runs offline once loaded", "Open source", "Free for classrooms" · 54 names the fact strip */
+
+:root {
+  color-scheme: light;
+
+  /* colour: tracing paper, blue-black ink, one red pencil for annotation only */
+  --color-paper: oklch(95% 0.012 85);
+  --color-paper-2: oklch(91% 0.012 85);
+  --color-ink: oklch(22% 0.02 260);
+  --color-ink-2: oklch(34% 0.018 260);
+  --color-muted: oklch(44% 0.015 260);
+  --color-rule: oklch(82% 0.012 85);
+  --color-rule-2: oklch(46% 0.02 260);
+  --color-accent: oklch(52% 0.19 30);
+  --color-accent-2: oklch(46% 0.18 30);
+  --color-accent-ink: oklch(97% 0.008 85);
+  --color-accent-deep: oklch(38% 0.16 30);
+  --color-focus: oklch(48% 0.19 30);
+
+  /* the instrument: ink on tracing paper, in both modes */
+  --color-plate-bg: oklch(22% 0.02 260);
+  --color-plate-fg: oklch(97% 0.008 85);
+  --color-plate-quiet: oklch(82% 0.012 85);
+  --color-plate-line: oklch(46% 0.02 260);
+  --color-plate-edge: oklch(22% 0.02 260);
+
+  /* the slab: the nav bar */
+  --color-slab: oklch(22% 0.02 260);
+  --color-slab-ink: oklch(97% 0.008 85);
+  --color-slab-muted: oklch(82% 0.012 85);
+
+  --color-shadow: oklch(22% 0.02 260);
+  --texture-opacity: 0.028;
+
+  --font-display: "Oswald", ui-sans-serif, "Arial Narrow", sans-serif;
+  --font-body: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-outlier: "Archivo Narrow", ui-sans-serif, "Arial Narrow", sans-serif;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5625rem;
+  --text-display: clamp(2.6rem, 4.2vw, 3.75rem);
+  --text-section: clamp(1.9rem, 2.8vw, 2.75rem);
+  --text-title: clamp(1.25rem, 1.5vw, 1.5rem);
+  --text-lead: clamp(1.0625rem, 1.2vw, 1.1875rem);
+  --tracking-display: 0.005em;
+  --display-weight: 700;
+
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 40px;
+  --space-2xl: 64px;
+  --space-3xl: 96px;
+
+  --container: 1240px;
+  --gutter: 56px;
+  --nav-h: 68px;
+  --section-gap: 112px;
+
+  --radius-pill: 0;
+  --rule-hair: 1px;
+  --rule-bar: 3px;
+  --shadow-plate: 8px 8px 0 var(--color-shadow);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-micro: 120ms;
+  --dur-short: 220ms;
+
+  --z-raised: 10;
+  --z-sticky-nav: 300;
+  --z-toast: 500;
+}
+
+/* Night pour, re-derived from the light values, never inverted. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --color-paper: oklch(20% 0.014 260);
+    --color-paper-2: oklch(24% 0.014 260);
+    --color-ink: oklch(95% 0.01 85);
+    --color-ink-2: oklch(84% 0.012 85);
+    --color-muted: oklch(70% 0.014 85);
+    --color-rule: oklch(34% 0.016 260);
+    --color-rule-2: oklch(70% 0.014 85);
+    --color-accent: oklch(68% 0.19 32);
+    --color-accent-2: oklch(74% 0.18 32);
+    --color-accent-ink: oklch(18% 0.014 260);
+    --color-accent-deep: oklch(50% 0.17 32);
+    --color-focus: oklch(74% 0.19 32);
+    --color-plate-bg: oklch(26% 0.014 260);
+    --color-plate-fg: oklch(96% 0.01 85);
+    --color-plate-quiet: oklch(80% 0.012 85);
+    --color-plate-line: oklch(46% 0.016 260);
+    --color-plate-edge: oklch(44% 0.016 260);
+    --color-slab: oklch(26% 0.014 260);
+    --color-slab-ink: oklch(96% 0.01 85);
+    --color-slab-muted: oklch(80% 0.012 85);
+    --color-shadow: oklch(10% 0.014 260);
+  }
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-paper: oklch(20% 0.014 260);
+  --color-paper-2: oklch(24% 0.014 260);
+  --color-ink: oklch(95% 0.01 85);
+  --color-ink-2: oklch(84% 0.012 85);
+  --color-muted: oklch(70% 0.014 85);
+  --color-rule: oklch(34% 0.016 260);
+  --color-rule-2: oklch(70% 0.014 85);
+  --color-accent: oklch(68% 0.19 32);
+  --color-accent-2: oklch(74% 0.18 32);
+  --color-accent-ink: oklch(18% 0.014 260);
+  --color-accent-deep: oklch(50% 0.17 32);
+  --color-focus: oklch(74% 0.19 32);
+  --color-plate-bg: oklch(26% 0.014 260);
+  --color-plate-fg: oklch(96% 0.01 85);
+  --color-plate-quiet: oklch(80% 0.012 85);
+  --color-plate-line: oklch(46% 0.016 260);
+  --color-plate-edge: oklch(44% 0.016 260);
+  --color-slab: oklch(26% 0.014 260);
+  --color-slab-ink: oklch(96% 0.01 85);
+  --color-slab-muted: oklch(80% 0.012 85);
+  --color-shadow: oklch(10% 0.014 260);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  overflow-x: clip;
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-h) + var(--space-md));
+  background: var(--color-paper);
+}
+body {
+  overflow-x: clip;
+  margin: 0;
+  min-height: 100%;
+  background: var(--color-paper);
+  color: var(--color-ink-2);
+  font-family: var(--font-body);
+  font-size: var(--text-md);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The grain: one artifact family, page-wide, inside the budget. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-raised);
+  pointer-events: none;
+  opacity: var(--texture-opacity);
+  background-size: 200px 200px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 9 -4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+:root[data-theme="dark"] body::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 5 -1.6'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) body::after {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 5 -1.6'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  }
+}
+
+::selection { background: var(--color-accent); color: var(--color-accent-ink); }
+:root { caret-color: var(--color-ink); scrollbar-color: var(--color-rule) var(--color-paper); }
+img, svg { max-width: 100%; }
+button, input { font: inherit; color: inherit; }
+
+h1, h2, h3, h4 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--display-weight);
+  color: var(--color-ink);
+  text-transform: uppercase;
+  text-wrap: balance;
+  font-synthesis: none;
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+h1, h2 { line-height: 1.02; letter-spacing: var(--tracking-display); }
+h3, h4 { line-height: 1.1; }
+p { margin: 0; text-wrap: pretty; max-width: 66ch; }
+
+:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.on-ink :focus-visible { outline-color: var(--color-accent); }
+
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+.skip {
+  position: absolute;
+  left: var(--space-md);
+  top: calc(-1 * var(--space-3xl));
+  z-index: var(--z-toast);
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--color-slab);
+  color: var(--color-slab-ink);
+  font-weight: 500;
+  text-decoration: none;
+}
+.skip:focus-visible { top: var(--space-md); }
