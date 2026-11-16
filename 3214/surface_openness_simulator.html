@@ -81,6 +81,38 @@
   background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
   padding: 8px 11px; margin: 9px 0 0; overflow-x: auto;
 }
+
+/* Green step controls for the point-center inputs only */
+.point-stepper {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 34px;
+  align-items: stretch;
+  gap: 6px;
+  margin-top: 6px;
+}
+.point-stepper .input { margin: 0; }
+.point-step-btn {
+  border: 1px solid #2f855a;
+  border-radius: 6px;
+  background: #3f8f68;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  box-shadow: 0 1px 2px rgba(0,0,0,.12);
+}
+.point-step-btn:hover { background: #347a59; }
+.point-step-btn:active { background: #286548; transform: translateY(1px); }
+.point-step-btn:focus-visible {
+  outline: 2px solid #68b684;
+  outline-offset: 2px;
+}
+
 </style>
 </head>
 <body>
@@ -158,12 +190,20 @@
         <label for="a" id="aLabel">Point x</label>
         <span class="value-pill" id="aPill">0</span>
       </div>
-      <input class="input" id="a" type="number" step="0.1" value="0" inputmode="decimal">
+      <div class="point-stepper">
+        <button class="point-step-btn" id="aDown" type="button" aria-label="Decrease point x">▼</button>
+        <input class="input" id="a" type="number" step="0.1" value="0" inputmode="decimal">
+        <button class="point-step-btn" id="aUp" type="button" aria-label="Increase point x">▲</button>
+      </div>
       <div class="field-row" style="margin-top:8px">
         <label for="b" id="bLabel">Point y</label>
         <span class="value-pill" id="bPill">0</span>
       </div>
-      <input class="input" id="b" type="number" step="0.1" value="0" inputmode="decimal">
+      <div class="point-stepper">
+        <button class="point-step-btn" id="bDown" type="button" aria-label="Decrease point y">▼</button>
+        <input class="input" id="b" type="number" step="0.1" value="0" inputmode="decimal">
+        <button class="point-step-btn" id="bUp" type="button" aria-label="Increase point y">▲</button>
+      </div>
       <p class="field-hint" id="pointHint">The surface point P = (a, b, f(a, b)) is the centre of the probe sphere.</p>
     </div>
 
@@ -1236,6 +1276,19 @@
   }
 
   /* ---------------- events ---------------- */
+  ["a", "b"].forEach(function (id) {
+    var input = $(id);
+    var step = Number(input.step) || 1;
+    $(id + "Down").addEventListener("click", function () {
+      input.value = (Number(input.value || 0) - step).toFixed(1);
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    $(id + "Up").addEventListener("click", function () {
+      input.value = (Number(input.value || 0) + step).toFixed(1);
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+  });
+
   $("preset").addEventListener("change", function () {
     applyPreset(this.value, false);
   });
