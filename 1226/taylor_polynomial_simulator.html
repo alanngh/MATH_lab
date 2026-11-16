@@ -2,6 +2,27 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>
+/* Default to light mode unless the visitor already picked a theme. */
+(function () {
+  try {
+    var root = document.documentElement;
+    var saved = null;
+    ["mathlab-theme", "theme", "lab-theme", "math-lab-theme"].forEach(function (k) {
+      if (!saved) saved = window.localStorage.getItem(k);
+    });
+    if (saved !== "light" && saved !== "dark") {
+      root.setAttribute("data-theme", "light");
+      window.localStorage.setItem("mathlab-theme", "light");
+      window.localStorage.setItem("theme", "light");
+    } else {
+      root.setAttribute("data-theme", saved);
+    }
+  } catch (e) {
+    document.documentElement.setAttribute("data-theme", "light");
+  }
+})();
+</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="claude:viewport-fit-sides" content="cover">
 <title>Taylor Polynomial Simulator</title>
@@ -1161,18 +1182,6 @@ table.ledger .term { font-family: var(--font-mono); font-size: 10.5px; color: va
     ctx.rect(pad.left, pad.top, iw, ih);
     ctx.clip();
 
-    // tolerance band: the interval where |f − P| stays within tolerance
-    if (data.tolOn && data.tolBand && !data.tolBand.empty && data.tolBand.width > 0) {
-      var bandL = X(Math.max(data.tolBand.lo, xmin));
-      var bandR = X(Math.min(data.tolBand.hi, xmax));
-      if (bandR > bandL) {
-        ctx.fillStyle = c.danger;
-        ctx.globalAlpha = 0.14;
-        ctx.fillRect(bandL, pad.top, bandR - bandL, ih);
-        ctx.globalAlpha = 1;
-      }
-    }
-
     // horizontal grid + labels come after clip release
     var yt = niceTicks(ymin, ymax, ih > 200 ? 5 : 4);
     ctx.strokeStyle = c.grid;
@@ -1205,6 +1214,18 @@ table.ledger .term { font-family: var(--font-mono); font-size: 10.5px; color: va
       ctx.beginPath(); ctx.moveTo(zeroX, pad.top); ctx.lineTo(zeroX, pad.top + ih); ctx.stroke();
     }
     ctx.globalAlpha = 1;
+
+    // tolerance band: same translucent fill as the remainder plot, drawn over the grid
+    if (data.tolOn && data.tolBand && !data.tolBand.empty && data.tolBand.width > 0) {
+      var bandL = X(Math.max(data.tolBand.lo, xmin));
+      var bandR = X(Math.min(data.tolBand.hi, xmax));
+      if (bandR > bandL) {
+        ctx.fillStyle = c.danger;
+        ctx.globalAlpha = 0.16;
+        ctx.fillRect(bandL, pad.top, bandR - bandL, ih);
+        ctx.globalAlpha = 1;
+      }
+    }
 
     // f curve
     strokeSeries(ctx, xs, X, Y, "f", c.f, 2, false);
@@ -1240,15 +1261,25 @@ table.ledger .term { font-family: var(--font-mono); font-size: 10.5px; color: va
 
     // hover crosshair
     if (Number.isFinite(hoverX) && hoverX >= xmin && hoverX <= xmax) {
-      var hx = Math.round(X(hoverX)) + 0.5;
-      ctx.strokeStyle = c.axis;
-      ctx.globalAlpha = 0.9;
-      ctx.setLineDash([3, 3]);
-      ctx.lineWidth = 1;
+      var hSample = nearestSample(xs, hoverX);
+      var hx = Math.round(X(hSample ? hSample.x : hoverX)) + 0.5;
+      ctx.strokeStyle = c.inkSoft;
+      ctx.globalAlpha = 0.85;
+      ctx.setLineDash([5, 4]);
+      ctx.lineWidth = 1.2;
       ctx.beginPath(); ctx.moveTo(hx, pad.top); ctx.lineTo(hx, pad.top + ih); ctx.stroke();
+      if (hSample) {
+        // horizontal dashed guides from each intersection to the y axis
+        [["f", c.f], ["p", c.p]].forEach(function (s) {
+          var v = hSample[s[0]];
+          if (!Number.isFinite(v)) return;
+          var gy = Math.round(Y(v)) + 0.5;
+          ctx.strokeStyle = s[1];
+          ctx.beginPath(); ctx.moveTo(pad.left, gy); ctx.lineTo(hx, gy); ctx.stroke();
+        });
+      }
       ctx.setLineDash([]);
       ctx.globalAlpha = 1;
-      var hSample = nearestSample(xs, hoverX);
       if (hSample) {
         if (Number.isFinite(hSample.f)) dot(ctx, X(hSample.x), Y(hSample.f), c.f, c.surface);
         if (Number.isFinite(hSample.p)) dot(ctx, X(hSample.x), Y(hSample.p), c.p, c.surface);
@@ -1454,7 +1485,7 @@ table.ledger .term { font-family: var(--font-mono); font-size: 10.5px; color: va
     var Y = logScale
       ? function (v) { return pad.top + (ymax - Math.log10(Math.max(v, Math.pow(10, floorExp)))) / (ymax - ymin) * ih; }
       : function (v) { return pad.top + (ymax - v) / (ymax - ymin) * ih; };
-    chart.geom = { pad: pad, X: X, Y: Y, xmin: xmin, xmax: xmax, log: logScale, tol: data.tol, tolOn: data.tolOn };
+    chart.geom = { pad: pad, X: X, Y: Y, xmin: xmin, xmax: xmax, iw: iw, ih: ih, log: logScale, tol: data.tol, tolOn: data.tolOn };
 
     // keep the tolerance line visible on the remainder axis
     var tol = data.tol;
@@ -1569,13 +1600,21 @@ table.ledger .term { font-family: var(--font-mono); font-size: 10.5px; color: va
 
     // hover crosshair
     if (Number.isFinite(hoverX) && hoverX >= xmin && hoverX <= xmax) {
-      var hx = Math.round(X(hoverX)) + 0.5;
-      ctx.strokeStyle = c.axis;
-      ctx.setLineDash([3, 3]);
-      ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(hx, pad.top); ctx.lineTo(hx, pad.top + ih); ctx.stroke();
-      ctx.setLineDash([]);
       var hs = nearestSample(xs, hoverX);
+      var hx = Math.round(X(hs ? hs.x : hoverX)) + 0.5;
+      ctx.strokeStyle = c.inkSoft;
+      ctx.globalAlpha = 0.85;
+      ctx.setLineDash([5, 4]);
+      ctx.lineWidth = 1.2;
+      ctx.beginPath(); ctx.moveTo(hx, pad.top); ctx.lineTo(hx, pad.top + ih); ctx.stroke();
+      if (hs && Number.isFinite(hs.r)) {
+        // horizontal dashed guide from the intersection to the y axis
+        var gy = Math.round(Y(hs.r)) + 0.5;
+        ctx.strokeStyle = c.r;
+        ctx.beginPath(); ctx.moveTo(pad.left, gy); ctx.lineTo(hx, gy); ctx.stroke();
+      }
+      ctx.setLineDash([]);
+      ctx.globalAlpha = 1;
       if (hs && Number.isFinite(hs.r)) dot(ctx, X(hs.x), Y(hs.r), c.r, c.surface);
     }
 
@@ -1833,46 +1872,74 @@ table.ledger .term { font-family: var(--font-mono); font-size: 10.5px; color: va
 
   /* ---- tooltip ---- */
 
-  function showTip(tipEl, wrapEl, geom, sample, kind) {
+  /* Tooltip numbers: 3 decimals; very small or very large values print as 1.123e-6. */
+  function tipNum(v) {
+    if (!Number.isFinite(v)) return "—";
+    if (v === 0) return "0.000";
+    var abs = Math.abs(v);
+    if (abs < 1e-3 || abs >= 1e5) return v.toExponential(3);
+    return v.toFixed(3);
+  }
+
+  function showTip(tipEl, wrapEl, geom, sample, kind, pointer) {
     if (!geom || !sample) { hideTip(tipEl); return; }
     var d = state.derived;
-    var rows = [];
-    if (kind === "compare") {
-      rows.push(rowHTML("f(x)", tidy(sample.f, 5), "f"));
-      rows.push(rowHTML("P" + subscriptGlyph(d.n) + "(x)", tidy(sample.p, 5), "p"));
-      if (Number.isFinite(sample.f) && Number.isFinite(sample.p)) {
-        rows.push(rowHTML("|Rₙ|", tidy(Math.abs(sample.f - sample.p), 3), "r"));
-      }
-    } else {
-      rows.push(rowHTML("|Rₙ(x)|", tidy(sample.r, 5), "r"));
-      if (Number.isFinite(sample.f) && Number.isFinite(sample.p)) {
-        rows.push(rowHTML("f(x)", tidy(sample.f, 5), "f"));
-        rows.push(rowHTML("P" + subscriptGlyph(d.n) + "(x)", tidy(sample.p, 5), "p"));
-      }
-    }
-    tipEl.innerHTML = '<div class="tip-x">x = ' + tidy(sample.x, 6) + "</div>" + rows.join("");
+    // Both plots show the same four readouts: x, f(x), Pₙ(x), |Rₙ(x)|.
+    var remainder = Number.isFinite(sample.r) ? sample.r
+      : (Number.isFinite(sample.f) && Number.isFinite(sample.p) ? Math.abs(sample.f - sample.p) : NaN);
+    var rows = [
+      rowHTML("f(x)", tipNum(sample.f), "f"),
+      rowHTML("P" + subscriptGlyph(d.n) + "(x)", tipNum(sample.p), "p"),
+      rowHTML("|R" + subscriptGlyph(d.n) + "(x)|", tipNum(remainder), "r")
+    ];
+    rows.unshift(rowHTML("x", tipNum(sample.x), "ink"));
+    // Three-column grid: label | = | value, so every "=" lines up.
+    tipEl.innerHTML = '<div style="display:grid;grid-template-columns:auto auto auto;column-gap:6px;row-gap:2px;align-items:baseline;font-variant-numeric:tabular-nums">' + rows.join("") + "</div>";
     tipEl.classList.add("on");
     tipEl.setAttribute("aria-hidden", "false");
+    tipEl.style.visibility = "visible";
+    tipEl.style.opacity = "1";
 
-    var px = geom.X(sample.x);
-    var maxX = wrapEl.clientWidth - tipEl.offsetWidth - 8;
-    var left = Math.max(8, Math.min(px + 14, maxX));
-    var py = wrapEl.clientHeight / 2 - tipEl.offsetHeight / 2;
-    if (kind === "compare") {
-      var top = Math.max(8, Math.min(geom.Y(sample.f) - 40, wrapEl.clientHeight - tipEl.offsetHeight - 8));
-      if (Number.isFinite(top)) py = top;
+    // The box must never catch the pointer, or it would steal the hover.
+    tipEl.style.pointerEvents = "none";
+    tipEl.style.position = "absolute";
+    tipEl.style.right = "auto";
+    tipEl.style.bottom = "auto";
+
+    var tw = tipEl.offsetWidth, th = tipEl.offsetHeight;
+    var ww = wrapEl.clientWidth, wh = wrapEl.clientHeight;
+    var left, top;
+    if (pointer) {
+      // follow the mouse: sit to the lower right, flip when it would overflow
+      left = pointer.x + 16;
+      if (left + tw > ww - 4) left = pointer.x - tw - 16;
+      top = pointer.y + 16;
+      if (top + th > wh - 4) top = pointer.y - th - 16;
+    } else {
+      // keyboard: anchor to the crosshair
+      left = geom.X(sample.x) + 14;
+      if (left + tw > ww - 4) left = geom.X(sample.x) - tw - 14;
+      top = (kind === "compare" && Number.isFinite(sample.f)) ? geom.Y(sample.f) - 40 : wh / 2 - th / 2;
     }
+    left = Math.max(4, Math.min(left, ww - tw - 4));
+    top = Math.max(4, Math.min(top, wh - th - 4));
     tipEl.style.left = left + "px";
-    tipEl.style.top = Math.max(8, py) + "px";
+    tipEl.style.top = top + "px";
   }
 
   function rowHTML(label, value, cls) {
-    return '<div class="tip-row"><i>' + label + "</i><b style=\"color:var(--series-" + cls + ")\">" + value + "</b></div>";
+    var color = cls === "ink" ? "var(--ink)" : "var(--series-" + cls + ")";
+    return '<div class="tip-row" style="display:contents">' +
+      '<i style="text-align:right;font-style:normal;white-space:nowrap">' + label + "</i>" +
+      '<span style="text-align:center;color:var(--muted)">=</span>' +
+      '<b style="text-align:left;font-weight:600;white-space:nowrap;color:' + color + '">' + value + "</b></div>";
   }
 
   function hideTip(tipEl) {
     tipEl.classList.remove("on");
     tipEl.setAttribute("aria-hidden", "true");
+    tipEl.style.visibility = "hidden";
+    tipEl.style.opacity = "0";
   }
 
   /* ---- pointer interaction ---- */
@@ -1894,15 +1961,23 @@ table.ledger .term { font-family: var(--font-mono); font-size: 10.5px; color: va
       state[kind === "compare" ? "hover1" : "hover2"] = xVal;
       var sample = nearestSample(state.samples, xVal);
       redraw();
-      showTip(tipEl, wrapEl, geom, sample, kind);
+      var wrapRect = wrapEl.getBoundingClientRect();
+      showTip(tipEl, wrapEl, geom, sample, kind, { x: evt.clientX - wrapRect.left, y: evt.clientY - wrapRect.top });
     }
     canvasEl.addEventListener("pointermove", handle);
     canvasEl.addEventListener("pointerdown", handle);
-    canvasEl.addEventListener("pointerleave", function () {
+    function leave() {
       state[kind === "compare" ? "hover1" : "hover2"] = null;
       hideTip(tipEl);
       redraw();
-    });
+    }
+    // Hide the box and crosshair whenever the mouse is no longer over the plot.
+    canvasEl.addEventListener("pointerleave", leave);
+    canvasEl.addEventListener("mouseleave", leave);
+    canvasEl.addEventListener("pointercancel", leave);
+    wrapEl.addEventListener("pointerleave", leave);
+    wrapEl.addEventListener("mouseleave", leave);
+    window.addEventListener("blur", leave);
     wrapEl.addEventListener("blur", function () {
       state[kind === "compare" ? "hover1" : "hover2"] = null;
       hideTip(tipEl);
@@ -2232,7 +2307,12 @@ table.ledger .term { font-family: var(--font-mono); font-size: 10.5px; color: va
   }
 
   /* ---- theme: toggle and collection label come from assets/lab.js ---- */
-  MathLab.onTheme(redraw);
+  if (window.MathLab && typeof window.MathLab.onTheme === "function") {
+    window.MathLab.onTheme(redraw);
+  } else {
+    // assets/lab.js did not load: redraw the charts when the theme attribute changes
+    new MutationObserver(redraw).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  }
 
   /* ---- hover + resize ---- */
 

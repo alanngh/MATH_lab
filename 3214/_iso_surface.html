@@ -1,0 +1,1135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Surface Openness Explorer</title>
+<meta name="description" content="Place a point on a surface, grow a probe sphere around it, and read the surface–sphere intersection as the local neighbourhood of the point.">
+<meta name="keywords" content="Calculus, Surfaces, Vector calculus">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Oswald:wght@400;500;600&family=Ubuntu:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="../assets/lab.css">
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem("mathlab-theme");
+      if (saved === "dark" || saved === "light") {
+        document.documentElement.setAttribute("data-theme", saved);
+      }
+    } catch (error) { /* private mode */ }
+  })();
+</script>
+<style>
+/* Page-specific additions to assets/lab.css */
+
+/* the rotation bar sits above the figure, so the controls travel with it */
+.viewbar {
+  display: flex; align-items: center; flex-wrap: wrap;
+  gap: 4px 20px; padding: 7px 2px 8px;
+  border-bottom: 1px solid var(--line);
+}
+.viewbar-label {
+  font-family: var(--font-mono); font-size: 9px; font-weight: 600;
+  letter-spacing: .11em; text-transform: uppercase; color: var(--muted);
+}
+.view-row { display: flex; align-items: center; gap: 8px; flex: 1 1 170px; min-width: 0; }
+.view-row label {
+  flex: none; width: 34px;
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--muted);
+}
+.view-row .range { flex: 1; height: 24px; min-width: 0; }
+.view-val {
+  flex: none; min-width: 50px; text-align: right;
+  font-family: var(--font-mono); font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px;
+}
+
+/* rail toggle */
+.switch {
+  display: flex; align-items: center; gap: 9px; cursor: pointer;
+  font-family: var(--font-mono); font-size: 10px; font-weight: 600;
+  letter-spacing: .11em; text-transform: uppercase; color: var(--rail-muted);
+}
+.switch input { width: 16px; height: 16px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+
+/* the figure needs more room than a flat line chart */
+.plot.plot3d { height: 470px; }
+.plot.plot3d canvas { touch-action: none; cursor: grab; }
+.plot.plot3d canvas:active { cursor: grabbing; }
+@media (max-width: 960px) { .plot.plot3d { height: 400px; } }
+@media (max-width: 720px) { .plot.plot3d { height: 330px; } }
+
+.note-card {
+  background: var(--surface-2); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 15px 17px 16px; box-shadow: var(--shadow);
+}
+.note-card h2 {
+  margin: 0 0 7px; font-family: var(--font-display); font-weight: 500;
+  font-size: 15.5px; letter-spacing: .04em; text-transform: uppercase; color: var(--ink);
+}
+.note-card h2 .idx {
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .06em;
+  color: var(--accent); margin-right: 7px; vertical-align: 2px;
+}
+.note-card p { margin: 0; font-size: 12px; line-height: 1.6; color: var(--ink-soft); max-width: 92ch; }
+.note-card p + p { margin-top: 7px; }
+.note-card b { color: var(--ink); font-weight: 700; }
+.note-card .formula {
+  font-family: var(--font-mono); font-size: 11.5px; color: var(--ink-soft);
+  background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+  padding: 8px 11px; margin: 9px 0 0; overflow-x: auto;
+}
+</style>
+<script>
+window.__noSurface = true;
+window.addEventListener("DOMContentLoaded",function(){
+ setTimeout(function(){
+  var g=function(id){return document.getElementById(id)};
+  g("preset").value="torus"; g("preset").dispatchEvent(new Event("change"));
+  setTimeout(function(){
+    var cv=document.getElementById("plot");
+    var el=document.createElement("div"); el.id="__png"; el.textContent=cv.toDataURL("image/png");
+    document.body.appendChild(el);
+  },600);
+ },700);
+});
+</script>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="brand">
+    <a class="brand-mark" href="../index.html" aria-label="Back to the Math Lab index" title="Back to the index">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3.5 20.5V4.5M3.5 20.5h17"></path>
+        <path d="M6.5 16.2c2.6-1.2 4.1-6.4 6.6-7.2 2-.6 3.1 1.7 5 1.2"></path>
+        <circle cx="6.5" cy="16.2" r="1.15" fill="currentColor" stroke="none"></circle>
+      </svg>
+    </a>
+    <div class="brand-copy">
+      <span class="brand-name" id="collectionName">Math Lab</span>
+      <span class="brand-sub" id="collectionSub">Collection</span>
+    </div>
+  </div>
+  <div class="masthead-meta">
+    <span class="chip optional" title="Rendering stack"><span class="pip" aria-hidden="true"></span>Canvas 2D</span>
+    <a class="chip" href="https://github.com/alanngh/MATH_lab/tree/main" target="_blank" rel="noopener">Nilton Garcia Hilares</a>
+    <button class="icon-btn" id="themeBtn" type="button" aria-label="Switch color theme" title="Switch color theme">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.2"></circle>
+        <path d="M12 2.5v2.2M12 19.3v2.2M4.3 4.3l1.6 1.6M18.1 18.1l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.3 19.7l1.6-1.6M18.1 5.9l1.6-1.6"></path>
+      </svg>
+    </button>
+    <a class="icon-btn" href="../index.html" aria-label="Back to the Math Lab index" title="Back to the index">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M3.6 10.6 12 3.8l8.4 6.8"></path>
+        <path d="M5.8 9.4V20h12.4V9.4"></path>
+        <path d="M10.2 20v-5.4h3.6V20"></path>
+      </svg>
+    </a>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="panel" aria-labelledby="panelTitle">
+    <div class="panel-head">
+      <h2 class="panel-title" id="panelTitle">Controls</h2>
+      <button class="ghost-btn" id="reset" type="button">Reset</button>
+    </div>
+
+    <div class="field">
+      <div class="field-row">
+        <label for="preset">Surface</label>
+        <span class="value-pill" id="presetPill">graph</span>
+      </div>
+      <div class="select-wrap">
+        <select id="preset">
+          <option value="paraboloid">Paraboloid: z = x² + y²</option>
+          <option value="saddle">Saddle: z = x² − y²</option>
+          <option value="wave">Wave: z = sin x cos y</option>
+          <option value="plane">Plane: z = 0.35x − 0.25y</option>
+          <option value="sphere">Sphere: parametric</option>
+          <option value="torus">Torus: parametric</option>
+          <option value="custom">Custom: z = f(x, y)</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field" id="exprField">
+      <div class="field-row">
+        <label for="expr">z = f(x, y)</label>
+        <span class="value-pill" id="exprPill">x² + y²</span>
+      </div>
+      <input class="input" id="expr" value="x*x + y*y" spellcheck="false" autocomplete="off" aria-label="Surface height f of x and y">
+      <p class="field-hint">Use <code>x</code>, <code>y</code>, <code>^</code> for powers, and sin, cos, exp, sqrt, log, pi.</p>
+      <p class="field-hint error" id="exprError" role="alert" hidden></p>
+    </div>
+
+    <div class="field">
+      <div class="field-row">
+        <label for="a" id="aLabel">Point x</label>
+        <span class="value-pill" id="aPill">0</span>
+      </div>
+      <input class="input" id="a" type="number" step="0.1" value="0" inputmode="decimal">
+      <div class="field-row" style="margin-top:8px">
+        <label for="b" id="bLabel">Point y</label>
+        <span class="value-pill" id="bPill">0</span>
+      </div>
+      <input class="input" id="b" type="number" step="0.1" value="0" inputmode="decimal">
+      <p class="field-hint" id="pointHint">The surface point P = (a, b, f(a, b)) is the centre of the probe sphere.</p>
+    </div>
+
+    <div class="field">
+      <div class="field-row">
+        <label for="domain">Domain half-width</label>
+        <span class="value-pill" id="domainPill">1.25</span>
+      </div>
+      <input class="range" id="domain" type="range" min="0.75" max="5" step="0.25" value="1.25">
+      <div class="ticks" aria-hidden="true"><span>0.75</span><span>1.8</span><span>2.9</span><span>3.9</span><span>5</span></div>
+    </div>
+
+    <div class="field">
+      <div class="field-row">
+        <label for="radius">Probe radius R</label>
+        <span class="value-pill" id="radiusPill">0.8</span>
+      </div>
+      <input class="range" id="radius" type="range" min="0.1" max="3" step="0.05" value="0.8">
+      <div class="ticks" aria-hidden="true"><span>0.1</span><span>0.8</span><span>1.5</span><span>2.3</span><span>3</span></div>
+    </div>
+
+    <div class="field">
+      <label class="switch"><input id="showSphere" type="checkbox" checked> Show probe sphere</label>
+      <p class="field-hint">Turn the sphere off to see the intersection curve on its own.</p>
+    </div>
+
+    <p class="panel-note">
+      Drag the figure to rotate it, or use the sliders above the plot. The intersection is the set of surface points at distance <code>R</code> from <b>P</b>.
+    </p>
+  </aside>
+
+  <main class="main">
+    <div class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">Surfaces · local neighbourhood</div>
+        <h1>Surface openness explorer</h1>
+        <p>Put a point on a surface and grow a sphere around it. The curve where the sphere meets the surface is the local neighbourhood you are inspecting.</p>
+      </div>
+    </div>
+
+    <section class="stats" aria-label="Surface summary">
+      <div class="stat">
+        <span class="stat-label">Point P</span>
+        <span class="stat-value" id="statPoint">—</span>
+        <span class="stat-sub" id="statPointFoot">on the surface</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Probe radius R</span>
+        <span class="stat-value" id="statRadius">—</span>
+        <span class="stat-sub">distance to the surface</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Surface</span>
+        <span class="stat-value" id="statSurface">—</span>
+        <span class="stat-sub" id="statSurfaceFoot">graph z = f(x, y)</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Intersection</span>
+        <span class="stat-value" id="statIntersection">—</span>
+        <span class="stat-sub">samples found</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Reach</span>
+        <span class="stat-value" id="statReach">—</span>
+        <span class="stat-sub" id="statReachFoot">R ÷ half-width</span>
+      </div>
+    </section>
+
+    <section class="chart-card" aria-labelledby="chartTitle">
+      <div class="chart-head">
+        <h2 class="chart-title" id="chartTitle"><span class="idx">01</span>Surface and probe sphere</h2>
+        <div class="legend" aria-hidden="true">
+          <span><i class="swatch band s-f"></i>surface</span>
+          <span><i class="swatch dot s-c"></i>point P</span>
+          <span><i class="swatch s-p"></i>intersection</span>
+          <span><i class="swatch dot s-muted"></i>probe sphere</span>
+        </div>
+      </div>
+
+      <div class="viewbar">
+        <span class="viewbar-label" aria-hidden="true">View</span>
+        <div class="view-row">
+          <label for="rx">Tilt</label>
+          <input class="range" id="rx" type="range" min="-90" max="90" step="1" value="20" aria-label="Tilt of the figure">
+          <span class="view-val" id="rxVal">20°</span>
+        </div>
+        <div class="view-row">
+          <label for="ry">Spin</label>
+          <input class="range" id="ry" type="range" min="-180" max="180" step="1" value="38" aria-label="Spin of the figure">
+          <span class="view-val" id="ryVal">38°</span>
+        </div>
+        <div class="view-row">
+          <label for="rz">Roll</label>
+          <input class="range" id="rz" type="range" min="-180" max="180" step="1" value="0" aria-label="Roll of the figure">
+          <span class="view-val" id="rzVal">0°</span>
+        </div>
+        <button class="log-btn" id="resetView" type="button">Reset view</button>
+      </div>
+
+      <div class="plot plot3d" id="plotWrap">
+        <canvas id="plot" role="img" aria-label="Three-dimensional plot of the surface, the selected point P and a translucent probe sphere with its intersection curve"></canvas>
+      </div>
+
+      <div class="chart-foot">
+        <span>triangles <b id="footTriangles">—</b></span>
+        <span>intersection <b id="footIntersection">—</b></span>
+      </div>
+    </section>
+
+    <section class="note-card" aria-labelledby="exploreTitle">
+      <h2 id="exploreTitle"><span class="idx">02</span>Try this</h2>
+      <p id="insight">Grow <b>R</b> from small to large. On a smooth surface the intersection stays a small closed loop; near a ridge, a saddle, or the edge of the patch, it breaks into separate arcs.</p>
+      <div class="formula">(x − a)² + (y − b)² + (f(x, y) − f(a, b))² = R²</div>
+      <p>The probe sphere is centred on <b>P</b>, not on the origin, and the surface is redrawn relative to P so the intersection is easy to read. For the sphere and torus presets the parameters are angles: <b>u</b> and <b>v</b> in radians.</p>
+    </section>
+  </main>
+</div>
+
+<footer class="foot">
+  <span>Surface Openness Explorer by <a href="https://github.com/alanngh/MATH_lab/tree/main" target="_blank" rel="noopener">Nilton Garcia Hilares</a></span>
+  <span class="formula-ref">|X − P| = R ∩ {X : X ∈ S}</span>
+</footer>
+
+<script src="../assets/lab.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var $ = function (id) { return document.getElementById(id); };
+  var canvas = $("plot");
+  var ctx = canvas.getContext("2d");
+  var wrap = $("plotWrap");
+  var chart = MathLab.canvas.lab(canvas);
+  var resizeTimer = null;
+
+  var MINUS = "−";
+  var GRID = 40;          /* graph resolution: GRID × GRID quads */
+  var PARAM_U = 88;       /* parametric surface: u steps */
+  var PARAM_V = 44;       /* parametric surface: v steps */
+
+  /* ---------------- state ---------------- */
+  var state = {
+    preset: "paraboloid",
+    view: { tilt: 20, spin: 38, roll: 0 },
+    geom: null,
+    error: null
+  };
+
+  var PRESETS = {
+    paraboloid: { expr: "x*x + y*y", title: "Paraboloid" },
+    saddle: { expr: "x*x - y*y", title: "Saddle" },
+    wave: { expr: "sin(x) * cos(y)", title: "Wave" },
+    plane: { expr: "0.35*x - 0.25*y", title: "Plane" }
+  };
+
+  /* ---------------- formatting ---------------- */
+  function tidy(v, sig) {
+    if (!Number.isFinite(v)) return "—";
+    sig = sig || 4;
+    if (v === 0) return "0";
+    var abs = Math.abs(v);
+    if (abs >= 1e5 || abs < 1e-3) {
+      return v.toExponential(Math.max(1, sig - 1)).replace("e+", "e").replace("e-", "e" + MINUS);
+    }
+    return String(Number(v.toPrecision(sig))).replace("-", MINUS);
+  }
+  function deg(v) { return (v < 0 ? MINUS : "") + Math.abs(v) + "°"; }
+
+  function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+  function palette() {
+    return {
+      surface: cssVar("--series-f"), point: cssVar("--center"),
+      curve: cssVar("--series-p"), sphere: cssVar("--muted"),
+      axis: cssVar("--axis"), grid: cssVar("--grid"),
+      ink: cssVar("--ink"), surface2: cssVar("--surface-2"),
+      line: cssVar("--line"), muted: cssVar("--muted")
+    };
+  }
+  /* accepts "#abc", "#aabbcc" and "rgb(r, g, b)"; the second form is
+     needed because mix() is called with its own output */
+  function parseColor(value) {
+    var text = String(value).trim();
+    var rgb = text.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+    if (rgb) return [Number(rgb[1]), Number(rgb[2]), Number(rgb[3])];
+    var hex = text.replace("#", "");
+    if (hex.length === 3) hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+    if (hex.length !== 6) return [42, 120, 214];
+    var n = parseInt(hex, 16);
+    return Number.isFinite(n) ? [(n >> 16) & 255, (n >> 8) & 255, n & 255] : [42, 120, 214];
+  }
+  function mix(a, b, t) {
+    var A = parseColor(a), B = parseColor(b);
+    return "rgb(" + Math.round(A[0] + (B[0] - A[0]) * t) + ","
+      + Math.round(A[1] + (B[1] - A[1]) * t) + ","
+      + Math.round(A[2] + (B[2] - A[2]) * t) + ")";
+  }
+
+  /* ---------------- expressions ----------------
+     Same whitelist as the integral explorer: no arbitrary names reach
+     the compiled function, so a pasted page cannot run someone else's code. */
+  function compile(source) {
+    var s = String(source).trim();
+    if (!s) throw new Error("Enter a height function f(x, y).");
+    if (!/^[0-9a-zA-Z+\-*/^().,\s]+$/.test(s)) {
+      throw new Error("Use numbers, x, y, supported functions and arithmetic only.");
+    }
+    var allowed = {
+      x: 1, y: 1, sin: 1, cos: 1, tan: 1, asin: 1, acos: 1, atan: 1,
+      sqrt: 1, abs: 1, exp: 1, log: 1, ln: 1, pi: 1, e: 1
+    };
+    var words = s.match(/[A-Za-z]+/g) || [];
+    for (var i = 0; i < words.length; i++) {
+      if (!allowed[words[i]]) {
+        throw new Error("Unrecognized name: " + words[i] + ".");
+      }
+    }
+    var expression = s.replace(/\^/g, "**");
+    try {
+      return new Function("x", "y",
+        '"use strict";' +
+        "const {sin,cos,tan,asin,acos,atan,sqrt,abs,exp,log}=Math;" +
+        "const ln=log,pi=Math.PI,e=Math.E;" +
+        "return (" + expression + ");");
+    } catch (error) {
+      throw new Error("The expression could not be parsed.");
+    }
+  }
+
+  /* ---------------- surfaces ----------------
+     Every surface exposes:
+       grid(uN, vN) -> vertices, quads, and a parameter->point map
+     Graphs are sampled on [a − D, a + D] × [b − D, b + D] and then
+     re-centred on P, so the probe sphere sits at (0, 0, 0). */
+  function graphSurface(fn, a, b, D) {
+    var z0 = fn(a, b);
+    return {
+      kind: "graph",
+      title: state.preset === "custom" ? "Custom graph" : PRESETS[state.preset].title,
+      P: [a, b, z0],
+      domain: { a: a, b: b, D: D },
+      point: function (x, y) {
+        var z = fn(x, y);
+        return [x, y, Number.isFinite(z) ? z : 0];
+      },
+      finite: function (x, y) { return Number.isFinite(fn(x, y)); },
+      build: function () {
+        var verts = [], quads = [], ok = [];
+        for (var i = 0; i <= GRID; i++) {
+          for (var j = 0; j <= GRID; j++) {
+            var x = a - D + 2 * D * i / GRID;
+            var y = b - D + 2 * D * j / GRID;
+            var finite = this.finite(x, y);
+            ok.push(finite);
+            verts.push(this.point(x, y));
+          }
+        }
+        for (var q = 0; q < GRID; q++) {
+          for (var r = 0; r < GRID; r++) {
+            var k = q * (GRID + 1) + r;
+            if (!(ok[k] && ok[k + 1] && ok[k + GRID + 1] && ok[k + GRID + 2])) continue;
+            quads.push([k, k + 1, k + GRID + 2], [k, k + GRID + 2, k + GRID + 1]);
+          }
+        }
+        return { verts: verts, faces: quads };
+      }
+    };
+  }
+
+  function sphereSurface(u0, v0) {
+    var map = function (u, v) {
+      return [Math.cos(v) * Math.cos(u), Math.cos(v) * Math.sin(u), Math.sin(v)];
+    };
+    return parametric("Sphere", map, u0, v0, -Math.PI / 2, Math.PI / 2);
+  }
+
+  function torusSurface(u0, v0) {
+    var Rm = 1.2, rm = 0.45;
+    var map = function (u, v) {
+      var w = Rm + rm * Math.cos(v);
+      return [w * Math.cos(u), w * Math.sin(u), rm * Math.sin(v)];
+    };
+    return parametric("Torus", map, u0, v0, 0, 2 * Math.PI);
+  }
+
+  /* one factory for the two closed parametric surfaces */
+  function parametric(title, map, u0, v0, va, vb) {
+    return {
+      kind: "param",
+      title: title,
+      map: map,
+      uRange: [0, 2 * Math.PI],
+      vRange: [va, vb],
+      P: map(u0, v0),
+      build: function () {
+        return paramGrid(map, 0, 2 * Math.PI, va, vb, true);
+      }
+    };
+  }
+
+  function paramGrid(map, ua, ub, va, vb, closedV) {
+    var verts = [], faces = [], probe = [];
+    for (var i = 0; i <= PARAM_U; i++) {
+      for (var j = 0; j <= PARAM_V; j++) {
+        var u = ua + (ub - ua) * i / PARAM_U;
+        var v = va + (vb - va) * j / PARAM_V;
+        var p = map(u, v);
+        verts.push(p);
+        probe.push([u, v].concat(p));
+      }
+    }
+    for (var q = 0; q < PARAM_U; q++) {
+      for (var r = 0; r < (closedV ? PARAM_V : PARAM_V - 1); r++) {
+        var k = q * (PARAM_V + 1) + r;
+        /* wound so the computed normal points out of the surface:
+           the closed-surface cull below depends on that orientation */
+        faces.push([k, k + PARAM_V + 2, k + 1], [k, k + PARAM_V + 1, k + PARAM_V + 2]);
+      }
+    }
+    return { verts: verts, faces: faces, params: probe };
+  }
+
+  /* ---------------- contours ----------------
+     Marching squares over a value grid. It is used for both kinds of
+     surface: the graph one on (x, y), the parametric ones on (u, v),
+     so a curve with several components needs no special case. */
+  function march(nu, nv, valueAt, pointAt) {
+    var stride = nu + 1;
+    var g = new Float64Array(stride * (nv + 1));
+    var i, j;
+    for (j = 0; j <= nv; j++) {
+      for (i = 0; i <= nu; i++) g[j * stride + i] = valueAt(i, j);
+    }
+    function at(i, j) { return g[j * stride + i]; }
+    function cross(i0, j0, i1, j1) {
+      var g0 = at(i0, j0), g1 = at(i1, j1);
+      var t = g0 === g1 ? 0.5 : g0 / (g0 - g1);
+      var p0 = pointAt(i0, j0), p1 = pointAt(i1, j1);
+      return [
+        p0[0] + (p1[0] - p0[0]) * t,
+        p0[1] + (p1[1] - p0[1]) * t,
+        p0[2] + (p1[2] - p0[2]) * t
+      ];
+    }
+
+    var segments = [];
+    for (j = 0; j < nv; j++) {
+      for (i = 0; i < nu; i++) {
+        var v0 = at(i, j), v1 = at(i + 1, j), v2 = at(i + 1, j + 1), v3 = at(i, j + 1);
+        var b = (v0 > 0 ? 1 : 0) | (v1 > 0 ? 2 : 0) | (v2 > 0 ? 4 : 0) | (v3 > 0 ? 8 : 0);
+        if (b === 0 || b === 15) continue;
+
+        var edges = [];
+        if ((b & 1) !== ((b >> 1) & 1)) edges.push(cross(i, j, i + 1, j));
+        if (((b >> 1) & 1) !== ((b >> 2) & 1)) edges.push(cross(i + 1, j, i + 1, j + 1));
+        if (((b >> 2) & 1) !== ((b >> 3) & 1)) edges.push(cross(i + 1, j + 1, i, j + 1));
+        if (((b >> 3) & 1) !== (b & 1)) edges.push(cross(i, j + 1, i, j));
+
+        if (edges.length === 2) {
+          segments.push([edges[0], edges[1]]);
+        } else if (edges.length === 4) {
+          /* saddle case: the cell centre decides which pair joins */
+          var centre = (v0 + v1 + v2 + v3) / 4;
+          if ((centre > 0) === (v0 > 0)) {
+            segments.push([edges[0], edges[1]], [edges[2], edges[3]]);
+          } else {
+            segments.push([edges[0], edges[3]], [edges[1], edges[2]]);
+          }
+        }
+      }
+    }
+    return segments;
+  }
+
+  function distanceSquared(p, centre) {
+    var dx = p[0] - centre[0], dy = p[1] - centre[1], dz = p[2] - centre[2];
+    return dx * dx + dy * dy + dz * dz;
+  }
+
+  function graphIntersection(surface, R) {
+    var N = 170;
+    var a = surface.domain.a, b = surface.domain.b, D = surface.domain.D;
+    var P = surface.P;
+    function xy(i, j) {
+      return [a - D + 2 * D * i / N, b - D + 2 * D * j / N];
+    }
+    function valueAt(i, j) {
+      var q = xy(i, j);
+      if (!surface.finite(q[0], q[1])) return -1;
+      return distanceSquared(surface.point(q[0], q[1]), P) - R * R;
+    }
+    function pointAt(i, j) {
+      var q = xy(i, j);
+      return surface.point(q[0], q[1]);
+    }
+    return march(N, N, valueAt, pointAt);
+  }
+
+  function paramIntersection(surface, R) {
+    var NU = 200, NV = 110;
+    var map = surface.map, P = surface.P;
+    var ua = surface.uRange[0], ub = surface.uRange[1];
+    var va = surface.vRange[0], vb = surface.vRange[1];
+    function uv(i, j) {
+      return [ua + (ub - ua) * i / NU, va + (vb - va) * j / NV];
+    }
+    function valueAt(i, j) {
+      var q = uv(i, j);
+      return distanceSquared(map(q[0], q[1]), P) - R * R;
+    }
+    function pointAt(i, j) {
+      var q = uv(i, j);
+      return map(q[0], q[1]);
+    }
+    return march(NU, NV, valueAt, pointAt);
+  }
+
+  /* ---------------- rebuild ---------------- */
+  function rebuild() {
+    var preset = $("preset").value;
+    state.preset = preset;
+    state.error = null;
+
+    var a = Number($("a").value);
+    var b = Number($("b").value);
+    if (!Number.isFinite(a)) a = 0;
+    if (!Number.isFinite(b)) b = 0;
+    var D = Number($("domain").value);
+    var R = Number($("radius").value);
+    var surface, built;
+
+    try {
+      if (preset === "sphere") surface = sphereSurface(a, b);
+      else if (preset === "torus") surface = torusSurface(a, b);
+      else {
+        var source = preset === "custom" ? $("expr").value : PRESETS[preset].expr;
+        var fn = compile(source);
+        var z0 = fn(a, b);
+        if (!Number.isFinite(z0)) throw new Error("P is outside the real-valued domain of f.");
+        surface = graphSurface(fn, a, b, D);
+      }
+      built = surface.build();
+    } catch (error) {
+      state.error = error.message;
+      showError(error.message);
+      return;
+    }
+    showError("");
+
+    var verts = built.verts;
+    var P = surface.P;
+
+    var segments = surface.kind === "graph"
+      ? graphIntersection(surface, R)
+      : paramIntersection(surface, R);
+
+    /* everything stays in the surface's own coordinates, so the axes
+       keep their meaning; only the probe is translated to P */
+    var probe = {
+      rings: probeSphere(R, 7, 48, false, P),
+      meridians: probeSphere(R, 9, 30, true, P)
+    };
+
+    var size = 1;
+    var lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
+    var i, k;
+    for (i = 0; i < verts.length; i++) {
+      for (k = 0; k < 3; k++) {
+        if (verts[i][k] < lo[k]) lo[k] = verts[i][k];
+        if (verts[i][k] > hi[k]) hi[k] = verts[i][k];
+      }
+      size = Math.max(size, Math.hypot(verts[i][0] - P[0], verts[i][1] - P[1], verts[i][2] - P[2]));
+    }
+    for (k = 0; k < 3; k++) {
+      lo[k] = Math.min(lo[k], P[k] - R);
+      hi[k] = Math.max(hi[k], P[k] + R);
+    }
+
+    state.geom = {
+      verts: verts,
+      faces: built.faces,
+      segments: segments,
+      probe: probe,
+      P: P,
+      R: R,
+      size: Math.max(size, 1),
+      bounds: { lo: lo, hi: hi },
+      center: [(lo[0] + hi[0]) / 2, (lo[1] + hi[1]) / 2, (lo[2] + hi[2]) / 2],
+      extent: Math.hypot(hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]) / 2 || 1,
+      kind: surface.kind,
+      title: surface.title
+    };
+
+    updateStats(state.geom, surface);
+    draw();
+  }
+
+  function showError(message) {
+    var el = $("exprError");
+    el.textContent = message || "";
+    el.hidden = !message;
+    $("expr").classList.toggle("bad", Boolean(message) && !$("exprField").hidden);
+  }
+
+  /* wireframe probe sphere centred on the origin */
+  function probeSphere(R, latRings, steps, meridians, P) {
+    var out = [];
+    var r, s, lat, lon, pts;
+    if (!meridians) {
+      for (r = 1; r < latRings; r++) {
+        lat = -Math.PI / 2 + r * Math.PI / latRings;
+        pts = [];
+        for (s = 0; s <= steps; s++) {
+          lon = Math.PI * 2 * s / steps;
+          pts.push([
+            P[0] + R * Math.cos(lat) * Math.cos(lon),
+            P[1] + R * Math.cos(lat) * Math.sin(lon),
+            P[2] + R * Math.sin(lat)
+          ]);
+        }
+        out.push(pts);
+      }
+    } else {
+      /* great circles through both poles */
+      for (r = 0; r < meridians; r++) {
+        lon = Math.PI * r / meridians;
+        pts = [];
+        for (s = 0; s <= steps; s++) {
+          lat = -Math.PI / 2 + Math.PI * s / steps;
+          pts.push([
+            P[0] + R * Math.cos(lat) * Math.cos(lon),
+            P[1] + R * Math.cos(lat) * Math.sin(lon),
+            P[2] + R * Math.sin(lat)
+          ]);
+        }
+        out.push(pts);
+      }
+    }
+    return out;
+  }
+
+  /* ---------------- projection ----------------
+     Camera frame: right = X, up = U, depth = D (larger is nearer).
+     The mathematical z is the vertical axis, so the first step maps
+     (x, y, z) to (right, depth, up) before any user rotation. */
+  function rotated(p, view) {
+    var spin = view.spin * Math.PI / 180;
+    var tilt = view.tilt * Math.PI / 180;
+    var roll = view.roll * Math.PI / 180;
+
+    /* spin about z (the world up axis) */
+    var cs = Math.cos(spin), ss = Math.sin(spin);
+    var x1 = cs * p[0] - ss * p[1];
+    var y1 = ss * p[0] + cs * p[1];
+    var z1 = p[2];
+
+    /* tilt about the screen-horizontal axis */
+    var ct = Math.cos(tilt), st = Math.sin(tilt);
+    var depth = ct * y1 + st * z1;
+    var up = -st * y1 + ct * z1;
+
+    /* roll in the screen plane */
+    var cr = Math.cos(roll), sr = Math.sin(roll);
+    return [cr * x1 - sr * up, sr * x1 + cr * up, depth];
+  }
+
+  /* ---------------- draw ----------------
+     The figure is framed from its own projected bounding box, so a
+     surface that sits away from the origin (a torus around its own
+     axis, a sphere centred on P) still fills the card. */
+  function draw() {
+    chart.fit();
+    chart.clear();
+    if (!state.geom) return;
+
+    var W = chart.w, H = chart.h;
+    if (W < 220 || H < 180) return;
+
+    var c = palette();
+    var geom = state.geom;
+    var showSphere = $("showSphere").checked;
+    var view = state.view;
+
+    var rotatedVerts = new Array(geom.verts.length);
+    var i, q;
+    var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    function include(p) {
+      var r = rotated(p, view);
+      if (r[0] < minX) minX = r[0];
+      if (r[0] > maxX) maxX = r[0];
+      if (r[1] < minY) minY = r[1];
+      if (r[1] > maxY) maxY = r[1];
+    }
+    for (i = 0; i < geom.verts.length; i++) {
+      rotatedVerts[i] = rotated(geom.verts[i], view);
+      include(geom.verts[i]);
+    }
+    axisTips(geom).forEach(include);
+
+    /* leave room for the axis arrows, then fit the box to the canvas */
+    var pad = 0.14;
+    var spanX = Math.max(maxX - minX, 1e-6);
+    var spanY = Math.max(maxY - minY, 1e-6);
+    var scale = (1 - 2 * pad) * Math.min(W / spanX, H / spanY);
+    var midX = (minX + maxX) / 2;
+    var midY = (minY + maxY) / 2;
+
+    function project(p) {
+      var r = rotated(p, view);
+      return {
+        x: W / 2 + (r[0] - midX) * scale,
+        y: H / 2 - (r[1] - midY) * scale,
+        d: r[2]
+      };
+    }
+
+    var centreDepth = project(geom.P).d;
+    if (showSphere && !window.__noProbe) drawProbe(project, geom.probe, c, false, centreDepth);
+    if (!window.__noSurface) drawSurface(rotatedVerts, geom, c, scale, W, H, midX, midY);
+    if (showSphere && !window.__noProbe) drawProbe(project, geom.probe, c, true, centreDepth);
+
+    if (!window.__noCurve) drawCurve(project, geom.segments, c);
+    if (!window.__noAxes) drawAxes(project, geom, c);
+
+    var origin = project(geom.P);
+    ctx.beginPath();
+    ctx.arc(origin.x, origin.y, 5.5, 0, Math.PI * 2);
+    ctx.fillStyle = c.point;
+    ctx.fill();
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = c.surface2;
+    ctx.stroke();
+
+    ctx.fillStyle = c.point;
+    ctx.font = '600 10px "JetBrains Mono", monospace';
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+    ctx.fillText("P", origin.x + 9, origin.y - 8);
+
+    $("footTriangles").textContent = String(geom.faces.length);
+    $("footIntersection").textContent = String(geom.segments.length);
+  }
+
+  function drawSurface(rotatedVerts, geom, c, scale, W, H, midX, midY) {
+    var faces = geom.faces;
+    var i;
+
+    /* screen coordinates, computed once */
+    var sx = new Float64Array(rotatedVerts.length);
+    var sy = new Float64Array(rotatedVerts.length);
+    var sz = new Float64Array(rotatedVerts.length);
+    for (i = 0; i < rotatedVerts.length; i++) {
+      var q = rotatedVerts[i];
+      sx[i] = W / 2 + (q[0] - midX) * scale;
+      sy[i] = H / 2 - (q[1] - midY) * scale;
+      sz[i] = q[2];
+    }
+
+    var depths = new Float64Array(faces.length);
+    var order = new Array(faces.length);
+    for (i = 0; i < faces.length; i++) {
+      var f = faces[i];
+      depths[i] = (sz[f[0]] + sz[f[1]] + sz[f[2]]) / 3;
+      order[i] = i;
+    }
+    /* painter's algorithm: far (small z) first */
+    order.sort(function (m, n) { return depths[m] - depths[n]; });
+
+    var light = [-0.42, 0.58, 0.70];
+    var ll = Math.hypot(light[0], light[1], light[2]);
+    light = [light[0] / ll, light[1] / ll, light[2] / ll];
+    var deep = mix(c.surface, c.ink, 0.66);
+    var bright = mix(c.surface, c.surface2, 0.70);
+    var lit = new Array(faces.length);
+
+    /* light from the true 3D normal in the rotated frame, not from the
+       flattened screen triangle: a face seen edge-on would otherwise
+       read as bright as one facing the camera */
+    for (i = 0; i < faces.length; i++) {
+      var t = faces[i];
+      var A = rotatedVerts[t[0]], B = rotatedVerts[t[1]], C = rotatedVerts[t[2]];
+      var ux = B[0] - A[0], uy = B[1] - A[1], uz = B[2] - A[2];
+      var vx = C[0] - A[0], vy = C[1] - A[1], vz = C[2] - A[2];
+      var nx = uy * vz - uz * vy;
+      var ny = uz * vx - ux * vz;
+      var nz = ux * vy - uy * vx;
+      var len = Math.hypot(nx, ny, nz) || 1;
+      var lambert = Math.abs((nx * light[0] + ny * light[1] + nz * light[2]) / len);
+      lit[i] = 0.12 + 0.88 * Math.pow(lambert, 1.35);
+    }
+
+    ctx.lineJoin = "round";
+    for (var k = 0; k < order.length; k++) {
+      var idx = order[k];
+      var tri = faces[idx];
+      ctx.beginPath();
+      ctx.moveTo(sx[tri[0]], sy[tri[0]]);
+      ctx.lineTo(sx[tri[1]], sy[tri[1]]);
+      ctx.lineTo(sx[tri[2]], sy[tri[2]]);
+      ctx.closePath();
+      var shade = lit[idx];
+      var fill = shade > 0.5 ? mix(deep, bright, (shade - 0.5) * 2) : deep;
+      ctx.globalAlpha = 0.96;
+      ctx.fillStyle = fill;
+      ctx.fill();
+      /* same colour as the fill: closes the hairline seams the
+         anti-aliased triangle edges would otherwise leave */
+      ctx.strokeStyle = fill;
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawProbe(project, probe, c, front, centreDepth) {
+    ctx.save();
+    ctx.strokeStyle = c.sphere;
+    ctx.lineWidth = 0.9;
+    var each = probe.rings.concat(probe.meridians);
+    for (var r = 0; r < each.length; r++) {
+      var pts = each[r];
+      for (var i = 0; i < pts.length - 1; i++) {
+        var a = project(pts[i]), b = project(pts[i + 1]);
+        /* front/back is judged against the sphere's own centre, not
+           the world origin: the probe sits on the surface point P */
+        if (((a.d + b.d) / 2 >= centreDepth) !== front) continue;
+        ctx.globalAlpha = front ? 0.36 : 0.15;
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+
+  function drawCurve(project, segments, c) {
+    if (!segments.length) return;
+    ctx.save();
+    ctx.strokeStyle = c.curve;
+    ctx.lineWidth = 2.6;
+    ctx.lineCap = "round";
+    ctx.globalAlpha = 0.95;
+    ctx.beginPath();
+    for (var i = 0; i < segments.length; i++) {
+      var a = project(segments[i][0]);
+      var b = project(segments[i][1]);
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  function axisTips(geom) {
+    var L = geom.size * 0.62;
+    var P = geom.P;
+    return [
+      [P[0] + L, P[1], P[2]],
+      [P[0], P[1] + L, P[2]],
+      [P[0], P[1], P[2] + L]
+    ];
+  }
+
+  function drawAxes(project, geom, c) {
+    var P = geom.P;
+    var tips = axisTips(geom);
+    var axes = [
+      [tips[0], "x"],
+      [tips[1], "y"],
+      [tips[2], "z"]
+    ];
+    ctx.save();
+    ctx.strokeStyle = c.axis;
+    ctx.fillStyle = c.muted;
+    ctx.lineWidth = 1.2;
+    ctx.globalAlpha = 0.7;
+    ctx.font = '10px "JetBrains Mono", monospace';
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    for (var i = 0; i < axes.length; i++) {
+      var end = project(axes[i][0]);
+      var origin = project(P);
+      ctx.beginPath();
+      ctx.moveTo(origin.x, origin.y);
+      ctx.lineTo(end.x, end.y);
+      ctx.stroke();
+      ctx.fillText(axes[i][1], end.x, end.y);
+    }
+    ctx.restore();
+  }
+
+  /* ---------------- stats + controls ---------------- */
+  function updateStats(geom, surface) {
+    var parametric = surface.kind === "param";
+    $("statPoint").textContent = parametric
+      ? "u " + tidy(Number($("a").value), 3) + ", v " + tidy(Number($("b").value), 3)
+      : "(" + tidy(Number($("a").value), 3) + ", " + tidy(Number($("b").value), 3) + ")";
+    $("statPointFoot").textContent = parametric ? "u, v in radians" : "a, b in the domain";
+    $("statRadius").textContent = tidy(geom.R, 3);
+    $("statSurface").textContent = geom.title;
+    $("statSurfaceFoot").textContent = parametric ? "parametric surface" : "graph z = f(x, y)";
+    $("statIntersection").textContent = geom.segments.length ? String(geom.segments.length) : "none";
+    $("statReach").textContent = tidy(geom.R / geom.size, 3);
+    $("statReachFoot").textContent = "R ÷ surface size";
+  }
+
+  function setFill(el) {
+    var min = Number(el.min), max = Number(el.max), val = Number(el.value);
+    var pct = max > min ? (val - min) / (max - min) * 100 : 0;
+    el.style.setProperty("--fill", Math.max(0, Math.min(100, pct)).toFixed(1) + "%");
+  }
+
+  function syncView() {
+    ["rx", "ry", "rz"].forEach(function (id) {
+      var el = $(id);
+      setFill(el);
+      $(id + "Val").textContent = deg(Number(el.value));
+    });
+    state.view.tilt = Number($("rx").value);
+    state.view.spin = Number($("ry").value);
+    state.view.roll = Number($("rz").value);
+  }
+
+  function syncPills() {
+    $("aPill").textContent = tidy(Number($("a").value), 3);
+    $("bPill").textContent = tidy(Number($("b").value), 3);
+    $("domainPill").textContent = tidy(Number($("domain").value), 3);
+    $("radiusPill").textContent = tidy(Number($("radius").value), 3);
+    setFill($("domain"));
+    setFill($("radius"));
+  }
+
+  /* ---------------- preset switching ---------------- */
+  function applyPreset(preset, keepPoint) {
+    $("preset").value = preset;
+    var parametric = preset === "sphere" || preset === "torus";
+    $("exprField").hidden = parametric;
+    $("aLabel").textContent = parametric ? "Angle u" : "Point x";
+    $("bLabel").textContent = parametric ? "Angle v" : "Point y";
+    $("pointHint").textContent = parametric
+      ? "The surface point P = S(u, v) in radians is the centre of the probe sphere."
+      : "The surface point P = (a, b, f(a, b)) is the centre of the probe sphere.";
+    $("presetPill").textContent = parametric ? "parametric" : (preset === "custom" ? "custom" : "graph");
+
+    if (!keepPoint) {
+      if (preset === "sphere") { $("a").value = "0"; $("b").value = "0.85"; }
+      else if (preset === "torus") { $("a").value = "0.9"; $("b").value = "1.2"; }
+      else { $("a").value = "0"; $("b").value = "0"; }
+    }
+    if (!parametric && preset !== "custom") $("expr").value = PRESETS[preset].expr;
+    if (!parametric) $("exprPill").textContent = preset === "custom" ? "f(x, y)" : PRESETS[preset].expr;
+    syncPills();
+    rebuild();
+  }
+
+  /* ---------------- events ---------------- */
+  $("preset").addEventListener("change", function () {
+    applyPreset(this.value, false);
+  });
+
+  ["a", "b"].forEach(function (id) {
+    $(id).addEventListener("input", function () {
+      syncPills();
+      rebuild();
+    });
+  });
+
+  $("expr").addEventListener("input", function () {
+    if (state.preset !== "custom") {
+      state.preset = "custom";
+      $("preset").value = "custom";
+      $("presetPill").textContent = "custom";
+    }
+    $("exprPill").textContent = this.value || "f(x, y)";
+    rebuild();
+  });
+
+  $("domain").addEventListener("input", function () {
+    syncPills();
+    rebuild();
+  });
+  $("radius").addEventListener("input", function () {
+    syncPills();
+    rebuild();
+  });
+  $("showSphere").addEventListener("change", draw);
+
+  ["rx", "ry", "rz"].forEach(function (id) {
+    $(id).addEventListener("input", function () {
+      syncView();
+      draw();
+    });
+  });
+
+  $("resetView").addEventListener("click", function () {
+    $("rx").value = "20";
+    $("ry").value = "38";
+    $("rz").value = "0";
+    syncView();
+    draw();
+  });
+
+  $("reset").addEventListener("click", function () {
+    $("domain").value = "1.25";
+    $("radius").value = "0.8";
+    $("showSphere").checked = true;
+    $("expr").value = PRESETS.paraboloid.expr;
+    $("rx").value = "20";
+    $("ry").value = "38";
+    $("rz").value = "0";
+    syncView();
+    applyPreset("paraboloid", false);
+  });
+
+  /* drag to rotate: spin follows x, tilt follows y */
+  var drag = null;
+  canvas.addEventListener("pointerdown", function (event) {
+    drag = { x: event.clientX, y: event.clientY, spin: state.view.spin, tilt: state.view.tilt };
+    canvas.setPointerCapture(event.pointerId);
+  });
+  canvas.addEventListener("pointermove", function (event) {
+    if (!drag) return;
+    var spin = drag.spin + (event.clientX - drag.x) * 0.65;
+    spin = ((spin + 180) % 360 + 360) % 360 - 180;
+    var tilt = Math.max(-90, Math.min(90, drag.tilt - (event.clientY - drag.y) * 0.5));
+    $("ry").value = String(Math.round(spin));
+    $("rx").value = String(Math.round(tilt));
+    syncView();
+    draw();
+  });
+  function endDrag() { drag = null; }
+  canvas.addEventListener("pointerup", endDrag);
+  canvas.addEventListener("pointercancel", endDrag);
+  canvas.addEventListener("lostpointercapture", endDrag);
+
+  /* ---------------- theme + resize ---------------- */
+  MathLab.onTheme(draw);
+
+  function onResize() {
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(draw, 90);
+  }
+  if (window.ResizeObserver) new ResizeObserver(onResize).observe(wrap);
+  else window.addEventListener("resize", onResize);
+
+  /* ---------------- boot ---------------- */
+  window.__state = state; window.__rot = rotated; window.__chart = chart;
+  syncView();
+  applyPreset("paraboloid", false);
+})();
+</script>
+</body>
+</html>

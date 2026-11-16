@@ -1,0 +1,5 @@
+{
+  "title": "Surface Openness Explorer",
+  "description": "Place a point on a surface, grow a probe sphere around it, and read the surface–sphere intersection as the point's local neighbourhood.",
+  "tags": ["Calculus", "Surfaces", "Vector calculus"]
+}
