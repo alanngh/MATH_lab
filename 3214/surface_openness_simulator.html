@@ -176,6 +176,28 @@
       <div class="ticks" aria-hidden="true"><span>0.75</span><span>1.8</span><span>2.9</span><span>3.9</span><span>5</span></div>
     </div>
 
+    <div class="field" id="rectField">
+      <label class="switch"><input id="useRect" type="checkbox"> Rectangular domain</label>
+      <div class="field-row" style="margin-top:8px">
+        <label for="rectX0">x range</label>
+      </div>
+      <div class="interval-row">
+        <input class="input" id="rectX0" type="number" step="0.25" value="-1.25" inputmode="decimal" aria-label="x minimum" disabled>
+        <span class="arrow" aria-hidden="true">→</span>
+        <input class="input" id="rectX1" type="number" step="0.25" value="1.25" inputmode="decimal" aria-label="x maximum" disabled>
+      </div>
+      <div class="field-row" style="margin-top:8px">
+        <label for="rectY0">y range</label>
+      </div>
+      <div class="interval-row">
+        <input class="input" id="rectY0" type="number" step="0.25" value="-1.25" inputmode="decimal" aria-label="y minimum" disabled>
+        <span class="arrow" aria-hidden="true">→</span>
+        <input class="input" id="rectY1" type="number" step="0.25" value="1.25" inputmode="decimal" aria-label="y maximum" disabled>
+      </div>
+      <p class="field-hint">Plots z = f(x, y) over the rectangle instead of the square set by the half-width.</p>
+      <p class="field-hint error" id="rectError" role="alert" hidden></p>
+    </div>
+
     <div class="field">
       <div class="field-row">
         <label for="radius">Probe radius R</label>
@@ -188,6 +210,11 @@
     <div class="field">
       <label class="switch"><input id="showSphere" type="checkbox" checked> Show probe sphere</label>
       <p class="field-hint">Turn the sphere off to see the intersection curve on its own.</p>
+    </div>
+
+    <div class="field">
+      <label class="switch"><input id="showIntersection" type="checkbox" checked> Show intersection</label>
+      <p class="field-hint">Shades the part of the surface inside the sphere and traces its boundary curve.</p>
     </div>
 
     <p class="panel-note">
@@ -252,7 +279,7 @@
         </div>
         <div class="view-row">
           <label for="ry">Spin</label>
-          <input class="range" id="ry" type="range" min="-180" max="180" step="1" value="38" aria-label="Spin of the figure">
+          <input class="range" id="ry" type="range" min="-180" max="180" step="1" value="148" aria-label="Spin of the figure">
           <span class="view-val" id="ryVal">148°</span>
         </div>
         <div class="view-row">
@@ -398,13 +425,15 @@
      A graph hides its height function behind point(x, y) and
      finite(x, y), so the mesher and the contour tracer share one
      definition of the surface. */
-  function graphSurface(fn, a, b, D) {
+  function graphSurface(fn, a, b, D, rect) {
     var z0 = fn(a, b);
+    /* without a rectangle the domain is the square of half-width D around (a, b) */
+    var box = rect || { x0: a - D, x1: a + D, y0: b - D, y1: b + D };
     return {
       kind: "graph",
       title: state.preset === "custom" ? "Custom graph" : PRESETS[state.preset].title,
       P: [a, b, z0],
-      domain: { a: a, b: b, D: D },
+      domain: { a: a, b: b, D: D, box: box },
       point: function (x, y) {
         var z = fn(x, y);
         return [x, y, Number.isFinite(z) ? z : 0];
@@ -414,8 +443,8 @@
         var verts = [], quads = [], ok = [];
         for (var i = 0; i <= GRID; i++) {
           for (var j = 0; j <= GRID; j++) {
-            var x = a - D + 2 * D * i / GRID;
-            var y = b - D + 2 * D * j / GRID;
+            var x = box.x0 + (box.x1 - box.x0) * i / GRID;
+            var y = box.y0 + (box.y1 - box.y0) * j / GRID;
             var finite = this.finite(x, y);
             ok.push(finite);
             verts.push(this.point(x, y));
@@ -561,10 +590,10 @@
 
   function graphIntersection(surface, R) {
     var N = 170;
-    var a = surface.domain.a, b = surface.domain.b, D = surface.domain.D;
+    var box = surface.domain.box;
     var P = surface.P;
     function xy(i, j) {
-      return [a - D + 2 * D * i / N, b - D + 2 * D * j / N];
+      return [box.x0 + (box.x1 - box.x0) * i / N, box.y0 + (box.y1 - box.y0) * j / N];
     }
     function valueAt(i, j) {
       var q = xy(i, j);
@@ -576,6 +605,45 @@
       return surface.point(q[0], q[1]);
     }
     return march(N, N, valueAt, pointAt);
+  }
+
+  /* Where the ball reaches past the edge of the domain, the curve alone
+     is open. The part of the surface's own edge that lies inside the ball
+     completes the boundary of the patch, so the loop is closed. */
+  function graphEdge(surface, R) {
+    var box = surface.domain.box, P = surface.P;
+    var M = 360;
+    var sides = [
+      function (t) { return [box.x0 + (box.x1 - box.x0) * t, box.y0]; },
+      function (t) { return [box.x0 + (box.x1 - box.x0) * t, box.y1]; },
+      function (t) { return [box.x0, box.y0 + (box.y1 - box.y0) * t]; },
+      function (t) { return [box.x1, box.y0 + (box.y1 - box.y0) * t]; }
+    ];
+    var out = [];
+    sides.forEach(function (side) {
+      var prev = null;
+      for (var i = 0; i <= M; i++) {
+        var q = side(i / M);
+        var pt = surface.finite(q[0], q[1]) ? surface.point(q[0], q[1]) : null;
+        var val = pt ? distanceSquared(pt, P) - R * R : NaN;
+        if (prev && pt && Number.isFinite(val) && Number.isFinite(prev.val)) {
+          var in0 = prev.val < 0, in1 = val < 0;
+          if (in0 && in1) {
+            out.push([prev.pt, pt]);
+          } else if (in0 !== in1) {
+            var t = prev.val / (prev.val - val);
+            var m = [
+              prev.pt[0] + (pt[0] - prev.pt[0]) * t,
+              prev.pt[1] + (pt[1] - prev.pt[1]) * t,
+              prev.pt[2] + (pt[2] - prev.pt[2]) * t
+            ];
+            out.push(in0 ? [prev.pt, m] : [m, pt]);
+          }
+        }
+        prev = pt ? { pt: pt, val: val } : null;
+      }
+    });
+    return out;
   }
 
   function paramIntersection(surface, R) {
@@ -619,15 +687,32 @@
         var fn = compile(source);
         var z0 = fn(a, b);
         if (!Number.isFinite(z0)) throw new Error("P is outside the real-valued domain of f.");
-        surface = graphSurface(fn, a, b, D);
+        var rect = null;
+        if ($("useRect").checked) {
+          rect = {
+            x0: Number($("rectX0").value), x1: Number($("rectX1").value),
+            y0: Number($("rectY0").value), y1: Number($("rectY1").value)
+          };
+          if (![rect.x0, rect.x1, rect.y0, rect.y1].every(Number.isFinite)
+              || !($("rectX0").value !== "" && $("rectX1").value !== ""
+                   && $("rectY0").value !== "" && $("rectY1").value !== "")
+              || !(rect.x0 < rect.x1) || !(rect.y0 < rect.y1)) {
+            var rectError = new Error("Enter numbers with x min < x max and y min < y max.");
+            rectError.rect = true;
+            throw rectError;
+          }
+        }
+        surface = graphSurface(fn, a, b, D, rect);
       }
       built = surface.build();
     } catch (error) {
       state.error = error.message;
-      showError(error.message);
+      if (error.rect) { showError(""); showRectError(error.message); }
+      else { showRectError(""); showError(error.message); }
       return;
     }
     showError("");
+    showRectError("");
 
     var verts = built.verts;
     var P = surface.P;
@@ -635,13 +720,10 @@
     var segments = surface.kind === "graph"
       ? graphIntersection(surface, R)
       : paramIntersection(surface, R);
+    var edge = surface.kind === "graph" ? graphEdge(surface, R) : [];
 
     /* everything stays in the surface's own coordinates, so the axes
-       keep their meaning; only the probe is translated to P */
-    var probe = {
-      rings: probeSphere(R, 7, 48, false, P),
-      meridians: probeSphere(R, 9, 30, true, P)
-    };
+       keep their meaning; the probe sphere is centred on P at draw time */
 
     var size = 1;
     var lo = [Infinity, Infinity, Infinity], hi = [-Infinity, -Infinity, -Infinity];
@@ -662,7 +744,7 @@
       verts: verts,
       faces: built.faces,
       segments: segments,
-      probe: probe,
+      edge: edge,
       P: P,
       R: R,
       size: Math.max(size, 1),
@@ -677,48 +759,17 @@
     draw();
   }
 
+  function showRectError(message) {
+    var el = $("rectError");
+    el.textContent = message || "";
+    el.hidden = !message;
+  }
+
   function showError(message) {
     var el = $("exprError");
     el.textContent = message || "";
     el.hidden = !message;
     $("expr").classList.toggle("bad", Boolean(message) && !$("exprField").hidden);
-  }
-
-  /* wireframe probe sphere centred on the origin */
-  function probeSphere(R, latRings, steps, meridians, P) {
-    var out = [];
-    var r, s, lat, lon, pts;
-    if (!meridians) {
-      for (r = 1; r < latRings; r++) {
-        lat = -Math.PI / 2 + r * Math.PI / latRings;
-        pts = [];
-        for (s = 0; s <= steps; s++) {
-          lon = Math.PI * 2 * s / steps;
-          pts.push([
-            P[0] + R * Math.cos(lat) * Math.cos(lon),
-            P[1] + R * Math.cos(lat) * Math.sin(lon),
-            P[2] + R * Math.sin(lat)
-          ]);
-        }
-        out.push(pts);
-      }
-    } else {
-      /* great circles through both poles */
-      for (r = 0; r < meridians; r++) {
-        lon = Math.PI * r / meridians;
-        pts = [];
-        for (s = 0; s <= steps; s++) {
-          lat = -Math.PI / 2 + Math.PI * s / steps;
-          pts.push([
-            P[0] + R * Math.cos(lat) * Math.cos(lon),
-            P[1] + R * Math.cos(lat) * Math.sin(lon),
-            P[2] + R * Math.sin(lat)
-          ]);
-        }
-        out.push(pts);
-      }
-    }
-    return out;
   }
 
   /* ---------------- projection ----------------
@@ -762,6 +813,7 @@
     var c = palette();
     var geom = state.geom;
     var showSphere = $("showSphere").checked;
+    var showRegion = $("showIntersection").checked;
     var view = state.view;
 
     var rotatedVerts = new Array(geom.verts.length);
@@ -787,6 +839,14 @@
     }
     axisTips(geom).forEach(include);
 
+    /* keep the whole ball inside the frame: its silhouette is a disc of
+       radius R around the projected centre */
+    var rCentre = rotated(geom.P, view);
+    minX = Math.min(minX, rCentre[0] - geom.R);
+    maxX = Math.max(maxX, rCentre[0] + geom.R);
+    minY = Math.min(minY, rCentre[1] - geom.R);
+    maxY = Math.max(maxY, rCentre[1] + geom.R);
+
     /* leave room for the axis arrows, then fit the box to the canvas */
     var pad = 0.14;
     var spanX = Math.max(maxX - minX, 1e-6);
@@ -804,12 +864,17 @@
       };
     }
 
-    var centreDepth = project(geom.P).d;
-    if (showSphere) drawProbe(project, geom.probe, c, false, centreDepth);
-    drawSurface(rotatedVerts, geom, c, scale, W, H, midX, midY);
-    if (showSphere) drawProbe(project, geom.probe, c, true, centreDepth);
+    drawSurface(rotatedVerts, geom, c, scale, W, H, midX, midY, {
+      sphere: showSphere,
+      region: showRegion,
+      centre: rCentre
+    });
 
-    drawCurve(project, geom.segments, c);
+    if (showRegion) {
+      /* the sphere's curve and the surface edge inside the ball form one closed boundary */
+      drawCurve(project, geom.segments, c, 3.4);
+      drawCurve(project, geom.edge, c, 3.4);
+    }
     drawAxes(project, geom, c);
 
     var origin = project(geom.P);
@@ -839,7 +904,15 @@
      silhouette without a per-triangle stroke. */
   var surfaceBuffer = null;
 
-  function drawSurface(rotatedVerts, geom, c, scale, W, H, midX, midY) {
+  /* resolves any CSS colour to [r, g, b] through the canvas itself */
+  var scratch = document.createElement("canvas").getContext("2d");
+  function resolveRgb(value) {
+    scratch.fillStyle = "#000000";
+    scratch.fillStyle = value;
+    return parseColor(scratch.fillStyle);
+  }
+
+  function drawSurface(rotatedVerts, geom, c, scale, W, H, midX, midY, opts) {
     var SS = 2;
     var bw = Math.max(1, Math.round(W * SS));
     var bh = Math.max(1, Math.round(H * SS));
@@ -876,6 +949,15 @@
     var deep = parseColor(mix(c.surface, c.ink, 0.66));
     var bright = parseColor(mix(c.surface, c.surface2, 0.70));
 
+    /* the part of the surface inside the ball is tinted with the curve
+       colour; the test is exact per pixel, since a rotation preserves
+       distances and the interpolated point is the true surface point */
+    var region = opts.region;
+    var centre = opts.centre;
+    var R2 = geom.R * geom.R;
+    var tint = resolveRgb(c.curve);
+    var tintOther = tint;   /* use the same orange tint on both faces */
+
     for (var f = 0; f < count; f++) {
       var tri = faces[f];
       var A = rotatedVerts[tri[0]], B = rotatedVerts[tri[1]], C = rotatedVerts[tri[2]];
@@ -889,6 +971,11 @@
       var nz = ux * vy - uy * vx;
       var len = Math.hypot(nx, ny, nz) || 1;
       var lambert = Math.abs((nx * light[0] + ny * light[1] + nz * light[2]) / len);
+      /* which face the camera sees: a graph's winding normal points down
+         and a closed surface's points outward, and the camera frame is
+         mirrored, so the sign test differs between the two */
+      var outer = geom.kind === "graph" ? nz > 0 : nz < 0;
+      var tc = outer ? tint : tintOther;
       var shade = 0.12 + 0.88 * Math.pow(lambert, 1.35);
       var t2 = shade > 0.5 ? (shade - 0.5) * 2 : 0;
       var r = deep[0] + (bright[0] - deep[0]) * t2;
@@ -925,13 +1012,26 @@
           if (depth <= zbuf[at]) continue;
           zbuf[at] = depth;
           var p4 = at * 4;
-          data[p4] = r;
-          data[p4 + 1] = g;
-          data[p4 + 2] = b;
+          var pr = r, pg = g, pb = b;
+          if (region) {
+            var qx = w0 * A[0] + w1 * B[0] + w2 * C[0] - centre[0];
+            var qy = w0 * A[1] + w1 * B[1] + w2 * C[1] - centre[1];
+            var qz = depth - centre[2];
+            if (qx * qx + qy * qy + qz * qz < R2) {
+              pr = r + (tc[0] - r) * 0.58;
+              pg = g + (tc[1] - g) * 0.58;
+              pb = b + (tc[2] - b) * 0.58;
+            }
+          }
+          data[p4] = pr;
+          data[p4 + 1] = pg;
+          data[p4 + 2] = pb;
           data[p4 + 3] = 255;
         }
       }
     }
+
+    if (opts.sphere) drawBall(data, zbuf, bw, bh, SS, geom, c, scale, W, H, midX, midY, centre);
 
     bctx.putImageData(image, 0, 0);
     ctx.save();
@@ -940,33 +1040,85 @@
     ctx.restore();
   }
 
-  function drawProbe(project, probe, c, front, centreDepth) {
-    ctx.save();
-    ctx.strokeStyle = c.sphere;
-    ctx.lineWidth = 0.9;
-    var each = probe.rings.concat(probe.meridians);
-    for (var r = 0; r < each.length; r++) {
-      var pts = each[r];
-      for (var i = 0; i < pts.length - 1; i++) {
-        var a = project(pts[i]), b = project(pts[i + 1]);
-        /* front/back is judged against the sphere's own centre, not
-           the world origin: the probe sits on the surface point P */
-        if (((a.d + b.d) / 2 >= centreDepth) !== front) continue;
-        ctx.globalAlpha = front ? 0.36 : 0.15;
-        ctx.beginPath();
-        ctx.moveTo(a.x, a.y);
-        ctx.lineTo(b.x, b.y);
-        ctx.stroke();
-      }
-    }
-    ctx.restore();
+  /* ---------------- probe ball ----------------
+     Under orthographic projection a sphere stays a sphere, so every pixel
+     inside its silhouette has an exact near and far depth. Each pixel is
+     composited in depth order against the surface already in the buffer:
+     far side, surface, near side. The surface therefore shows through the
+     glass, and the part of the ball behind the surface is hidden. */
+  function over(d, p, sr, sg, sb, sa) {
+    var da = d[p + 3] / 255;
+    var oa = sa + da * (1 - sa);
+    if (oa <= 0) return;
+    d[p] = (sr * sa + d[p] * da * (1 - sa)) / oa;
+    d[p + 1] = (sg * sa + d[p + 1] * da * (1 - sa)) / oa;
+    d[p + 2] = (sb * sa + d[p + 2] * da * (1 - sa)) / oa;
+    d[p + 3] = oa * 255;
   }
 
-  function drawCurve(project, segments, c) {
+  function drawBall(data, zbuf, bw, bh, SS, geom, c, scale, W, H, midX, midY, centre) {
+    var Rs = geom.R;
+    var cx = centre[0], cy = centre[1], cz = centre[2];
+    var sCx = (W / 2 + (cx - midX) * scale) * SS;
+    var sCy = (H / 2 - (cy - midY) * scale) * SS;
+    var sRad = Rs * scale * SS;
+    var x0 = Math.max(0, Math.floor(sCx - sRad) - 1);
+    var x1 = Math.min(bw - 1, Math.ceil(sCx + sRad) + 1);
+    var y0 = Math.max(0, Math.floor(sCy - sRad) - 1);
+    var y1 = Math.min(bh - 1, Math.ceil(sCy + sRad) + 1);
+    var base = resolveRgb(c.sphere);
+
+    /* light and half-vector in camera space (x right, y up, z toward the viewer) */
+    var Ll = Math.hypot(-0.40, 0.60, 0.70);
+    var L0 = -0.40 / Ll, L1 = 0.60 / Ll, L2 = 0.70 / Ll;
+    var Hl = Math.hypot(L0, L1, L2 + 1);
+    var H0 = L0 / Hl, H1 = L1 / Hl, H2 = (L2 + 1) / Hl;
+
+    for (var yy = y0; yy <= y1; yy++) {
+      var ry = midY - ((yy + 0.5) / SS - H / 2) / scale;
+      for (var xx = x0; xx <= x1; xx++) {
+        var rx = midX + ((xx + 0.5) / SS - W / 2) / scale;
+        var dx = rx - cx, dy = ry - cy;
+        var d2 = dx * dx + dy * dy;
+        if (d2 >= Rs * Rs) continue;
+
+        var h = Math.sqrt(Rs * Rs - d2);
+        var zFront = cz + h, zBack = cz - h;
+        var at = yy * bw + xx;
+        var zs = zbuf[at];
+        if (zs >= zFront) continue;            /* the surface is in front of the ball here */
+
+        var p = at * 4;
+        var rim = Math.pow(1 - h / Rs, 2);     /* 0 at the disc centre, 1 at the edge */
+
+        if (zs < zBack) {
+          /* far side of the ball, drawn first and dimmer */
+          var lamB = Math.max(0, (dx * L0 + dy * L1 - h * L2) / Rs);
+          var kB = 0.45 + 0.35 * lamB;
+          over(data, p, base[0] * kB, base[1] * kB, base[2] * kB, 0.10 + 0.22 * rim);
+        }
+
+        /* near side, with a soft highlight and a denser rim */
+        var lamF = Math.max(0, (dx * L0 + dy * L1 + h * L2) / Rs);
+        var spec = Math.pow(Math.max(0, (dx * H0 + dy * H1 + h * H2) / Rs), 36);
+        var kF = 0.62 + 0.38 * lamF;
+        var lift = 255 * 0.55 * spec;
+        over(
+          data, p,
+          Math.min(255, base[0] * kF + lift),
+          Math.min(255, base[1] * kF + lift),
+          Math.min(255, base[2] * kF + lift),
+          Math.min(0.92, 0.15 + 0.32 * rim + 0.45 * spec)
+        );
+      }
+    }
+  }
+
+  function drawCurve(project, segments, c, width) {
     if (!segments.length) return;
     ctx.save();
     ctx.strokeStyle = c.curve;
-    ctx.lineWidth = 2.6;
+    ctx.lineWidth = width || 2.6;
     ctx.lineCap = "round";
     ctx.globalAlpha = 0.95;
     ctx.beginPath();
@@ -1064,6 +1216,7 @@
     $("preset").value = preset;
     var parametric = preset === "sphere" || preset === "torus";
     $("exprField").hidden = parametric;
+    $("rectField").hidden = parametric;
     $("aLabel").textContent = parametric ? "Angle u" : "Point x";
     $("bLabel").textContent = parametric ? "Angle v" : "Point y";
     $("pointHint").textContent = parametric
@@ -1112,7 +1265,30 @@
     syncPills();
     rebuild();
   });
+  /* the rectangle replaces the square half-width while it is switched on */
+  var RECT_IDS = ["rectX0", "rectX1", "rectY0", "rectY1"];
+  function syncRect() {
+    var on = $("useRect").checked;
+    RECT_IDS.forEach(function (id) { $(id).disabled = !on; });
+    $("domain").disabled = on;
+  }
+  $("useRect").addEventListener("change", function () {
+    if (this.checked) {
+      /* start from the square that is currently drawn */
+      var a = Number($("a").value) || 0, b = Number($("b").value) || 0;
+      var D = Number($("domain").value);
+      $("rectX0").value = String(Number((a - D).toFixed(4)));
+      $("rectX1").value = String(Number((a + D).toFixed(4)));
+      $("rectY0").value = String(Number((b - D).toFixed(4)));
+      $("rectY1").value = String(Number((b + D).toFixed(4)));
+    }
+    syncRect();
+    rebuild();
+  });
+  RECT_IDS.forEach(function (id) { $(id).addEventListener("input", rebuild); });
+
   $("showSphere").addEventListener("change", draw);
+  $("showIntersection").addEventListener("change", draw);
 
   ["rx", "ry", "rz"].forEach(function (id) {
     $(id).addEventListener("input", function () {
@@ -1131,8 +1307,13 @@
 
   $("reset").addEventListener("click", function () {
     $("domain").value = "1.25";
+    $("useRect").checked = false;
+    $("rectX0").value = "-1.25"; $("rectX1").value = "1.25";
+    $("rectY0").value = "-1.25"; $("rectY1").value = "1.25";
+    syncRect();
     $("radius").value = "0.8";
     $("showSphere").checked = true;
+    $("showIntersection").checked = true;
     $("expr").value = PRESETS.paraboloid.expr;
     $("rx").value = "20";
     $("ry").value = "148";
