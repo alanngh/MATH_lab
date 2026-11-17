@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light" class="js"><head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#EDEADE" id="themeColor">
+  <meta name="description" content="Interactive mathematics by Nilton Garcia Hilares. Each folder in the lab is a class: pick its orb, open a simulator, and move a parameter to watch the mathematics answer.">
+  <title>Math Lab. Interactive mathematics by Nilton Garcia Hilares</title>
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23072C2C'/%3E%3Ctext x='32' y='47' font-family='Georgia,serif' font-size='40' fill='%23EDEADE' text-anchor='middle'%3E%E2%88%91%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&amp;family=Oswald:wght@500;600&amp;family=Ubuntu:wght@400;500;700&amp;display=swap">
+  <link rel="stylesheet" href="assets/index.css">
+  <link rel="stylesheet" href="assets/index-page.css">
+
+  <script>
+    /* Saved theme wins; otherwise the page opens light like the simulators. */
+    (function () {
+      var root = document.documentElement;
+      var theme = "light";
+      try {
+        var saved = localStorage.getItem("mathlab-theme");
+        if (saved === "dark" || saved === "light") theme = saved;
+      } catch (error) { /* private mode */ }
+      root.setAttribute("data-theme", theme);
+      root.classList.add("js");
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site-head">
+    <div class="container head-inner">
+      <a class="brand" href="#top" aria-label="Math Lab, back to the top">
+        <span class="brand-mark" aria-hidden="true">∑</span>
+        <span class="brand-copy">
+          <span class="brand-name">Math Lab</span>
+          <span class="brand-sub">Nilton Garcia Hilares</span>
+        </span>
+      </a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="#top">Classes</a>
+        <a href="#browse">Browse</a>
+        <a href="#suggest">Suggest</a>
+        <a href="#about">About</a>
+        <a href="https://github.com/alanngh/MATH_lab/tree/main" target="_blank" rel="noopener" data-nav="github">GitHub<span class="visually-hidden"> (opens in a new tab)</span></a>
+        <button class="icon-btn" id="themeToggle" type="button" aria-label="Switch to dark theme" title="Switch color theme" aria-pressed="false">
+          <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4.2"></circle>
+            <path d="M12 2.5v2.2M12 19.3v2.2M4.3 4.3l1.6 1.6M18.1 18.1l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.3 19.7l1.6-1.6M18.1 5.9l1.6-1.6"></path>
+          </svg>
+          <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20.5 14.2A8.6 8.6 0 0 1 9.8 3.5a8.6 8.6 0 1 0 10.7 10.7Z"></path>
+          </svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ============ hero: wordmark and device metrics | the class orbit ============ -->
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="container">
+        <div class="hero-stage" id="heroStage">
+          <div class="hero-copy">
+            <h1 class="wordmark" id="hero-title" aria-label="Math Lab"><span class="ch" style="--i:0" aria-hidden="true">M</span><span class="ch" style="--i:1" aria-hidden="true">a</span><span class="ch" style="--i:2" aria-hidden="true">t</span><span class="ch" style="--i:3" aria-hidden="true">h</span><span class="ch space" style="--i:4" aria-hidden="true"></span><span class="ch" style="--i:5" aria-hidden="true">L</span><span class="ch" style="--i:6" aria-hidden="true">a</span><span class="ch" style="--i:7" aria-hidden="true">b</span></h1>
+            <p class="hero-lede">Interactive calculus, one page per idea. Pick a class, open a simulator, move a parameter.</p>
+            <div class="hero-actions">
+              <a class="btn" href="#classes">Choose a class</a>
+              <a class="btn-quiet" href="#browse">Browse every simulator</a>
+            </div>
+            <div class="hero-metrics" id="heroMetrics">
+              <div class="metric">
+                <span class="metric-value" id="metricSims">4</span>
+                <span class="metric-label" id="metricSimsLabel">simulators</span>
+              </div>
+              <div class="metric">
+                <span class="metric-value" id="metricClasses">2</span>
+                <span class="metric-label" id="metricClassesLabel">classes</span>
+              </div>
+              <div class="metric">
+                <span class="metric-value" id="metricSaved">0</span>
+                <span class="metric-label">saved here</span>
+              </div>
+            </div>
+            <p class="device-note" id="deviceNote">Saves and history stay in this browser.</p>
+          </div>
+
+          <div class="portal" id="portal">
+            <div class="portal-stage" id="portalStage">
+              <div class="wheel" id="wheel" role="group" aria-label="Classes" style="--orb: 89px;">
+                <svg class="track" viewBox="0 0 100 100" aria-hidden="true" style="transform: rotate(-1.5708rad);">
+                  <circle cx="50" cy="50" r="34"></circle>
+                  <circle class="dash" cx="50" cy="50" r="34"></circle>
+                </svg>
+                <div class="core" id="core" style="--hue: var(--color-accent);">
+                  <div class="core-inner swap" id="coreInner"><div class="core-kicker">Math Lab</div><h3>Choose a class</h3><p>Every folder in the lab is a class. Pick its orb to open the simulators inside.</p><div class="core-list">4 simulators · 2 classes</div></div>
+                </div>
+                <div id="slots"><div class="slot" style="transform: translate(195.5px, 32.3px);"><div class="f-wrap" style="--dur:4.60s;--delay:0.00s"><button type="button" class="orb" data-id="1226" style="--hue:var(--color-hue-a)" aria-pressed="false" aria-label="1226, 3 simulators"><span class="orb-glyph" aria-hidden="true">1226</span><span class="orb-count">3</span></button><span class="f-label">1226</span></div></div><div class="slot" style="transform: translate(195.5px, 358.7px);"><div class="f-wrap" style="--dur:5.30s;--delay:-1.10s"><button type="button" class="orb" data-id="3214" style="--hue:var(--color-hue-b)" aria-pressed="false" aria-label="3214, 1 simulator"><span class="orb-glyph" aria-hidden="true">3214</span><span class="orb-count">1</span></button><span class="f-label">3214</span></div></div></div>
+              </div>
+              <div class="fpanel" id="fpanel" role="region" aria-label="Simulators in the selected class" aria-hidden="true"></div>
+            </div>
+            <noscript><p class="device-note">The class orbit needs JavaScript. Every simulator is also listed under <a href="#browse">Browse</a>.</p></noscript>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ browse ============ -->
+    <section class="block" id="browse" aria-labelledby="browse-title">
+      <div class="container">
+        <div class="block-head">
+          <h2 id="browse-title">Browse the lab</h2>
+          <p>Search by name, or filter by topic. The heart saves a simulator in this browser.</p>
+        </div>
+
+        <div class="browse-panel">
+          <div class="filters" id="filters" role="search">
+            <label class="search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="6.5"></circle>
+                <path d="m16 16 4.5 4.5"></path>
+              </svg>
+              <span class="visually-hidden">Filter simulations</span>
+              <input id="simSearch" type="search" placeholder="Filter by name or topic" autocomplete="off" spellcheck="false">
+              <button class="search-clear" id="simSearchClear" type="button" aria-label="Clear filter" hidden="">×</button>
+            </label>
+            <div class="filter-tags" id="simTags" role="group" aria-label="Filter by topic"><button type="button" class="filter-tag" aria-pressed="false" data-tag="Approximation">Approximation</button><button type="button" class="filter-tag" aria-pressed="false" data-tag="Calculus">Calculus</button><button type="button" class="filter-tag" aria-pressed="false" data-tag="Integration">Integration</button><button type="button" class="filter-tag" aria-pressed="false" data-tag="Parametric">Parametric</button><button type="button" class="filter-tag" aria-pressed="false" data-tag="Polar">Polar</button><button type="button" class="filter-tag" aria-pressed="false" data-tag="Riemann sums">Riemann sums</button><button type="button" class="filter-tag" aria-pressed="false" data-tag="Series">Series</button><button type="button" class="filter-tag" aria-pressed="false" data-tag="Surfaces">Surfaces</button><button type="button" class="filter-tag" aria-pressed="false" data-tag="Vector calculus">Vector calculus</button></div>
+            <span class="filter-count" id="simCount" aria-live="polite">4 simulations</span>
+          </div>
+
+          <div class="catalog" id="catalog">
+            <!-- AUTO-CATALOG-START -->
+            <div class="collection" data-collection="1226">
+              <header class="collection-head">
+                <div class="collection-meta">
+                  <span class="collection-kicker">Collection</span>
+                  <h3 class="collection-title">1226</h3>
+                  <p class="collection-desc">Simulations grouped for the 1226 course.</p>
+                </div>
+                <span class="collection-count">3 simulators</span>
+              </header>
+              <div class="sim-grid">
+              <div class="sim-hold"><a class="sim-card" href="1226/curve_explorer.html" data-tags="Calculus|Polar|Parametric" data-search="curve explorer trace polar and parametric curves and watch enclosed area and arc length accumulate as the parameter advances. calculus polar parametric" data-title="Curve Explorer">
+                <span class="sim-num">01</span>
+                <div class="sim-body">
+                  <h4 class="sim-name">Curve Explorer</h4>
+                  <p class="sim-desc">Trace polar and parametric curves and watch enclosed area and arc length accumulate as the parameter advances.</p>
+                  <span class="sim-tags"><span class="tag">Calculus</span><span class="tag">Polar</span><span class="tag">Parametric</span></span>
+                </div>
+                <span class="sim-open" aria-hidden="true">Open</span>
+              </a><button type="button" class="save" data-save="1226/curve_explorer.html" data-title="Curve Explorer" aria-pressed="false" aria-label="Save Curve Explorer in this browser" title="Save in this browser"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.9 13a4.6 4.6 0 0 1 6.5-6.5l.6.6.6-.6a4.6 4.6 0 0 1 6.5 6.5Z"></path></svg></button></div>
+              <div class="sim-hold"><a class="sim-card" href="1226/definite_integral_explorer.html" data-tags="Calculus|Integration|Riemann sums" data-search="definite integral explorer shade signed area under a curve, compare it with left, right and midpoint riemann sums, then drag the endpoint to watch the integral accumulate. calculus integration riemann sums" data-title="Definite Integral Explorer">
+                <span class="sim-num">02</span>
+                <div class="sim-body">
+                  <h4 class="sim-name">Definite Integral Explorer</h4>
+                  <p class="sim-desc">Shade signed area under a curve, compare it with left, right and midpoint Riemann sums, then drag the endpoint to watch the integral accumulate.</p>
+                  <span class="sim-tags"><span class="tag">Calculus</span><span class="tag">Integration</span><span class="tag">Riemann sums</span></span>
+                </div>
+                <span class="sim-open" aria-hidden="true">Open</span>
+              </a><button type="button" class="save" data-save="1226/definite_integral_explorer.html" data-title="Definite Integral Explorer" aria-pressed="false" aria-label="Save Definite Integral Explorer in this browser" title="Save in this browser"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.9 13a4.6 4.6 0 0 1 6.5-6.5l.6.6.6-.6a4.6 4.6 0 0 1 6.5 6.5Z"></path></svg></button></div>
+              <div class="sim-hold"><a class="sim-card" href="1226/taylor_polynomial_simulator.html" data-tags="Calculus|Series|Approximation" data-search="taylor polynomial simulator move the center and degree to watch a taylor polynomial lock onto a function, with the remainder isolated on its own axis. calculus series approximation" data-title="Taylor Polynomial Simulator">
+                <span class="sim-num">03</span>
+                <div class="sim-body">
+                  <h4 class="sim-name">Taylor Polynomial Simulator</h4>
+                  <p class="sim-desc">Move the center and degree to watch a Taylor polynomial lock onto a function, with the remainder isolated on its own axis.</p>
+                  <span class="sim-tags"><span class="tag">Calculus</span><span class="tag">Series</span><span class="tag">Approximation</span></span>
+                </div>
+                <span class="sim-open" aria-hidden="true">Open</span>
+              </a><button type="button" class="save" data-save="1226/taylor_polynomial_simulator.html" data-title="Taylor Polynomial Simulator" aria-pressed="false" aria-label="Save Taylor Polynomial Simulator in this browser" title="Save in this browser"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.9 13a4.6 4.6 0 0 1 6.5-6.5l.6.6.6-.6a4.6 4.6 0 0 1 6.5 6.5Z"></path></svg></button></div>
+              </div>
+            </div>
+            <div class="collection" data-collection="3214">
+              <header class="collection-head">
+                <div class="collection-meta">
+                  <span class="collection-kicker">Collection</span>
+                  <h3 class="collection-title">3214</h3>
+                  <p class="collection-desc">Simulations grouped for the 3214 course.</p>
+                </div>
+                <span class="collection-count">1 simulator</span>
+              </header>
+              <div class="sim-grid">
+              <div class="sim-hold"><a class="sim-card" href="3214/surface_openness_simulator.html" data-tags="Calculus|Surfaces|Vector calculus" data-search="surface openness explorer place a point on a surface, grow a probe sphere around it, and read the surface–sphere intersection as the point's local neighbourhood. calculus surfaces vector calculus" data-title="Surface Openness Explorer">
+                <span class="sim-num">04</span>
+                <div class="sim-body">
+                  <h4 class="sim-name">Surface Openness Explorer</h4>
+                  <p class="sim-desc">Place a point on a surface, grow a probe sphere around it, and read the surface–sphere intersection as the point's local neighbourhood.</p>
+                  <span class="sim-tags"><span class="tag">Calculus</span><span class="tag">Surfaces</span><span class="tag">Vector calculus</span></span>
+                </div>
+                <span class="sim-open" aria-hidden="true">Open</span>
+              </a><button type="button" class="save" data-save="3214/surface_openness_simulator.html" data-title="Surface Openness Explorer" aria-pressed="false" aria-label="Save Surface Openness Explorer in this browser" title="Save in this browser"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.3 4.9 13a4.6 4.6 0 0 1 6.5-6.5l.6.6.6-.6a4.6 4.6 0 0 1 6.5 6.5Z"></path></svg></button></div>
+              </div>
+            </div>
+            <!-- AUTO-CATALOG-END -->
+          </div>
+
+          <p class="filter-empty" id="filterEmpty" hidden="">No simulation matches that filter yet. Clear it to see the full catalog, or <a href="#suggest">suggest a simulator</a>.</p>
+          <p class="catalog-empty" id="catalogEmpty" hidden="">No simulations are published yet. Add an HTML page and its metadata file, then run <code>python3 update_index_links.py</code> to file it here.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ suggest ============ -->
+    <section class="block" id="suggest" aria-labelledby="suggest-title">
+      <div class="container">
+        <div class="suggest">
+          <div>
+            <h2 id="suggest-title">Suggest a simulator</h2>
+            <p>Is there a calculus idea you would like to see move? Describe it and it opens as a ready-to-send idea on the project page.</p>
+          </div>
+          <form id="ideaForm" novalidate="">
+            <div class="field">
+              <label for="ideaTitle">Topic</label>
+              <input class="input" id="ideaTitle" maxlength="90" placeholder="e.g. Riemann sums with adjustable partitions" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="ideaBody">What should it show?</label>
+              <textarea class="input" id="ideaBody" maxlength="800" placeholder="Describe the picture, the controls, or the question it should answer."></textarea>
+            </div>
+            <div class="form-row">
+              <button class="btn" type="submit">Send the idea</button>
+              <span class="form-note" id="ideaNote" role="status"></span>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ about ============ -->
+    <section class="block" id="about" aria-labelledby="about-title">
+      <div class="container">
+        <div class="about">
+          <div>
+            <h2 id="about-title">Built while teaching, kept for the next class</h2>
+            <p class="about-lead">I teach mathematics and build the tools I want in front of a room: <strong>small, fast pages</strong> that turn a formula into something a student can grab. The lab collects those experiments as they are made, Taylor polynomials today, whatever the course needs next.</p>
+            <ul class="about-links" role="list">
+              <li><a class="chip" href="https://github.com/alanngh" target="_blank" rel="noopener">GitHub<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"></path></svg></a></li>
+              <li><a class="chip" href="https://github.com/alanngh/MATH_lab/tree/main" target="_blank" rel="noopener">Source repository<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"></path></svg></a></li>
+              <li><a class="chip" href="Licence.md">Licence</a></li>
+            </ul>
+          </div>
+          <div>
+            <ul class="notes" role="list">
+              <li>Each simulation is one HTML file with its own data and styling.</li>
+              <li>Folders group pages by course, and every folder becomes a class orb.</li>
+              <li>A small Python script rewrites this index whenever pages are added.</li>
+            </ul>
+          </div>
+          <p class="about-foot"><!-- AUTO-SIM-COUNT -->4<!-- /AUTO-SIM-COUNT --> simulations across <!-- AUTO-COLLECTION-COUNT -->2<!-- /AUTO-COLLECTION-COUNT --> classes. Last built <!-- AUTO-UPDATED -->2026-11-16<!-- /AUTO-UPDATED -->.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-foot">
+    <div class="container">
+      <div class="foot-inner">
+        <p>© <span id="year">2026</span> Nilton Garcia Hilares, Math Lab</p>
+        <p class="foot-formula" aria-hidden="true">P<sub>n</sub>(x) = Σ<sub>k=0</sub><sup>n</sup> f<sup>(k)</sup>(a)(x−a)<sup>k</sup> / k!</p>
+        <ul class="foot-links" role="list">
+          <li><a href="#browse">Browse</a></li>
+          <li><a href="#suggest">Suggest</a></li>
+          <li><a href="#top">Back to top</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+
+  <script src="assets/index.js"></script>
+
+
+</body></html>

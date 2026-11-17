@@ -4,35 +4,37 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" content="#F2EEE6" id="themeColor">
-  <meta name="description" content="Interactive mathematics by Nilton Garcia Hilares. One self-contained page per idea: open it, move a parameter, watch the idea answer in front of the class.">
+  <meta name="theme-color" content="#EDEADE" id="themeColor">
+  <meta name="description" content="Interactive mathematics by Nilton Garcia Hilares. Each folder in the lab is a class: pick its orb, open a simulator, and move a parameter to watch the mathematics answer.">
   <title>Math Lab. Interactive mathematics by Nilton Garcia Hilares</title>
 
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23B52113'/%3E%3Ctext x='32' y='48' font-family='Georgia,serif' font-size='42' fill='%23151B24' text-anchor='middle'%3E%E2%88%91%3C/text%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23072C2C'/%3E%3Ctext x='32' y='47' font-family='Georgia,serif' font-size='40' fill='%23EDEADE' text-anchor='middle'%3E%E2%88%91%3C/text%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@500&family=Archivo:wght@400;500&family=Oswald:wght@700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Oswald:wght@500;600&family=Ubuntu:wght@400;500;700&display=swap">
   <link rel="stylesheet" href="assets/index.css">
   <link rel="stylesheet" href="assets/index-page.css">
 
   <script>
-    /* Apply the saved theme before first paint. */
+    /* Saved theme wins; otherwise the page opens light like the simulators. */
     (function () {
+      var root = document.documentElement;
+      var theme = "light";
       try {
         var saved = localStorage.getItem("mathlab-theme");
-        if (saved === "dark" || saved === "light") {
-          document.documentElement.setAttribute("data-theme", saved);
-        }
-      } catch (error) { /* private mode: follow the system */ }
+        if (saved === "dark" || saved === "light") theme = saved;
+      } catch (error) { /* private mode */ }
+      root.setAttribute("data-theme", theme);
+      root.classList.add("js");
     })();
   </script>
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
 
-  <header class="site-head on-ink" id="top">
-    <div class="head-inner">
-      <a class="brand" href="#top" aria-label="Math Lab, home">
+  <header class="site-head">
+    <div class="container head-inner">
+      <a class="brand" href="#top" aria-label="Math Lab, back to the top">
         <span class="brand-mark" aria-hidden="true">∑</span>
         <span class="brand-copy">
           <span class="brand-name">Math Lab</span>
@@ -40,15 +42,17 @@
         </span>
       </a>
       <nav class="site-nav" aria-label="Primary">
-        <a href="#simulations">Simulations</a>
+        <a href="#top">Classes</a>
+        <a href="#browse">Browse</a>
+        <a href="#suggest">Suggest</a>
         <a href="#about">About</a>
-        <a href="https://github.com/alanngh/MATH_lab/tree/main" target="_blank" rel="noopener">GitHub<span class="visually-hidden"> (opens in a new tab)</span></a>
+        <a href="https://github.com/alanngh/MATH_lab/tree/main" target="_blank" rel="noopener" data-nav="github">GitHub<span class="visually-hidden"> (opens in a new tab)</span></a>
         <button class="icon-btn" id="themeToggle" type="button" aria-label="Switch to dark theme" title="Switch color theme" aria-pressed="false">
-          <svg class="ico ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+          <svg class="ico-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
             <circle cx="12" cy="12" r="4.2"></circle>
             <path d="M12 2.5v2.2M12 19.3v2.2M4.3 4.3l1.6 1.6M18.1 18.1l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.3 19.7l1.6-1.6M18.1 5.9l1.6-1.6"></path>
           </svg>
-          <svg class="ico ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M20.5 14.2A8.6 8.6 0 0 1 9.8 3.5a8.6 8.6 0 1 0 10.7 10.7Z"></path>
           </svg>
         </button>
@@ -57,167 +61,199 @@
   </header>
 
   <main id="main">
-    <section class="hero" aria-labelledby="hero-title">
+    <!-- ============ hero: wordmark and device metrics | the class orbit ============ -->
+    <section class="hero" id="top" aria-labelledby="hero-title">
       <div class="container">
-        <div class="hero-grid">
+        <div class="hero-stage" id="heroStage">
           <div class="hero-copy">
-            <h1 class="hero-title" id="hero-title">A lab you can put on screen</h1>
-            <p class="hero-lede">Move a parameter and the mathematics answers in front of the class. No install, no account.</p>
+            <h1 class="wordmark" id="hero-title" aria-label="Math Lab">Math Lab</h1>
+            <p class="hero-lede">Interactive calculus, one page per idea. Pick a class, open a simulator, move a parameter.</p>
             <div class="hero-actions">
-              <a class="btn" href="#simulations">Open the catalog</a>
-              <a class="link-quiet" href="#about">How the lab is organized</a>
+              <a class="btn" href="#classes">Choose a class</a>
+              <a class="btn-quiet" href="#browse">Browse every simulator</a>
             </div>
+            <div class="hero-metrics" id="heroMetrics">
+              <div class="metric">
+                <span class="metric-value" id="metricSims">4</span>
+                <span class="metric-label" id="metricSimsLabel">simulators</span>
+              </div>
+              <div class="metric">
+                <span class="metric-value" id="metricClasses">2</span>
+                <span class="metric-label" id="metricClassesLabel">classes</span>
+              </div>
+              <div class="metric">
+                <span class="metric-value" id="metricSaved">0</span>
+                <span class="metric-label">saved here</span>
+              </div>
+            </div>
+            <p class="device-note" id="deviceNote">Counts are read from the catalog. Saves and visits stay in this browser.</p>
           </div>
 
-          <figure class="plate on-ink">
-            <div class="plate-head">
-              <span class="plate-no">Fig. 1</span>
-              <span class="plate-name">sin x and T<sub>n</sub>(x)</span>
-            </div>
-            <div class="plot-frame">
-              <svg id="heroPlot" viewBox="0 0 600 360" role="img" aria-labelledby="plotTitle plotDesc">
-                <title id="plotTitle">Sine and its Taylor polynomial</title>
-                <desc id="plotDesc">A live plot of f(x) = sin x and its Taylor polynomial at a = 0, on the interval minus pi over two to pi over two. Use the degree buttons to change the polynomial.</desc>
-                <g id="plotUnderlay" aria-hidden="true"></g>
-                <path id="curveF" class="curve-f" d=""></path>
-                <path id="curveP" class="curve-p" d=""></path>
-              </svg>
-            </div>
-            <div class="plate-body">
-              <p class="plate-formula" id="plotFormula"><span class="pf-key">T₃(x)</span> = x − x³ / 6</p>
-              <div class="plate-controls">
-                <div class="deg-group" role="group" aria-label="Polynomial degree">
-                  <span class="deg-label" aria-hidden="true">Degree</span>
-                  <button class="deg" type="button" data-n="1" aria-pressed="false">1</button>
-                  <button class="deg" type="button" data-n="3" aria-pressed="true">3</button>
-                  <button class="deg" type="button" data-n="5" aria-pressed="false">5</button>
-                  <button class="deg" type="button" data-n="7" aria-pressed="false">7</button>
-                  <button class="deg" type="button" data-n="9" aria-pressed="false">9</button>
+          <div class="portal" id="classes">
+            <div class="portal-stage" id="portalStage">
+              <div class="wheel" id="wheel" role="group" aria-label="Classes">
+                <svg class="track" viewBox="0 0 100 100" aria-hidden="true">
+                  <circle cx="50" cy="50" r="34"></circle>
+                  <circle class="dash" cx="50" cy="50" r="34"></circle>
+                </svg>
+                <div class="core" id="core">
+                  <div class="core-inner" id="coreInner">
+                    <div class="core-kicker">Math Lab</div>
+                    <h3>Choose a class</h3>
+                    <p>Every folder in the lab is a class. Pick its orb to open the simulators inside.</p>
+                  </div>
                 </div>
-                <p class="plate-readout" aria-live="polite">Largest gap on [−π/2, π/2]<br><strong id="errValue">0.0752</strong></p>
+                <div id="slots"></div>
               </div>
+              <div class="fpanel" id="fpanel" role="region" aria-label="Simulators in the selected class" aria-hidden="true"></div>
             </div>
-            <figcaption class="plate-cap">Every simulator below is built this way: a curve, a control, the number that answers.</figcaption>
-          </figure>
+            <noscript><p class="device-note">The class orbit needs JavaScript. Every simulator is also listed under <a href="#browse">Browse</a>.</p></noscript>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="section" id="simulations" aria-labelledby="simulations-title">
+    <!-- ============ browse ============ -->
+    <section class="block" id="browse" aria-labelledby="browse-title">
       <div class="container">
-        <div class="section-head">
-          <h2 id="simulations-title">The catalog</h2>
-          <span class="filter-count" id="simCount" aria-live="polite"></span>
-          <p>Every page is a single HTML file, grouped by the course it was made for. New simulations appear here as soon as they are added.</p>
+        <div class="block-head">
+          <h2 id="browse-title">Browse the lab</h2>
+          <p>Search by name, or filter by topic. The heart saves a simulator in this browser.</p>
         </div>
 
-        <nav class="collection-jumps" id="collectionJumps" aria-label="Collections" hidden></nav>
-
-        <div class="filters" id="filters" role="search">
-          <label class="search">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
-              <circle cx="11" cy="11" r="6.5"></circle>
-              <path d="m16 16 4.5 4.5"></path>
-            </svg>
-            <span class="visually-hidden">Filter simulations</span>
-            <input id="simSearch" type="search" placeholder="Filter by name or topic" autocomplete="off" spellcheck="false">
-            <button class="search-clear" id="simSearchClear" type="button" aria-label="Clear filter" hidden>×</button>
-          </label>
-          <div class="filter-tags" id="simTags" aria-label="Filter by topic"></div>
-        </div>
-
-        <div class="catalog" id="catalog">
-          <!-- AUTO-CATALOG-START -->
-          <div class="collection" data-collection="1226">
-            <header class="collection-head">
-              <div class="collection-meta">
-                <span class="collection-kicker">Collection</span>
-                <h3 class="collection-title">1226</h3>
-                <p class="collection-desc">Simulations grouped for the 1226 course.</p>
-              </div>
-              <span class="collection-count">3 simulators</span>
-            </header>
-            <div class="sim-grid">
-            <a class="sim-card" href="1226/curve_explorer.html" data-tags="Calculus|Polar|Parametric" data-search="curve explorer trace polar and parametric curves and watch enclosed area and arc length accumulate as the parameter advances. calculus polar parametric">
-              <span class="sim-num">01</span>
-              <div class="sim-body">
-                <h4 class="sim-name">Curve Explorer</h4>
-                <p class="sim-desc">Trace polar and parametric curves and watch enclosed area and arc length accumulate as the parameter advances.</p>
-                <span class="sim-tags"><span class="tag">Calculus</span><span class="tag">Polar</span><span class="tag">Parametric</span></span>
-              </div>
-              <span class="sim-open" aria-hidden="true">Open</span>
-            </a>
-            <a class="sim-card" href="1226/definite_integral_explorer.html" data-tags="Calculus|Integration|Riemann sums" data-search="definite integral explorer shade signed area under a curve, compare it with left, right and midpoint riemann sums, then drag the endpoint to watch the integral accumulate. calculus integration riemann sums">
-              <span class="sim-num">02</span>
-              <div class="sim-body">
-                <h4 class="sim-name">Definite Integral Explorer</h4>
-                <p class="sim-desc">Shade signed area under a curve, compare it with left, right and midpoint Riemann sums, then drag the endpoint to watch the integral accumulate.</p>
-                <span class="sim-tags"><span class="tag">Calculus</span><span class="tag">Integration</span><span class="tag">Riemann sums</span></span>
-              </div>
-              <span class="sim-open" aria-hidden="true">Open</span>
-            </a>
-            <a class="sim-card" href="1226/taylor_polynomial_simulator.html" data-tags="Calculus|Series|Approximation" data-search="taylor polynomial simulator move the center and degree to watch a taylor polynomial lock onto a function, with the remainder isolated on its own axis. calculus series approximation">
-              <span class="sim-num">03</span>
-              <div class="sim-body">
-                <h4 class="sim-name">Taylor Polynomial Simulator</h4>
-                <p class="sim-desc">Move the center and degree to watch a Taylor polynomial lock onto a function, with the remainder isolated on its own axis.</p>
-                <span class="sim-tags"><span class="tag">Calculus</span><span class="tag">Series</span><span class="tag">Approximation</span></span>
-              </div>
-              <span class="sim-open" aria-hidden="true">Open</span>
-            </a>
-            </div>
+        <div class="browse-panel">
+          <div class="filters" id="filters" role="search">
+            <label class="search">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="6.5"></circle>
+                <path d="m16 16 4.5 4.5"></path>
+              </svg>
+              <span class="visually-hidden">Filter simulations</span>
+              <input id="simSearch" type="search" placeholder="Filter by name or topic" autocomplete="off" spellcheck="false">
+              <button class="search-clear" id="simSearchClear" type="button" aria-label="Clear filter" hidden>×</button>
+            </label>
+            <div class="filter-tags" id="simTags" role="group" aria-label="Filter by topic"></div>
+            <span class="filter-count" id="simCount" aria-live="polite"></span>
           </div>
-          <div class="collection" data-collection="3214">
-            <header class="collection-head">
-              <div class="collection-meta">
-                <span class="collection-kicker">Collection</span>
-                <h3 class="collection-title">3214</h3>
-                <p class="collection-desc">Simulations grouped for the 3214 course.</p>
+
+          <div class="catalog" id="catalog">
+            <!-- AUTO-CATALOG-START -->
+            <div class="collection" data-collection="1226">
+              <header class="collection-head">
+                <div class="collection-meta">
+                  <span class="collection-kicker">Collection</span>
+                  <h3 class="collection-title">1226</h3>
+                  <p class="collection-desc">Single-variable calculus: polar curves, definite integrals and Taylor series.</p>
+                </div>
+                <span class="collection-count">3 simulators</span>
+              </header>
+              <div class="sim-grid">
+              <a class="sim-card" href="1226/curve_explorer.html" data-tags="Calculus|Polar|Parametric" data-search="curve explorer trace polar and parametric curves and watch enclosed area and arc length accumulate as the parameter advances. calculus polar parametric">
+                <span class="sim-num">01</span>
+                <div class="sim-body">
+                  <h4 class="sim-name">Curve Explorer</h4>
+                  <p class="sim-desc">Trace polar and parametric curves and watch enclosed area and arc length accumulate as the parameter advances.</p>
+                  <span class="sim-tags"><span class="tag">Calculus</span><span class="tag">Polar</span><span class="tag">Parametric</span></span>
+                </div>
+                <span class="sim-open" aria-hidden="true">Open</span>
+              </a>
+              <a class="sim-card" href="1226/definite_integral_explorer.html" data-tags="Calculus|Integration|Riemann sums" data-search="definite integral explorer shade signed area under a curve, compare it with left, right and midpoint riemann sums, then drag the endpoint to watch the integral accumulate. calculus integration riemann sums">
+                <span class="sim-num">02</span>
+                <div class="sim-body">
+                  <h4 class="sim-name">Definite Integral Explorer</h4>
+                  <p class="sim-desc">Shade signed area under a curve, compare it with left, right and midpoint Riemann sums, then drag the endpoint to watch the integral accumulate.</p>
+                  <span class="sim-tags"><span class="tag">Calculus</span><span class="tag">Integration</span><span class="tag">Riemann sums</span></span>
+                </div>
+                <span class="sim-open" aria-hidden="true">Open</span>
+              </a>
+              <a class="sim-card" href="1226/taylor_polynomial_simulator.html" data-tags="Calculus|Series|Approximation" data-search="taylor polynomial simulator move the center and degree to watch a taylor polynomial lock onto a function, with the remainder isolated on its own axis. calculus series approximation">
+                <span class="sim-num">03</span>
+                <div class="sim-body">
+                  <h4 class="sim-name">Taylor Polynomial Simulator</h4>
+                  <p class="sim-desc">Move the center and degree to watch a Taylor polynomial lock onto a function, with the remainder isolated on its own axis.</p>
+                  <span class="sim-tags"><span class="tag">Calculus</span><span class="tag">Series</span><span class="tag">Approximation</span></span>
+                </div>
+                <span class="sim-open" aria-hidden="true">Open</span>
+              </a>
               </div>
-              <span class="collection-count">1 simulator</span>
-            </header>
-            <div class="sim-grid">
-            <a class="sim-card" href="3214/surface_openness_simulator.html" data-tags="Calculus|Surfaces|Vector calculus" data-search="surface openness explorer place a point on a surface, grow a probe sphere around it, and read the surface–sphere intersection as the point&#x27;s local neighbourhood. calculus surfaces vector calculus">
-              <span class="sim-num">04</span>
-              <div class="sim-body">
-                <h4 class="sim-name">Surface Openness Explorer</h4>
-                <p class="sim-desc">Place a point on a surface, grow a probe sphere around it, and read the surface–sphere intersection as the point&#x27;s local neighbourhood.</p>
-                <span class="sim-tags"><span class="tag">Calculus</span><span class="tag">Surfaces</span><span class="tag">Vector calculus</span></span>
-              </div>
-              <span class="sim-open" aria-hidden="true">Open</span>
-            </a>
             </div>
+            <div class="collection" data-collection="3214">
+              <header class="collection-head">
+                <div class="collection-meta">
+                  <span class="collection-kicker">Collection</span>
+                  <h3 class="collection-title">3214</h3>
+                  <p class="collection-desc">Several-variable calculus: surfaces, neighbourhoods and local behaviour.</p>
+                </div>
+                <span class="collection-count">1 simulator</span>
+              </header>
+              <div class="sim-grid">
+              <a class="sim-card" href="3214/surface_openness_simulator.html" data-tags="Calculus|Surfaces|Vector calculus" data-search="surface openness explorer place a point on a surface, grow a probe sphere around it, and read the surface–sphere intersection as the point&#x27;s local neighbourhood. calculus surfaces vector calculus">
+                <span class="sim-num">04</span>
+                <div class="sim-body">
+                  <h4 class="sim-name">Surface Openness Explorer</h4>
+                  <p class="sim-desc">Place a point on a surface, grow a probe sphere around it, and read the surface–sphere intersection as the point&#x27;s local neighbourhood.</p>
+                  <span class="sim-tags"><span class="tag">Calculus</span><span class="tag">Surfaces</span><span class="tag">Vector calculus</span></span>
+                </div>
+                <span class="sim-open" aria-hidden="true">Open</span>
+              </a>
+              </div>
+            </div>
+            <!-- AUTO-CATALOG-END -->
           </div>
-          <!-- AUTO-CATALOG-END -->
+
+          <p class="filter-empty" id="filterEmpty" hidden>No simulation matches that filter yet. Clear it to see the full catalog, or <a href="#suggest">suggest a simulator</a>.</p>
+          <p class="catalog-empty" id="catalogEmpty" hidden>No simulations are published yet. Add an HTML page and its metadata file, then run <code>python3 update_index_links.py</code> to file it here.</p>
         </div>
-
-        <p class="filter-empty" id="filterEmpty" hidden>No simulation matches that filter yet. Clear it to see the full catalog, or <a href="#about">read how the lab is organized</a>.</p>
-
-        <p class="catalog-empty" id="catalogEmpty" hidden>No simulations are published yet. Add an HTML page and its metadata file, then run <code>python3 update_index_links.py</code> to file it here.</p>
       </div>
     </section>
 
-    <section class="colophon-wrap" id="about" aria-labelledby="about-title">
+    <!-- ============ suggest ============ -->
+    <section class="block" id="suggest" aria-labelledby="suggest-title">
       <div class="container">
-        <div class="colophon">
+        <div class="suggest">
+          <div>
+            <h2 id="suggest-title">Suggest a simulator</h2>
+            <p>Is there a calculus idea you would like to see move? Describe it and it opens as a ready-to-send idea on the project page.</p>
+          </div>
+          <form id="ideaForm" novalidate>
+            <div class="field">
+              <label for="ideaTitle">Topic</label>
+              <input class="input" id="ideaTitle" maxlength="90" placeholder="e.g. Riemann sums with adjustable partitions" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="ideaBody">What should it show?</label>
+              <textarea class="input" id="ideaBody" maxlength="800" placeholder="Describe the picture, the controls, or the question it should answer."></textarea>
+            </div>
+            <div class="form-row">
+              <button class="btn" type="submit">Send the idea</button>
+              <span class="form-note" id="ideaNote" role="status"></span>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ about ============ -->
+    <section class="block" id="about" aria-labelledby="about-title">
+      <div class="container">
+        <div class="about">
           <div>
             <h2 id="about-title">Built while teaching, kept for the next class</h2>
-            <p class="colophon-lead">I teach mathematics and build the tools I want in front of a room: <strong>small, fast pages</strong> that turn a formula into something a student can grab. The lab collects those experiments as they are made, Taylor polynomials today, whatever the course needs next.</p>
-            <ul class="colophon-links" role="list">
+            <p class="about-lead">I teach mathematics and build the tools I want in front of a room: <strong>small, fast pages</strong> that turn a formula into something a student can grab. The lab collects those experiments as they are made, Taylor polynomials today, whatever the course needs next.</p>
+            <ul class="about-links" role="list">
               <li><a class="chip" href="https://github.com/alanngh" target="_blank" rel="noopener">GitHub<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
               <li><a class="chip" href="https://github.com/alanngh/MATH_lab/tree/main" target="_blank" rel="noopener">Source repository<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></li>
               <li><a class="chip" href="Licence.md">Licence</a></li>
             </ul>
           </div>
-          <div class="colophon-side">
-            <h3>How the lab is organized</h3>
+          <div>
             <ul class="notes" role="list">
               <li>Each simulation is one HTML file with its own data and styling.</li>
-              <li>Folders group pages by course, and the catalog reads that structure.</li>
+              <li>Folders group pages by course, and every folder becomes a class orb.</li>
               <li>A small Python script rewrites this index whenever pages are added.</li>
             </ul>
           </div>
-          <p class="colophon-foot"><!-- AUTO-SIM-COUNT -->4<!-- /AUTO-SIM-COUNT --> simulations across <!-- AUTO-COLLECTION-COUNT -->2<!-- /AUTO-COLLECTION-COUNT --> collections. Last built <!-- AUTO-UPDATED -->2026-11-16<!-- /AUTO-UPDATED -->.</p>
+          <p class="about-foot"><!-- AUTO-SIM-COUNT -->4<!-- /AUTO-SIM-COUNT --> simulations across <!-- AUTO-COLLECTION-COUNT -->2<!-- /AUTO-COLLECTION-COUNT --> classes. Last built <!-- AUTO-UPDATED -->2026-11-17<!-- /AUTO-UPDATED -->.</p>
         </div>
       </div>
     </section>
@@ -228,357 +264,15 @@
       <div class="foot-inner">
         <p>© <span id="year">2026</span> Nilton Garcia Hilares, Math Lab</p>
         <p class="foot-formula" aria-hidden="true">P<sub>n</sub>(x) = Σ<sub>k=0</sub><sup>n</sup> f<sup>(k)</sup>(a)(x−a)<sup>k</sup> / k!</p>
-        <p><a href="#top">Back to top</a></p>
+        <ul class="foot-links" role="list">
+          <li><a href="#browse">Browse</a></li>
+          <li><a href="#suggest">Suggest</a></li>
+          <li><a href="#top">Back to top</a></li>
+        </ul>
       </div>
     </div>
   </footer>
 
-  <script>
-    (function () {
-      "use strict";
-
-      var root = document.documentElement;
-      var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-      /* ---------------- theme ---------------- */
-      var themeButton = document.getElementById("themeToggle");
-      var themeColor = document.getElementById("themeColor");
-
-      function systemTheme() {
-        return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      }
-      function activeTheme() {
-        var explicit = root.getAttribute("data-theme");
-        return explicit === "dark" || explicit === "light" ? explicit : systemTheme();
-      }
-      function syncThemeButton() {
-        var dark = activeTheme() === "dark";
-        themeButton.setAttribute("aria-pressed", dark ? "true" : "false");
-        themeButton.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
-        if (themeColor) themeColor.setAttribute("content", dark ? "#1B2029" : "#F2EEE6");
-      }
-      themeButton.addEventListener("click", function () {
-        var next = activeTheme() === "dark" ? "light" : "dark";
-        root.setAttribute("data-theme", next);
-        try { localStorage.setItem("mathlab-theme", next); } catch (error) { /* ignore */ }
-        syncThemeButton();
-      });
-      syncThemeButton();
-
-      /* ---------------- year ---------------- */
-      var year = document.getElementById("year");
-      if (year) year.textContent = String(new Date().getFullYear());
-
-      /* ---------------- catalog filter ---------------- */
-      var filters = document.getElementById("filters");
-      var searchInput = document.getElementById("simSearch");
-      var clearButton = document.getElementById("simSearchClear");
-      var tagRow = document.getElementById("simTags");
-      var countEl = document.getElementById("simCount");
-      var catalog = document.getElementById("catalog");
-      var emptyEl = document.getElementById("filterEmpty");
-      var catalogEmpty = document.getElementById("catalogEmpty");
-
-      var cards = catalog ? Array.prototype.slice.call(catalog.querySelectorAll(".sim-card")) : [];
-      var collections = catalog ? Array.prototype.slice.call(catalog.querySelectorAll(".collection")) : [];
-      var activeTag = "";
-      var noun = function (n) { return n === 1 ? "simulation" : "simulations"; };
-
-      if (catalogEmpty && cards.length === 0) catalogEmpty.hidden = false;
-
-      /* Collection jumps: only useful once there are several collections. */
-      var jumpNav = document.getElementById("collectionJumps");
-      if (jumpNav && collections.length > 1) {
-        var label = document.createElement("span");
-        label.className = "jump-label";
-        label.textContent = "Jump to";
-        jumpNav.appendChild(label);
-        collections.forEach(function (collection, index) {
-          var titleEl = collection.querySelector(".collection-title");
-          if (!titleEl) return;
-          var id = "collection-" + (index + 1);
-          collection.id = id;
-          var link = document.createElement("a");
-          link.href = "#" + id;
-          link.textContent = titleEl.textContent;
-          jumpNav.appendChild(link);
-        });
-        jumpNav.hidden = false;
-      }
-
-      /* Build the topic filters from the tags the generator emitted. */
-      var tagCounts = {};
-      var tagOrder = [];
-      cards.forEach(function (card) {
-        (card.getAttribute("data-tags") || "").split("|").forEach(function (tag) {
-          tag = tag.trim();
-          if (!tag) return;
-          if (!(tag in tagCounts)) { tagCounts[tag] = 0; tagOrder.push(tag); }
-          tagCounts[tag] += 1;
-        });
-      });
-      tagOrder.sort(function (a, b) { return a.toLowerCase().localeCompare(b.toLowerCase()); });
-
-      if (tagRow) {
-        tagOrder.forEach(function (tag) {
-          var button = document.createElement("button");
-          button.type = "button";
-          button.className = "filter-tag";
-          button.setAttribute("aria-pressed", "false");
-          button.setAttribute("data-tag", tag);
-          button.textContent = tag;
-          tagRow.appendChild(button);
-        });
-      }
-
-      function cardMatches(card) {
-        var query = searchInput ? searchInput.value.trim().toLowerCase() : "";
-        if (activeTag) {
-          var tags = (card.getAttribute("data-tags") || "").split("|").map(function (t) {
-            return t.trim().toLowerCase();
-          });
-          if (tags.indexOf(activeTag.toLowerCase()) === -1) return false;
-        }
-        if (query) {
-          var haystack = (card.getAttribute("data-search") || "") + " " + card.textContent.toLowerCase();
-          if (haystack.toLowerCase().indexOf(query) === -1) return false;
-        }
-        return true;
-      }
-
-      function applyFilter() {
-        var shown = 0;
-        cards.forEach(function (card) {
-          var match = cardMatches(card);
-          card.hidden = !match;
-          if (match) shown += 1;
-        });
-        collections.forEach(function (collection) {
-          var visible = collection.querySelector(".sim-card:not([hidden])");
-          collection.classList.toggle("is-hidden", !visible);
-        });
-        var filtering = shown !== cards.length;
-        if (filters) filters.classList.toggle("is-empty", filtering && shown === 0);
-        if (emptyEl) emptyEl.hidden = !(filtering && shown === 0);
-        if (countEl) {
-          countEl.textContent = shown === cards.length
-            ? cards.length + " " + noun(cards.length)
-            : shown + " of " + cards.length + " " + noun(cards.length);
-        }
-        if (clearButton) clearButton.hidden = !(searchInput && searchInput.value);
-        if (catalog) catalog.classList.toggle("is-filtered", filtering);
-      }
-
-      if (searchInput) {
-        searchInput.addEventListener("input", applyFilter);
-        searchInput.addEventListener("keydown", function (event) {
-          if (event.key === "Escape" && searchInput.value) {
-            searchInput.value = "";
-            applyFilter();
-          }
-        });
-      }
-      if (clearButton) {
-        clearButton.addEventListener("click", function () {
-          if (searchInput) searchInput.value = "";
-          applyFilter();
-          if (searchInput) searchInput.focus();
-        });
-      }
-      if (tagRow) {
-        tagRow.addEventListener("click", function (event) {
-          var button = event.target.closest("button[data-tag]");
-          if (!button) return;
-          var tag = button.getAttribute("data-tag");
-          activeTag = activeTag === tag ? "" : tag;
-          Array.prototype.forEach.call(tagRow.querySelectorAll("button[data-tag]"), function (other) {
-            other.setAttribute("aria-pressed", other.getAttribute("data-tag") === activeTag ? "true" : "false");
-          });
-          applyFilter();
-        });
-      }
-      applyFilter();
-
-      /* ---------------- hero figure ----------------
-         f(x) = sin x with its Taylor polynomial at a = 0. */
-      var svg = document.getElementById("heroPlot");
-      var underlay = document.getElementById("plotUnderlay");
-      var curveF = document.getElementById("curveF");
-      var curveP = document.getElementById("curveP");
-      var formulaEl = document.getElementById("plotFormula");
-      var errorEl = document.getElementById("errValue");
-      var degreeButtons = document.querySelectorAll(".deg");
-
-      var W = 600, H = 360, PAD = 14;
-      var X_MIN = -4.3, X_MAX = 4.3, Y_MIN = -2.2, Y_MAX = 2.2;
-      var MAX_DEGREE = 9;
-      var SUB = "₀₁₂₃₄₅₆₇₈₉";
-
-      function xToPx(x) { return PAD + (x - X_MIN) / (X_MAX - X_MIN) * (W - 2 * PAD); }
-      function yToPx(y) { return H - PAD - (y - Y_MIN) / (Y_MAX - Y_MIN) * (H - 2 * PAD); }
-
-      function factorial(k) {
-        var out = 1;
-        for (var i = 2; i <= k; i++) out *= i;
-        return out;
-      }
-
-      function coeffsFor(degree) {
-        var c = new Array(MAX_DEGREE + 1).fill(0);
-        for (var k = 1; k <= degree; k += 2) {
-          c[k] = (Math.floor((k - 1) / 2) % 2 === 0 ? 1 : -1) / factorial(k);
-        }
-        return c;
-      }
-
-      function polyAt(coeffs, x) {
-        var y = 0, power = x;
-        for (var k = 1; k <= MAX_DEGREE; k += 2) {
-          y += coeffs[k] * power;
-          power *= x * x;
-        }
-        return y;
-      }
-
-      function buildPath(coeffs) {
-        var d = "", drawing = false, samples = 460;
-        for (var i = 0; i <= samples; i++) {
-          var x = X_MIN + (X_MAX - X_MIN) * i / samples;
-          var y = polyAt(coeffs, x);
-          if (!isFinite(y) || Math.abs(y) > 7) { drawing = false; continue; }
-          d += (drawing ? " L" : " M") + xToPx(x).toFixed(1) + " " + yToPx(y).toFixed(1);
-          drawing = true;
-        }
-        return d.trim();
-      }
-
-      function drawUnderlay() {
-        var svgNS = "http://www.w3.org/2000/svg";
-        function el(name, attrs) {
-          var node = document.createElementNS(svgNS, name);
-          for (var key in attrs) node.setAttribute(key, attrs[key]);
-          underlay.appendChild(node);
-          return node;
-        }
-        var halfPi = Math.PI / 2;
-
-        el("rect", {
-          x: xToPx(-halfPi).toFixed(1), y: PAD,
-          width: (xToPx(halfPi) - xToPx(-halfPi)).toFixed(1),
-          height: H - 2 * PAD, "class": "plot-band"
-        });
-
-        var x;
-        for (x = Math.ceil(X_MIN); x <= Math.floor(X_MAX); x++) {
-          if (x === 0) continue;
-          el("line", { x1: xToPx(x).toFixed(1), y1: PAD, x2: xToPx(x).toFixed(1), y2: H - PAD, "class": "plot-grid-line" });
-        }
-        var y;
-        for (y = Math.ceil(Y_MIN); y <= Math.floor(Y_MAX); y++) {
-          if (y === 0) continue;
-          el("line", { x1: PAD, y1: yToPx(y).toFixed(1), x2: W - PAD, y2: yToPx(y).toFixed(1), "class": "plot-grid-line" });
-        }
-
-        el("line", { x1: PAD, y1: yToPx(0).toFixed(1), x2: W - PAD, y2: yToPx(0).toFixed(1), "class": "plot-axis" });
-        el("line", { x1: xToPx(0).toFixed(1), y1: PAD, x2: xToPx(0).toFixed(1), y2: H - PAD, "class": "plot-axis" });
-
-        el("line", { x1: xToPx(-halfPi).toFixed(1), y1: PAD, x2: xToPx(-halfPi).toFixed(1), y2: H - PAD, "class": "plot-pi" });
-        el("line", { x1: xToPx(halfPi).toFixed(1), y1: PAD, x2: xToPx(halfPi).toFixed(1), y2: H - PAD, "class": "plot-pi" });
-
-      }
-
-      function drawSine() {
-        var d = "", samples = 460;
-        for (var i = 0; i <= samples; i++) {
-          var x = X_MIN + (X_MAX - X_MIN) * i / samples;
-          d += (i === 0 ? " M" : " L") + xToPx(x).toFixed(1) + " " + yToPx(Math.sin(x)).toFixed(1);
-        }
-        curveF.setAttribute("d", d.trim());
-      }
-
-      function formulaFor(degree) {
-        var terms = ["x"];
-        for (var k = 3; k <= degree; k += 2) {
-          var sign = Math.floor((k - 1) / 2) % 2 === 0 ? " + " : " − ";
-          var sup = ["", "", "", "³", "", "⁵", "", "⁷", "", "⁹"][k];
-          terms.push(sign + "x" + sup + " / " + factorial(k).toLocaleString("en-US"));
-        }
-        return '<span class="pf-key">T' + SUB[degree] + "(x)</span> = " + terms.join("");
-      }
-
-      function maxError(degree) {
-        var coeffs = coeffsFor(degree);
-        var halfPi = Math.PI / 2;
-        var worst = 0;
-        for (var i = 0; i <= 400; i++) {
-          var x = -halfPi + (2 * halfPi) * i / 400;
-          worst = Math.max(worst, Math.abs(Math.sin(x) - polyAt(coeffs, x)));
-        }
-        return worst;
-      }
-
-      function formatError(value) {
-        if (value === 0) return "0";
-        var superscripts = "⁰¹²³⁴⁵⁶⁷⁸⁹";
-        if (value < 0.001) {
-          var parts = value.toExponential(2).split("e-");
-          var exponent = parts[1].replace(/\d/g, function (digit) {
-            return superscripts[Number(digit)];
-          });
-          return parts[0] + " × 10⁻" + exponent;
-        }
-        return value.toFixed(4);
-      }
-
-      var current = coeffsFor(3);
-      var frame = null;
-
-      function renderPolynomial() { curveP.setAttribute("d", buildPath(current)); }
-
-      function animateTo(next) {
-        cancelAnimationFrame(frame);
-        var from = current.slice();
-        if (reduceMotion) {
-          current = next.slice();
-          renderPolynomial();
-          return;
-        }
-        var start = performance.now();
-        var duration = 440;
-        function step(now) {
-          var t = Math.min(1, (now - start) / duration);
-          var eased = 1 - Math.pow(1 - t, 3);
-          for (var k = 0; k <= MAX_DEGREE; k++) {
-            current[k] = from[k] + (next[k] - from[k]) * eased;
-          }
-          renderPolynomial();
-          if (t < 1) frame = requestAnimationFrame(step);
-        }
-        frame = requestAnimationFrame(step);
-      }
-
-      function setDegree(degree) {
-        animateTo(coeffsFor(degree));
-        if (formulaEl) formulaEl.innerHTML = formulaFor(degree);
-        if (errorEl) errorEl.textContent = formatError(maxError(degree));
-      }
-
-      degreeButtons.forEach(function (button) {
-        button.addEventListener("click", function () {
-          var degree = Number(button.dataset.n);
-          degreeButtons.forEach(function (other) {
-            other.setAttribute("aria-pressed", other === button ? "true" : "false");
-          });
-          setDegree(degree);
-        });
-      });
-
-      drawUnderlay();
-      drawSine();
-      renderPolynomial();
-      if (formulaEl) formulaEl.innerHTML = formulaFor(3);
-      if (errorEl) errorEl.textContent = formatError(maxError(3));
-    })();
-  </script>
+  <script src="assets/index.js"></script>
 </body>
 </html>

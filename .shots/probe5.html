@@ -1,0 +1,19 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body>
+<pre id="out" style="font:12px monospace;white-space:pre-wrap"></pre>
+<script>
+var f=document.createElement("iframe"); f.style.cssText="width:1440px;height:1000px;border:0"; f.src="../index.html#classes/1226";
+f.onload=function(){ setTimeout(function(){
+ var d=f.contentDocument,w=f.contentWindow;
+ function b(s){var e=d.querySelector(s); if(!e) return s+": MISSING"; var r=e.getBoundingClientRect(); return s+": "+[r.x,r.y,r.width,r.height].map(Math.round).join(",")+" pos="+w.getComputedStyle(e).position;}
+ document.getElementById("out").textContent=[
+  "heroStage=["+d.getElementById("heroStage").className+"]",
+  "portal=["+d.getElementById("classes").className+"]",
+  "scrollY="+w.scrollY,
+  b(".hero-stage"), b(".hero-copy"), b("h1.wordmark"), b(".portal"), b(".portal-stage"), b(".wheel"), b(".fpanel"), b(".flist"), b(".core"),
+  "fpanelLen="+d.getElementById("fpanel").innerHTML.length,
+  "wheel transform="+w.getComputedStyle(d.getElementById("wheel")).transform,
+  "grid cols="+w.getComputedStyle(d.getElementById("heroStage")).gridTemplateColumns
+ ].join("\n");
+},2500);};
+document.body.appendChild(f);
+</script></body></html>

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../assets/index.css">
+<link rel="stylesheet" href="../assets/index-page.css">
+</head>
+<body>
+<h1 class="wordmark" id="w">Math Lab</h1>
+<button class="orb" style="--hue:var(--color-hue-a); width:92px; height:92px"><span class="orb-glyph">12</span></button>
+<pre id="out"></pre>
+<script>
+var w = getComputedStyle(document.getElementById("w"));
+var o = getComputedStyle(document.querySelector(".orb"));
+var root = getComputedStyle(document.documentElement);
+document.getElementById("out").textContent = [
+  "wordmark color: " + w.color,
+  "wordmark font: " + w.fontFamily,
+  "--color-ink: " + root.getPropertyValue("--color-ink"),
+  "--color-accent: " + root.getPropertyValue("--color-accent"),
+  "orb bg: " + o.backgroundImage.slice(0, 160),
+  "orb hue: [" + o.getPropertyValue("--hue") + "]"
+].join("\n");
+</script>
+</body>
+</html>

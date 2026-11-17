@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><style>html,body{margin:0}iframe{width:1440px;height:1000px;border:0}</style></head>
+<body>
+<iframe id="f" src="../index.html#classes/1226"></iframe>
+<pre id="out" style="font:12px monospace;white-space:pre-wrap"></pre>
+<script>
+setTimeout(function () {
+  var d = document.getElementById("f").contentDocument;
+  var w = document.getElementById("f").contentWindow;
+  function box(sel) {
+    var el = d.querySelector(sel);
+    if (!el) return sel + ": MISSING";
+    var r = el.getBoundingClientRect();
+    var cs = w.getComputedStyle(el);
+    return sel + ": " + [r.x, r.y, r.width, r.height].map(function (n) { return Math.round(n); }).join(",") +
+      " display=" + cs.display + " vis=" + cs.visibility + " op=" + cs.opacity;
+  }
+  var lines = [];
+  lines.push("viewport " + w.innerWidth + "x" + w.innerHeight);
+  ["header.site-head", ".hero", "h1.wordmark", ".hero-lede", ".hero-actions", ".hero-metrics", ".device-note",
+   ".portal", ".portal-stage", ".wheel", ".core", ".fpanel", ".flist", ".frow", ".fhead", ".ftitle"].forEach(function (s) {
+    lines.push(box(s));
+  });
+  lines.push("orbs: " + d.querySelectorAll(".orb").length);
+  lines.push("slots: " + d.querySelectorAll(".slot").length);
+  lines.push("open? " + d.getElementById("portal").className);
+  lines.push("heroStage? " + d.getElementById("heroStage").className);
+  var orbs = d.querySelectorAll(".slot");
+  for (var i = 0; i < orbs.length; i++) lines.push("slot " + i + " " + orbs[i].style.transform);
+  document.getElementById("out").textContent = lines.join("\n");
+}, 3000);
+</script>
+</body>
+</html>

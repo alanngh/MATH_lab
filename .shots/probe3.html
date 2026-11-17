@@ -1,0 +1,27 @@
+<!doctype html>
+<html><head><meta charset="utf-8"></head><body>
+<pre id="out" style="font:12px monospace;white-space:pre-wrap"></pre>
+<script>
+var lines = [];
+var f = document.createElement("iframe");
+f.style.cssText = "width:1440px;height:1000px;border:0";
+f.src = "../index.html#classes/1226";
+f.onload = function () {
+  var w = f.contentWindow;
+  w.addEventListener("error", function (e) { lines.push("ERROR: " + e.message + " @" + e.filename + ":" + e.lineno); });
+  setTimeout(check, 400);
+  setTimeout(check, 1500);
+  setTimeout(check, 3000);
+};
+var done = 0;
+function check() {
+  done++;
+  var d = f.contentDocument, w = f.contentWindow;
+  var portal = d.getElementById("classes");
+  var fp = d.getElementById("fpanel");
+  lines.push("t" + done + " hash=" + w.location.hash + " portal=[" + portal.className + "] fpanelLen=" + fp.innerHTML.length + " aria=" + fp.getAttribute("aria-hidden") + " heroStage=[" + d.getElementById("heroStage").className + "]");
+  if (done >= 3) document.getElementById("out").textContent = lines.join("\n");
+}
+document.body.appendChild(f);
+</script>
+</body></html>

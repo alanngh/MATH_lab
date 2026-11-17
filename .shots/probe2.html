@@ -1,0 +1,29 @@
+<!doctype html>
+<html><head><meta charset="utf-8"></head><body>
+<pre id="out" style="font:12px monospace;white-space:pre-wrap"></pre>
+<script>
+var f = document.createElement("iframe");
+f.style.cssText = "width:1440px;height:1000px;border:0";
+f.src = "../index.html#classes/1226";
+document.body.appendChild(f);
+setTimeout(function () {
+  var d = f.contentDocument, w = f.contentWindow;
+  var lede = d.querySelector(".hero-lede");
+  var cs = w.getComputedStyle(lede);
+  var lines = [];
+  lines.push("hash: " + w.location.hash);
+  lines.push("lede animName: " + cs.animationName + " dur=" + cs.animationDuration + " delay=" + cs.animationDelay + " fill=" + cs.animationFillMode + " play=" + cs.animationPlayState + " op=" + cs.opacity);
+  lines.push("lede rect: " + JSON.stringify(lede.getBoundingClientRect()));
+  lines.push("portal class: [" + d.getElementById("portal").className + "]");
+  lines.push("heroStage class: [" + d.getElementById("heroStage").className + "]");
+  lines.push("fpanel aria: " + d.getElementById("fpanel").getAttribute("aria-hidden"));
+  lines.push("fpanel html len: " + d.getElementById("fpanel").innerHTML.length);
+  lines.push("portal --S: " + w.getComputedStyle(d.getElementById("portal")).getPropertyValue("--S"));
+  lines.push("stage min-height: " + w.getComputedStyle(d.getElementById("portalStage")).minHeight);
+  lines.push("stage height: " + d.getElementById("portalStage").getBoundingClientRect().height);
+  lines.push("wheel height: " + d.getElementById("wheel").getBoundingClientRect().height);
+  lines.push("matches reduced: " + w.matchMedia("(prefers-reduced-motion: reduce)").matches);
+  document.getElementById("out").textContent = lines.join("\n");
+}, 3500);
+</script>
+</body></html>
