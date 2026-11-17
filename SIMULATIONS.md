@@ -37,8 +37,18 @@ Rules the generator enforces:
 | Files or folders starting with `_` | Skipped — use for templates, drafts, retired pages |
 | Files or folders starting with `.` | Skipped |
 | Any other `*.html` | Becomes a catalog card |
+| An empty course folder at the root | Becomes an empty class (0 simulators) |
+| A folder with `_collection.json` | Becomes a class, even with no pages yet |
+| Other folders with no pages | Not listed (e.g. `assets/`, a notes folder) |
 
 So to retire a page without deleting it, rename it `_old_name.html`.
+
+A class with no pages yet shows its orb as "soon" and an empty list that
+links to the suggestion form, so a course can be announced before its first
+simulator.
+
+`AUTO-UPDATED` records the date the catalog last *changed*, not the last time
+the script ran. Running `--check` the day after a build still exits 0.
 
 ## 2. Metadata
 

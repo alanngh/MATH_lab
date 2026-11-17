@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vector Field Path Explorer</title>
+<style>
+:root{--bg:#0b1220;--panel:#111c31;--panel2:#16243d;--text:#e8eefc;--muted:#9eb0cf;--accent:#63d297;--accent2:#66a6ff;--danger:#ff7b7b;--grid:#263754;--axis:#7f95b8}
+*{box-sizing:border-box} body{margin:0;background:linear-gradient(135deg,#09101c,#101b31);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,sans-serif;min-height:100vh}
+.app{display:grid;grid-template-columns:310px minmax(0,1fr);min-height:100vh}.sidebar{padding:22px;background:rgba(10,18,33,.92);border-right:1px solid #263652;overflow:auto}.brand{font-size:22px;font-weight:750;letter-spacing:.2px;margin-bottom:4px}.subtitle{color:var(--muted);line-height:1.4;margin:0 0 20px}.section{border-top:1px solid #263652;padding-top:17px;margin-top:17px}.section h2{font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:#b9c9e7;margin:0 0 11px}.row{display:flex;gap:9px;align-items:center;margin:9px 0}.row label{min-width:28px;color:#c9d6ed;font-weight:650}.expr{width:100%;background:#0a1426;color:#f4f7ff;border:1px solid #385073;border-radius:7px;padding:9px 10px;font:15px ui-monospace,SFMono-Regular,Menlo,monospace}.expr:focus{outline:2px solid rgba(99,210,151,.3);border-color:var(--accent)}select,input[type=number]{width:100%;background:#0a1426;color:var(--text);border:1px solid #385073;border-radius:7px;padding:8px}button{border:0;border-radius:7px;padding:9px 11px;background:var(--accent);color:#082015;font-weight:700;cursor:pointer}button:hover{filter:brightness(1.08)}button.secondary{background:#243a60;color:#dbe8ff}button.danger{background:#633545;color:#ffe2e2}.buttons{display:flex;gap:8px;flex-wrap:wrap}.hint{color:var(--muted);font-size:12px;line-height:1.45}.check{display:flex;gap:9px;align-items:center;color:#cbd8ee;margin:10px 0}.check input{accent-color:var(--accent);width:auto}.readout{background:#0a1426;border:1px solid #263e62;border-radius:8px;padding:11px;line-height:1.55;color:#dce8fb}.readout strong{color:var(--accent)}.main{padding:22px;display:flex;flex-direction:column;min-width:0}.topbar{display:flex;align-items:flex-start;justify-content:space-between;gap:15px;margin-bottom:15px}.topbar h1{font-size:25px;margin:0 0 5px}.topbar p{margin:0;color:var(--muted)}.badge{border:1px solid #315477;color:#9dc1f2;border-radius:999px;padding:7px 11px;white-space:nowrap;font-size:12px}.canvas-wrap{position:relative;flex:1;min-height:540px;background:#08111f;border:1px solid #2a4164;border-radius:12px;overflow:hidden;box-shadow:0 12px 35px #0004}.canvas-wrap canvas{display:block;width:100%;height:100%;cursor:crosshair}.legend{position:absolute;left:15px;bottom:13px;background:#08111ddd;border:1px solid #30496d;border-radius:7px;padding:8px 10px;color:#b9c9e7;font-size:12px}.footer-note{margin-top:12px;color:var(--muted);font-size:13px}.error{color:#ffaaa5;font-size:12px;min-height:18px;margin-top:5px}@media(max-width:850px){.app{grid-template-columns:1fr}.sidebar{border-right:0;border-bottom:1px solid #263652}.canvas-wrap{min-height:65vh}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar">
+  <div class="brand">Vector Field Explorer</div>
+  <p class="subtitle">Sketch a planar vector field, then click a point to trace the integral curve through it.</p>
+  <div class="section">
+    <h2>Vector field</h2>
+    <div class="row"><label>P =</label><input id="pExpr" class="expr" value="-y" aria-label="P expression"></div>
+    <div class="row"><label>Q =</label><input id="qExpr" class="expr" value="x" aria-label="Q expression"></div>
+    <div id="error" class="error"></div>
+    <div class="row"><label for="preset">Cases</label><select id="preset"><option value="rotation">Rotation: (−y, x)</option><option value="radial">Radial source: (x, y)</option><option value="sink">Sink: (−x, −y)</option><option value="saddle">Saddle: (x, −y)</option><option value="spiral">Spiral sink: (−x−y, x−y)</option><option value="shear">Shear: (y, 0)</option><option value="custom">Custom</option></select></div>
+    <button id="apply">Apply field</button>
+  </div>
+  <div class="section">
+    <h2>Plot controls</h2>
+    <div class="row"><label for="xMin">x</label><input id="xMin" type="number" value="-5"><span>to</span><input id="xMax" type="number" value="5"></div>
+    <div class="row"><label for="yMin">y</label><input id="yMin" type="number" value="-5"><span>to</span><input id="yMax" type="number" value="5"></div>
+    <div class="row"><label for="density">Arrows</label><input id="density" type="number" min="5" max="35" value="17"></div>
+    <label class="check"><input id="normalize" type="checkbox" checked> Normalize arrow lengths</label>
+    <label class="check"><input id="showGrid" type="checkbox" checked> Show grid and axes</label>
+  </div>
+  <div class="section">
+    <h2>Integral curve</h2>
+    <div class="row"><label for="step">Step</label><input id="step" type="number" min="0.005" max="0.5" step="0.005" value="0.04"></div>
+    <div class="row"><label for="steps">Steps</label><input id="steps" type="number" min="10" max="3000" value="700"></div>
+    <div class="buttons"><button id="clear" class="secondary">Clear path</button><button id="reverse" class="secondary">Reverse direction</button></div>
+    <p class="hint">Click directly on the plot. The curve is computed by integrating both forward and backward from the selected point.</p>
+  </div>
+  <div class="section"><div class="readout" id="readout">Click the field to choose an initial point.</div></div>
+</aside>
+<main class="main">
+  <div class="topbar"><div><h1>Vector Field Path Explorer</h1><p>Explore how a vector field determines motion and flow lines.</p></div><div class="badge">Green: vector field · Orange: path</div></div>
+  <div class="canvas-wrap"><canvas id="plot"></canvas><div class="legend">Click anywhere to trace the corresponding path</div></div>
+  <div class="footer-note">Use <code>x</code>, <code>y</code>, <code>^</code>, <code>sin</code>, <code>cos</code>, <code>exp</code>, <code>sqrt</code>, <code>abs</code>, and <code>pi</code> in custom expressions.</div>
+</main>
+</div>
+<script>
+const $=id=>document.getElementById(id), canvas=$("plot"), ctx=canvas.getContext("2d");
+let field={p:"-y",q:"x",P:(x,y)=>-y,Q:(x,y)=>x}, path=null, reverse=false;
+const presets={rotation:["-y","x"],radial:["x","y"],sink:["-x","-y"],saddle:["x","-y"],spiral:["-x-y","x-y"],shear:["y","0"]};
+function compile(s){let z=s.toLowerCase().replace(/π/g,"pi").replace(/\^/g,"**").replace(/\bpi\b/g,"Math.PI").replace(/\be\b/g,"Math.E");["sin","cos","tan","asin","acos","atan","exp","sqrt","abs","log","floor","ceil"].forEach(n=>z=z.replace(new RegExp('\\b'+n+'\\b','g'),'Math.'+n));return new Function('x','y','return '+z+';')}
+function applyField(){try{let p=$("pExpr").value.trim(),q=$("qExpr").value.trim(),P=compile(p),Q=compile(q);[[-2.1,1.7],[0,0],[2.4,-1.3]].forEach(([x,y])=>{if(!Number.isFinite(P(x,y))||!Number.isFinite(Q(x,y)))throw Error('Expressions must return numbers.');});field={p,q,P,Q};$("error").textContent="";path=null;draw()}catch(e){$("error").textContent="Check the expressions: "+e.message}}
+$("preset").addEventListener("change",e=>{let v=e.target.value;if(presets[v]){$("pExpr").value=presets[v][0];$("qExpr").value=presets[v][1];applyField()}});$("apply").onclick=applyField;
+["xMin","xMax","yMin","yMax","density","step","steps","normalize","showGrid"].forEach(id=>$(id).addEventListener("input",draw));$("clear").onclick=()=>{path=null;draw()};$("reverse").onclick=()=>{reverse=!reverse;draw()};
+function bounds(){return{x0:+$("xMin").value,x1:+$("xMax").value,y0:+$("yMin").value,y1:+$("yMax").value}}
+function resize(){let r=canvas.getBoundingClientRect(),d=devicePixelRatio||1;canvas.width=r.width*d;canvas.height=r.height*d;ctx.setTransform(d,0,0,d,0,0);draw()}addEventListener("resize",resize);
+function map(){let b=bounds(),w=canvas.clientWidth,h=canvas.clientHeight;return{x:X=>((X-b.x0)/(b.x1-b.x0))*w,y:Y=>h-((Y-b.y0)/(b.y1-b.y0))*h,ix:px=>b.x0+px/w*(b.x1-b.x0),iy:py=>b.y0+(h-py)/h*(b.y1-b.y0),w,h}}
+function arrow(x,y,dx,dy,color="#63d297",scale=1){let L=Math.hypot(dx,dy)||1, ux=dx/L,uy=dy/L, len=9*scale;ctx.strokeStyle=color;ctx.fillStyle=color;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+dx,y+dy);ctx.stroke();ctx.beginPath();ctx.moveTo(x+dx,y+dy);ctx.lineTo(x+dx-len*ux+len*.48*uy,y+dy-len*uy-len*.48*ux);ctx.lineTo(x+dx-len*ux-len*.48*uy,y+dy-len*uy+len*.48*ux);ctx.closePath();ctx.fill()}
+function drawGrid(m){let b=bounds();ctx.clearRect(0,0,m.w,m.h);ctx.fillStyle="#08111f";ctx.fillRect(0,0,m.w,m.h);if(!$('showGrid').checked)return;ctx.lineWidth=1;ctx.strokeStyle="#1c2c47";for(let x=Math.ceil(b.x0);x<=b.x1;x++){let px=m.x(x);ctx.beginPath();ctx.moveTo(px,0);ctx.lineTo(px,m.h);ctx.stroke()}for(let y=Math.ceil(b.y0);y<=b.y1;y++){let py=m.y(y);ctx.beginPath();ctx.moveTo(0,py);ctx.lineTo(m.w,py);ctx.stroke()}ctx.strokeStyle="#7188ab";ctx.lineWidth=1.4;if(b.x0<=0&&b.x1>=0){let px=m.x(0);ctx.beginPath();ctx.moveTo(px,0);ctx.lineTo(px,m.h);ctx.stroke()}if(b.y0<=0&&b.y1>=0){let py=m.y(0);ctx.beginPath();ctx.moveTo(0,py);ctx.lineTo(m.w,py);ctx.stroke()}}
+function draw(){
+  const m=map();
+  if(!Number.isFinite(m.w)||!Number.isFinite(m.h)||m.w<=0||m.h<=0)return;
+  drawGrid(m);
+  const n=Math.max(5,Math.min(35,Number($("density").value)||17));
+  const b=bounds();
+  if(!(b.x1>b.x0&&b.y1>b.y0))return;
+  const dx=(b.x1-b.x0)/(n-1),dy=(b.y1-b.y0)/(n-1),vals=[];
+  for(let j=0;j<n;j++)for(let i=0;i<n;i++){
+    const x=b.x0+i*dx,y=b.y0+j*dy;
+    try{const u=field.P(x,y),v=field.Q(x,y);if(Number.isFinite(u)&&Number.isFinite(v))vals.push(Math.hypot(u,v));}catch{}
+  }
+  const max=Math.max(...vals,1);
+  const base=Math.min(m.w/(n+1),m.h/(n+1))*.62;
+  for(let j=0;j<n;j++)for(let i=0;i<n;i++){
+    const x=b.x0+i*dx,y=b.y0+j*dy;
+    try{
+      const u=field.P(x,y),v=field.Q(x,y),mag=Math.hypot(u,v);
+      if(!Number.isFinite(mag)||mag<1e-12)continue;
+      const length=$("normalize").checked?base:base*Math.min(2.2,mag/max*2.2);
+      arrow(m.x(x),m.y(y),u/mag*length,-v/mag*length,"#63d297",1);
+    }catch{}
+  }
+  if(path){ctx.strokeStyle="#ff9b61";ctx.lineWidth=3;ctx.shadowColor="#ff9b61aa";ctx.shadowBlur=8;ctx.beginPath();path.forEach((p,i)=>{const px=m.x(p[0]),py=m.y(p[1]);i?ctx.lineTo(px,py):ctx.moveTo(px,py)});ctx.stroke();ctx.shadowBlur=0;const s=path[Math.floor(path.length/2)];if(s){ctx.fillStyle="#ffd1b8";ctx.beginPath();ctx.arc(m.x(s[0]),m.y(s[1]),4,0,7);ctx.fill()}const start=path[Math.floor(path.length/2)];ctx.fillStyle="#fff";ctx.strokeStyle="#ff9b61";ctx.lineWidth=2;ctx.beginPath();ctx.arc(m.x(start[0]),m.y(start[1]),6,0,7);ctx.fill();ctx.stroke();}
+}
+function deriv(x,y){let u=field.P(x,y),v=field.Q(x,y);return[Number.isFinite(u)?u:0,Number.isFinite(v)?v:0]}
+function rk4(x,y,h){let [k1x,k1y]=deriv(x,y),[k2x,k2y]=deriv(x+h*k1x/2,y+h*k1y/2),[k3x,k3y]=deriv(x+h*k2x/2,y+h*k2y/2),[k4x,k4y]=deriv(x+h*k3x,y+h*k3y);return[x+h*(k1x+2*k2x+2*k3x+k4x)/6,y+h*(k1y+2*k2y+2*k3y+k4y)/6]}
+function trace(x,y){let h=+$("step").value, count=+$("steps").value, b=bounds(), result=[];for(let dir of [-1,1]){let pts=[[x,y]],cx=x,cy=y;for(let i=0;i<count;i++){let next=rk4(cx,cy,h*dir);if(!Number.isFinite(next[0])||!Number.isFinite(next[1])||Math.abs(next[0])>Math.max(Math.abs(b.x0),Math.abs(b.x1))*5+10||Math.abs(next[1])>Math.max(Math.abs(b.y0),Math.abs(b.y1))*5+10)break;pts.push(next);cx=next[0];cy=next[1]}if(dir<0)pts.reverse();result=dir<0?pts.concat(result.slice(1)):result.concat(pts.slice(1))}return reverse?result.reverse():result}
+canvas.addEventListener("click",e=>{let r=canvas.getBoundingClientRect(),m=map(),x=m.ix(e.clientX-r.left),y=m.iy(e.clientY-r.top);path=trace(x,y);let [u,v]=deriv(x,y);$("readout").innerHTML=`Initial point: <strong>(${x.toFixed(3)}, ${y.toFixed(3)})</strong><br>Vector: <strong>(${u.toFixed(3)}, ${v.toFixed(3)})</strong><br>Path points: <strong>${path.length}</strong>`;draw()});
+applyField();resize();
+</script>
+</body>
+</html>
